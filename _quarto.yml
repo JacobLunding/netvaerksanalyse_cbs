@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "Kursusmateriale til Virksomhedsstrategi i et netværksperspektiv"
+  title: "Virksomhedsstrategi i et netværksperspektiv"
   navbar:
     left:
       - href: index.qmd
