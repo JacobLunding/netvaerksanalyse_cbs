@@ -1,0 +1,64 @@
+---
+title: "Virksomhedsstrategi i et netværksperspektiv"
+---
+
+```{r, echo = F}
+# Load necessary libraries
+library(rvest)
+
+# URL of the RStudio releases page
+url <- "https://posit.co/download/rstudio-desktop/"
+
+# Read the HTML content from the page
+page <- read_html(url)
+
+# Extract the version information
+version <- page %>%
+  html_nodes("a") %>%
+  html_attr("href") %>%
+  trimws()
+version <- version[which(grepl("\\.exe", version))]
+
+```
+
+Undervisere:
+
+Lasse Folke Henriksen, IOA: Office hours mandag 10.00-11.20 (efter aftale)
+
+Christoph Houman Ellersgaard, IOA: Office hours mandag 9.00-10.20 (efter aftale)
+
+Jacob Aagaard Lunding, IOA: Office hours fredag 13.40 - 15.00 (efter aftale)
+
+**Kursets formål**
+
+Kurset introducerer til virksomhedsstrategi i et netværksperspektiv. Virksomheder og deres medarbejdere er afhængige af deres omverden og en helt central måde er at knytte an til omverdenen gennem netværk af forskellig art. Virksomheder konkurrerer og samarbejder med andre organisationer via netværk, som bl.a. giver dem adgang til ressourcer, som de er afhængige af. Kurset udstyrer de studerende med redskaber fra netværksanalyse til at forstå hvordan interne såvel som eksterne netværk indvirker på virksomhedens strategiske processer. 
+
+Kurset har tre elementer. Første del giver en introduktion til forskellige **teorier om ’virksomhedsstrategi i netværksperspektiv’** og eksemplificerer teorierne gennem brug af cases. Anden del indfører de studerende i **metodiske redskaber fra netværksanalysen**. Tredje del har fokus på **anvendelse af netværksanalyse** på konkrete cases og giver de studerende mulighed for at lave en konkret netværksanalyse af et intra- eller inter-organisatorisk netværk som vil være grundlag for eksamensopgaven. Forbindelsen mellem teori og metode i konkrete caseanalyser har prioritet ligesom de praktisk-strategiske implikationer af virksomhedsnetværk løbende vil blive diskuteret gennem kurset.
+
+**Øvelserne**
+
+| Uge(r):       | Hold | Tid                   | Lokale    |
+|---------------|------|-----------------------|-----------|
+| 6, 8-12       | XB   | Fredag 8:00 - 9:40    | DH.V.1.23 |
+| 8             | XB   | Torsdag 8:00 - 9:40   | DH.V.1.23 |
+| 6, 8-12       | XC   | Fredag 9:50 - 11.30   | DH.V.1.23 |
+| 8             | XC   | Torsdag 9:50 - 11:30  | DH.V.1.23 |
+| 6, 8-9, 11-12 | XA   | Fredag 12:35 - 14.15  | DH.V.1.23 |
+| 8             | XA   | Torsdag 12:35 - 14:15 | DH.V.1.23 |
+| 10            | XA   | Fredag 11:40 - 13.20  | DH.V.0.30 |
+
+Over de næste 7 uger bliver I alle sammen kompetente brugere af [programmeringssproget R](https://en.wikipedia.org/wiki/R_(programming_language)) og programmet [RStudio](https://en.wikipedia.org/wiki/RStudio), som er en slags *kode-editor*, der gør det nemmere at skrive, teste og køre kode. Med de kompetencer vil I ikke bare få en indsigt i tidens *data science*. I øvelserne kommer i også til at træne og udvikle jeres *hand-on skills* i kodning og avanceret computerbrug.
+
+I løbet af øvelserne skal vi arbejde med at indsamle, behandle og visualiserer relationelle data (i denne sammenhæng, data der kan studeres som netværk). Det er forhåbentlig nogle egenskaber, I vil kunne drage nytte af i jeres fremtidige studier og arbejdsliv.
+
+Som med så meget andet nyt vil de første par uger måske virke frustrerende for nogle. Programmeringstilgangen til databehandling (i modsætning til peg-og-klik-programmer) er måske ny for jer. Frustrationen er naturlig og forventet(!). Den bedste vej igennem er at **møde op** til øvelserne, hvor det også er muligt at stille spørgsmål og få konkret hjælp. Tålmodighed er desuden en dyd i denne sammenhæng. Selvom læringskurven kan være stejl, vil I efter et par uger allerede være mere fortrolige med at læse og skrive R kode.
+
+Under fanen [Install and setup R](Install_guide.html) finder I en kommenteret guide til at installere den seneste version af **R (`r R.version$version.string %>% gsub("R version ", "",.)`)** and **Rstudio (`r version %>% gsub("(.*?/RStudio-)(.*?(?=\\.exe))(.*)", "\\2", ., perl = T)`)**.
+
+::: callout-note
+Det er **vigtigt** at I har disse versioner installeret på jeres computere, når vi starter, da nogle af de funktioner og pakker vi skal bruge til netværks-analyse kun virker i disse.
+:::
+
+Vi ses til øvelserne!!
+
+Jacob
