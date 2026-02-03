@@ -1,0 +1,99 @@
+---
+title: "Setting up (or updating) R and RStudio"
+author: "Jacob Aagaard Lunding"
+---
+
+```{r, echo=F}
+# Load necessary libraries
+library(rvest)
+
+# URL of the RStudio releases page
+url <- "https://posit.co/download/rstudio-desktop/"
+
+# Read the HTML content from the page
+page <- read_html(url)
+
+# Extract the version information
+version <- page %>%
+  html_nodes("a") %>%
+  html_attr("href") %>%
+  trimws()
+version <- version[which(grepl("\\.exe", version))]
+
+```
+
+------------------------------------------------------------------------
+
+## Opsætning af R og RStudio
+
+Det første I skal gøre er at sikre jer at alle har den samme, seneste, version af R og RStudio installeret. Mange af jer har formentlig taget et statistikkursus af en eller anden art, hvor I har installeret R og RStudio. **Men**... hvis I ikke har brugt det siden eller ikke har opdateret programmerne er de formentlig forældede og erstattet af nye. Der kommer nye versioner hele tiden. Lad os derfor slette/afinstallere de gamle versioner først.
+
+> Hvis du aldrig har installeret R eller RStudio på din computer kan du springer over denne del og hoppe direkte videre til [Installér R]
+
+### Afinstallér R og RStudio
+
+#### For MacOs brugere
+
+Det er relativt simpelt at afinstallere R og RStudio. Gå til din applications folder og flyt RStudio til trash ved at højre-klikke på applications ikonet. Gør det samme for R applicationen.
+
+![Slet RStudio på Mac](images/Screen%20Shot%202023-01-25%20at%2015.07.40.png){fig-align="center" width="600" fig.pos="H"}
+
+![Slet R på Mac](images/Screen%20Shot%202023-01-25%20at%2015.09.10.png){fig-align="center" width="600" fig.pos="H"}
+
+#### For Windows brugere
+
+At afinstallere de to programmer i Windows er også relativt simpelt. Gå til 'Apps & features', som findes 'settings'. Her finder du en liste over alle apps/programmer på din computer. "R for Windows (version number)" og RStudio og afinstallér dem. Se de to screenshots.
+
+![Slet RStudio på Windows 10](images/Screenshot%20(19).jpg){fig-align="center" width="600"}
+
+![Slet R på Windows 10](images/Screenshot%20(18).jpg){fig-align="center" width="600"}
+
+### Installér R
+
+Download den seneste version af R fra [cran](https://cran.rstudio.com/). Vælg dit styresystem:
+
+-   Hvis du er på en windows computer, klik på 'base' og på 'Download R X.X.X for Windows' (i stedet for X.X.X vil der være tal som indikere versionen, den nyeste)
+
+-   Hvis du er på en Mac, klik på .pkg-filen under 'latest release', som hedder noget i retning af R-X.X.X.pkg, ligesom windows-versionen. Her skal I vide om I har en ældre eller nyere Mac (ca. før og efter 2020).
+
+-   Hvis du er på en Linux computer, kan du følge denne [guide](https://cran.r-project.org/bin/linux/ubuntu/README.html).
+
+Then install the programming language. You don't need to adapt the default install options during installation.
+
+::: callout-note
+Bemærk at den version af R vi bruger i dette kursus er **`r R.version$version.string`**.
+:::
+
+### Installér RStudio
+
+Når du har installeret R, er næste skridt at installere RStudio. Følg dette link til [RStudio](https://posit.co/download/rstudio-desktop/). Almindeligvis vil hjemmesiden allerede have registretet dit styre system og du kan bare klikke download og fortsætte.
+
+Hvis ikke, så scroll ned på siden, hvor der findes en list af download links til forskellige styresystemer.
+
+[![Options på https://posit.co/download/rstudio-desktop/](images/Rstudio.png){fig-align="center" width="600"}](https://posit.co/download/rstudio-desktop/)
+
+::: callout-note
+Bemærk at den version af **Rstudio** vi bruger i dette kursus er **`r version %>% gsub("(.*?/RStudio)(.*?(?=\\.exe))(.*)", "\\2", ., perl = T)`**.
+:::
+
+### Klar, parat, start!
+
+Nu skulle R og RStudio gerne være opdateret/installeret på jeres computere og vi er klar til at komme i gang med at skrive og læse kode.
+
+Inden vi går videre skal I have downloadet zip-filen med r-projektet *virkstrat_netvaerk* her:
+
+[Download Data](data/virkstrat.zip){.btn .btn-primary}
+
+eller fra kursets canvas-side.
+
+Den fil indeholder følgende filer og mapper:
+
+![Indhold af zip-filen](images/Screenshot%20from%202025-02-03%2020-33-04.png){width="100%"}
+
+(og skal i øvrigt opdateres med filer, jeg løbende lægger op på Canvas):
+
+Download zip-filen og pak den ud et fornuftigt sted på jeres harddisk (så I ved hvor I har den), det kunne fx. være i den mappe i har jeres andre studierelevante ting i, så som noter o.l.
+
+Hvis I sørger for altid at åbne *virkstrat_netvaerk.Rproj* filen enten ved at dobbeltklikke på den, eller åbne den inde fra R-studio øverste højre hjørne (hvor den vil ligge som 'recent projects' hvis den *har* været åbnet før). Hvis ikke skal I finde den under *open project...* (hvor I 'browser' jer frem til der hvor filen ligger).
+
+Vi ses Jacob

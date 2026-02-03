@@ -1,0 +1,113 @@
+---
+title: "Sammenhængskraft, Densitet, kliker og strukturelle huller"
+---
+
+```{r, message = F}
+library(tidyverse)
+library(Matrix)
+library(igraph)
+library(ggraph)
+```
+
+# Transportsektoren i det danske elitenetværk
+
+## Data: Det danske elitenetværk
+
+```{r, warning=FALSE, message = FALSE}
+den <- read_csv("data/den17-no-nordic-letters.csv")
+```
+
+Vha funktionen `show.all.tags()` fra `custom_functions.R` i functionsmappen, kan vi studere og udvælge specifikke tags, vi synes skal med for at indfange et bestemt område: [Download costumfunctions.R her](functions/custom_functions.R){.btn .btn-primary}
+
+```{r}
+source("functions/custom_functions.R")
+head(show.all.tags(den), 25)
+```
+
+## Subset: Tags
+
+Lad os i det følgende kigge på mødesteder, e.g. bestyrelser, råd, nævn m.v., i det danske elitenetværk (2017), der tematisk kan siges at udgøre transportområdet. Det gør vi vha. `has.tags()` funktionen i `custom_functions.R`
+
+```{r, }
+transport <- c("BILH","Cars", "Public transport", "TRAN", "Transport", "Traffic", "Infrastructure", "VL", "Roads")
+den_sub   <- has.tags(den, tags = transport, result = "den", mode = "or")
+
+```
+
+```{r}
+den_sub <- den_sub %>% group_by(name) %>% mutate(n_afil = n_distinct(affiliation))
+den_sub <- den_sub %>% filter(n_afil > 1)
+```
+
+## Grafobjekt
+
+Vi laver en sparse incidence eller bipartite adjacency matrix. Dvs en matrice med individer (`name`) i rækker og virksomheder m.v. (`affiliation`) i kolonner:
+
+```{r}
+bi_adj <- xtabs(formula = ~ name + affiliation, data = den_sub, sparse = TRUE)
+```
+
+Og laver vha matrix multiplikation $individ \times individ$ matricen:
+
+```{r}
+adj <-  bi_adj %*% t(bi_adj)
+```
+
+Jeg vil gerne vide hvilke værdier vores matrice indeholder. Så jeg kan overveje om den er vægtet eller ej. Da det er en sparse matrice vi har lavet kan vi dog ikke lave en simple `table()`. `str()` fortæller os hvad dataobjektet indeholder.
+
+```{r}
+str(adj)
+```
+
+`@x` indeholder matrices værdier (ud over 0): Så kan vi tælle:
+
+```{r}
+table(adj@x)
+```
+
+Der er altså (444 + 23 + 5 + 1 + 1 = `r 444 + 23 + 5 + 1 + 1`) / 2 individer, der mødes mere end et sted. Så der er en mulighed for at lade edges være vægtede. I dette eksempel vælger jeg at se bort fra vægten (dvs vi *undlader* at skrive `weighted = TRUE`).
+
+```{r}
+gr    <- adj %>% graph_from_adjacency_matrix(mode = "undirected", diag = FALSE) %>% simplify()
+gr
+```
+
+```{r}
+gr %>% ggraph() +
+  geom_edge_link0(edge_width = 0.3, edge_alpha = .5) +
+  geom_node_point() +
+  theme_graph()
+```
+
+# Sammenhængskraft - *Cohesion*
+
+I det følgende skal vi se på forskellige måder at at studere et netværks 'sammenhængskraft' eller forbundethed. Hvor sammenfiltret er det?
+
+## Densitet: `edge_density()`
+
+Det mest simple og intuitive mål for 'sammenfiltrethed' er at udtrykke det faktiske antal af forbindelser i et netværk som en andel af de teoretisk mulige.
+
+Lad os sige vi har et netværk med $n=25$ individer. Hvis alle har en forbindelse til alle vil der være: $$n \times (n-1)$$ forbindelser, hvis forbindelserne er retningsbestemte, så $A \rightarrow B \nRightarrow A \leftarrow B$, dvs. forbindelsen A-B medfører ikke nødvendigvis forbindelsen B-A.
+
+og $$(n \times (n-1)) \over 2$$ forbindelser, hvis forbindelserne er symmetriske per definition, $A - B = B-A$.
+
+Det kalder vi det teoretiske max og densiteten er således: $$
+{E \over n \times (n-1)} \quad \text{eller} \quad {2E \over n \times (n-1)}, \quad \text{hvor er det faktiske antal forbindelser} 
+$$
+
+```{r, echo = F}
+teo_max <- tibble(nodes = c(2:10000)) %>% mutate(teo_max = (nodes * (nodes -1))/2)
+options(scipen = 999)
+ggplot(teo_max) + 
+  geom_line(aes(x = nodes, y = teo_max)) + 
+  scale_y_continuous(labels = scales::comma, name = "Teoretisk max") +
+  scale_x_continuous(labels = scales::comma, name = "Antal noder") +
+  theme_bw(base_family = "serif") 
+
+```
+
+```{r}
+transitivity(largest_component(gr))
+```
+
+[Download nye funktioner her](functions/networkfunctions.R){.btn .btn-primary}

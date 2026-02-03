@@ -1,0 +1,558 @@
+---
+title: "Indsamling af netværksdata og konstruktion af netværksobjekter"
+---
+
+```{r, echo = F, message=F}
+# Load necessary packages
+library(igraph)
+library(ggraph)
+library(patchwork)
+# Define nodes
+directors <- c("Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", 
+               "Henry", "Ivy", "Jack", "Kevin", "Laura", "Olivia", "Ryan", 
+               "Sophia", "Noah", "Mia", "Lucas", "Emma", "Daniel")
+
+companies <- c("Tesla", "Google", "Microsoft", "Amazon", "Apple", "Netflix", "Meta", "IBM")
+
+# Define edges (director-company board memberships)
+edges <- c(
+  # Directors serving multiple companies
+  "Alice", "Tesla",
+  "Alice", "Google",
+  "Alice", "Meta",
+  "Bob", "Tesla",
+  "Charlie", "Google",
+  "Charlie", "Microsoft",
+  "Charlie", "Apple",
+  "Diana", "Microsoft",
+  "Diana", "Apple",
+  "Diana", "Meta",
+  "Eve", "Apple",
+  "Eve", "Netflix",
+  "Frank", "Tesla",
+  "Frank", "IBM",
+  "Grace", "Apple",
+  "Grace", "Google",
+  "Grace", "IBM",
+  "Henry", "Amazon",
+  "Henry", "Microsoft",
+  "Henry", "Netflix",
+  "Ivy", "Tesla",
+  "Ivy", "IBM",
+  "Jack", "Google",
+  "Jack", "Meta",
+  "Jack", "IBM",
+  "Kevin", "Amazon",  # Previously added unique director
+  "Laura", "IBM",     # Previously added unique director
+  
+  # NEW: Unique directors for each company
+  "Olivia", "Tesla",
+  "Ryan", "Google",
+  "Sophia", "Microsoft",
+  "Noah", "Amazon",
+  "Mia", "Apple",
+  "Lucas", "Netflix",
+  "Emma", "Meta",
+  "Daniel", "IBM"
+)
+# Create a bipartite graph
+g <- make_graph(edges, directed = FALSE)
+
+# Assign node types: 0 for students, 1 for clubs
+V(g)$type <- V(g)$name %in% companies
+
+p1 <- ggraph(g, "kk") +
+  geom_edge_link(aes(edge_alpha = 0.8), color = "gray") +
+  geom_node_point(aes(color = type, shape = type, size = type)) +
+  geom_node_label(aes(label = name, color = type), repel = TRUE, show.legend = FALSE,size = 5, family = "serif") +
+  scale_color_manual(values = c("salmon1", "steelblue2"), labels = c("Bestyrelsesmedlem", "Virksomhed"), name = "") +
+  scale_shape_manual(values = c(20, 18), labels = c("Bestyrelsesmedlem", "Virksomhed"), name = "") +
+  scale_size_manual(values = c(6, 10), labels = c("Bestyrelsesmedlem", "Virksomhed"), name = "") +
+  theme_graph(base_family = "serif") + guides(edge_alpha = "none", color = guide_legend(position = "bottom")) +
+  ggtitle( "Two-Mode Network:", subtitle = "(Bestyrelsesmedlemmer <-> Virksomheder)") + theme(title = element_text(size = 8))
+
+# Create Student Projection (One-Mode)
+student_proj <- bipartite_projection(g)$proj1
+
+# Plot the student projection
+p2 <- ggraph(student_proj, "kk") +
+  geom_edge_link(aes(edge_alpha = 0.8), color = "gray") +
+  geom_node_point(color = "salmon1", size = 6, shape = 20) +
+  geom_node_text(aes(label = name), repel = TRUE, size = 5) +
+  theme_graph(base_family = "serif") + guides(edge_alpha = "none") +
+  ggtitle("Medlems-projektion", subtitle = "(delte bestyrelsmedlemskaber)") + theme(title = element_text(size = 8))
+
+# Create Club Projection (One-Mode)
+club_proj <- bipartite_projection(g)$proj2
+
+# Plot the club projection
+p3 <- ggraph(club_proj, layout = "fr") +
+  geom_edge_link(aes(edge_alpha = 0.8), color = "gray") +
+  geom_node_point(color ="steelblue2", size = 6, shape =18) +
+  geom_node_text(aes(label = name), repel = TRUE, size = 5) +
+  theme_graph(base_family = "serif") + guides(edge_alpha = "none") +
+  ggtitle("Virksomheds-projektion", subtitle = "(delte bestyrelsesmedlemmer)") + theme(title = element_text(size = 8))
+
+p <- (p1 / (p2 | p3)) 
+ggsave(filename = "images/session2.png", plot = p, width = 20, height = 30, units = c("cm"))
+
+```
+
+# Vigtige spørgsmål ift netværksdata
+
+::: callout-note
+Som med al anden indsamling af samfundsvidenskabelig data er det også med netværksanalyse meget vigtig at man forholder sig til en række metodologiske og videnskabsteoretiske spørgsmål, allerede i den fase, hvor man overvejer hvilken data man vil indsamle(/bruge) og hvordan man vil indsamle(/bruge) det!
+:::
+
+I social netværksanalyse behandler vi data *relationelt*, dvs. vi har nogle enheder (mennesker, virksomheder, 'ideer/begreber', hjemmesider), som vi antager indgår i nogle relationer, som vi gerne vil strudere på en systematisk måde. Det betyder at vi på et visuelt plan hele tiden arbejder med punkter (vertices eller noder) der er forbundet (eller ikke forbundet) af streger (edges):
+
+::::: grid
+::: g-col-6
+![](images/Screenshot%20from%202025-02-17%2011-43-34.png){width="50%"}
+:::
+
+::: g-col-6
+![](images/Screenshot%20from%202025-02-17%2011-52-41.png){width="50%"}
+:::
+:::::
+
+Det rejser nogle vigtige spørgsmål:
+
+1.  Hvad er en relation?
+
+    -   Er det medlemskaber (som i figuren til højre, de to blå punkter er begge medlem af det røde punkt), er det venskaber/kendskaber (som i figuren til venstre de tre blå punkter kender hinanden). Er relationen samtidig? dvs. Er de to blå punkter fx. medlem af den samme klub nu(!) eller er det nok (for vores analyse) at de begge har været med på et tidspunkt, men ikke nødvendigvis samtidig? En forbindelse kan også udtrykke udveklingsrelationer. Er det fx to virksomheder der sender penge eller varer til hinanden? Eller kampagnedonationer til politikere/partier? Relationer kan også være mere abstrakte, fx. relationer mellem ideer og begreber, fx semantiske relationer eller referencer - "forfatter B" trækker på "forfatter A"s ideer osv. På mange måder mulighederne uendelige. Det vigtigste er at man er eksplicit og tydelig omkring hvad man mener man kigger på. Det har nemlig stor betydning for om man faktisk viser det man tror man viser i sine analyser. Det er også afgørende om tænker at relationen har en **retning**, som i eksemlet med forfatter B, der trækker på forfatter As ideer. Der kan man sige at relationen fra B til A (eller den anden vej for den sags skyld; er det det at B *trækker* på A, der er afgørende eller er det det at ideen *flyder* fra A til B der er afgørende?). Eller er relationen gensidig, når A og B er vener. Har relationerne forskellig **vægt**? Kender A og B fx hinanden *mere* eller *bedre* end B kender C osv.?
+
+2.  Hvad er et punkt?
+
+    -   I skal også forholde jer til hvad enheden i analyserne er? Hvad er udgør et punkt? Og hvilke punkter skal med? Hvis vi kiggede på venskaber i en klasse, så er punkterne måske klassens elever. Men hvad hvis elev A og B ikke nævner hinanden som venner, men begge nævner X fra parallelklassen? Skal X så med? Skal hele parallelklassen med? Eller hele skolen? Og måske også naboskolen? Det er et helt afgørende spørgsmål i netværksanalyse: Hvor starter og slutter netværket?
+
+3.  Hvilken slags netværk er det vi kigger på?
+
+    -   Som vi tidligere har talt om kan vi have både netværk mellem en enkelt type af aktører og netværk mellem flere typer af 'aktører'. Ofte har vi måske indsamlet et netværk med to distinkte typer (et bipartite netværk), fx bestyrelsespersoner og deres virksomheder, eller forfattere og deres begreber osv. I en analytisk sammenhæng kunne vi måske være interesseret i at rette blikket mod (de formidlede) relationer mellem én netværkets enheder. Det kræver en så kaldt projektion af netværket.
+
+![](images/session2.png)
+
+En vigtig del af en netværksanalyse er at forholde sig til spørgsmål som disse. Hvilken mekanisme er vi interesseret i at studere. Er vi optaget af en epidemologisk kortlægning af risikoen for spredning af coronavirus? Ja men, så vi nødt til at tænke relationen som en eller anden grad af fysisk kontakt. Er vi interesseret i indflydelse på beslutninger, så er relationen måske medlemskab i organer, hvor der træffes beslutninger. Er vi interesseret i popularitet og anerkendelse, så er relationen vi skal lede efter måske oplevede venskaber. Vil vi studere muligheder for innovation i virksomheder, så skal vi måske forstå relationerne som et flow af vidensdeling mellem individer eller teams.
+
+Selvom netværksanalyse på papiret 'bare' er punkter og streger er det altså utrolig vigtigt at forholde sig til hvad punkterne og stregerne repræsenterer.
+
+# Kilder til Netværksdata:
+
+Lod os kigge nærmere på hvilke typer af data I kan bruge i jeres eksamensopgaver. Der er grundlæggende tre muligheder:
+
+-   I kan bruge Danish Elite Network 2017 (Ellersgaard og Larsen m.fl), og finde et spændende subset af dette, I kan analysere
+-   I kan bruge CBS' adgang til Orbis og definere og downloade et datasæt herfra.
+-   I kan bruge andre tilgængelige kilder eller indsamle jeres egen data (the sky is the limit!).
+
+I det følgende skal vi se nærmere på de forskellige mulighedre:
+
+men først indlæser vi lige de R-pakker vi får brug for (som altså skal installeres først, hvis de ikke allerede er det).
+
+```{r, echo = T, message=F}
+# install.packages("tidyverse")
+# install.packages("igraph")
+# install.packages("ggraph")
+# install.packages("ggpubr")
+# install.packages("readxl")
+# install.packages("writexl")
+# install.packages("RColorBrewer")
+
+library(tidyverse)
+library(igraph)
+library(ggraph)
+library(ggpubr)
+library(readxl)
+library(Matrix)
+library(RColorBrewer)
+```
+
+Vi skal også indlæse et *script*, der indeholder funktioner skrevet specifikt til dette kursus. Det drejer sig om filen *custom_functions.R* i mappen "/functions".
+
+::: callout-note
+Et script indlæses med funktionen `source(, ...echo = FALSE)`, hvor `echo = FALSE` betyder at scriptet indlæses uden at vise indholdet.
+:::
+
+```{r, }
+source("functions/custom_functions.R", echo = FALSE)
+```
+
+## Danish Elite Network 2017 (den17)
+
+I mappen `"/data"` i R projketet finder i filen `den17-no-nordic-letters.csv`. Den kan også downloades her:
+
+[Download den17](data/den17-no-nordic-letters.csv){.btn .btn-primary}
+
+Indlæs data med `read_csv`
+
+```{r, warning=FALSE, message=FALSE}
+den <- read_csv("data/den17-no-nordic-letters.csv")
+```
+
+den17 er et *affiliation* datasæt, som indeholder bestyrelsesposter og og andre medlemskaber i (stort set) alle (relevante) virksomheder, organisationer, fonde, insitutioner, råd, nævn, kommissioner osv. Dvs alt lige fra Kattens Vaern over A.P. Moeller - Maersk og Novo Nordisk til regeringens sikkerhedsudvalg osv. Hver række i datasættet repræsenterer en position, dvs. en person med en rolle i organisation:
+
+```{r}
+den %>% head()
+```
+
+Vi kan bruge `glimpse()` til lige at se hvad data ellers indeholder:
+
+```{r}
+den %>% glimpse()
+```
+
+Alle 'organisationer' i datasættet er kodet med en række `tags` som kategoriserer organisationerne i forskellige emner.
+
+```{r}
+den %>% select(name, affiliation, tags)
+```
+
+Disse emne-tags kan bruges til at udvælge subset af data til forskellige analyser. I `custom_functions.R` filen, vi indlæste tidligere, ligger en funktion der giver et overblik over hvilke tags `den17`-datasættet indeholder: nemlig `show.all.tags()`, som viser hvor mange positioner (poster) i hvor mange organisationer, der knytter sig til hvert tag.
+
+```{r}
+den %>% show.all.tags() %>% head(15)
+```
+
+hvis I skriver:
+
+```{r, eval=FALSE}
+den %>% show.all.tags() %>% enframe() 
+```
+
+tags i kombination med `sector` og evt. også type `type` er en god mode at finde frem til et spændende subset af virksomheder og eller personer.
+
+...lad os se hvad variablen `sector` indeholder. Til det kan vi bruge verbet `count()`, som optæller cases på en given variabel.
+
+```{r}
+den %>% count(sector)
+```
+
+...lad os også se på `type`, der giver en alternativ inddeling .
+
+```{r}
+den %>% count(type) 
+```
+
+For eksemplets skyld lad os begynde med at 'subsette' datasættet, så vi kun beholder de *7989* rækker hvor en 'affiliation' har værdien `Corporations` på sector variablen.
+
+```{r}
+den_corp <- den %>% filter(sector == "Corporations")
+```
+
+lad os se på hvilke **tags** vi kan finde her:
+
+```{r}
+show.all.tags(den_corp) %>% head(10)
+```
+
+funktionen `has.tags()` er en hjælpefunktion, der giver os enten (`... result = "affil"`) en liste af navne på de *organisationer*, der har det eller et af de pågældende tags, eller (`... result = "name"`) en liste af navne på *individer* der er i en af disse organisationer, eller (`... result = "den"`) et nyt datasæt med kun poster i organisationer med de relevante tags. Option'en `...mode =` bruges til at fortælle om vi vil have alle de poster der har der har et af tags'ne (`...mode = "or"`), eller om vi ønsker at posterne skal have alle tags'ne (`...mode = "and"`):
+
+Lad os lave en streng vector med de Tags vi gerne vil kigge efter.
+
+```{r}
+tags <- c("Banks", "FINA", "Finance", "Investment", "Insurance")
+```
+
+Hvis vi bruger `result = "affil"` sammen med `mode = "or"` får vi alle de *virksomheder*, der har et af de pågældende tags:
+
+```{r}
+den_corp %>% has.tags(tags, result = "affil", silent = TRUE, mode = "or") %>% head(10)
+```
+
+Hvis vi bruger `result = "name"` sammen med `mode = "or"` får vi alle de *personer*, der har poster i virksomheder med et af de pågældende tags:
+
+```{r}
+den_corp %>% has.tags(tags, result = "name", silent = TRUE, mode = "or") %>% head(10)
+```
+
+Hvis vi bruger `result = "den"` sammen med `mode = "or"` får vi et subset af data med alle de poster der har et af de pågældende tags. Det data assigner vi (`<-`) til et nyt dataobjekt `den_fina`:
+
+```{r}
+den_fina <- den_corp %>% has.tags(tags, result = "den", silent = TRUE, mode = "or")
+dim(den_fina)
+```
+
+## Orbis
+
+En anden kilde til (netværks-)data om virksomheder er *Orbis*. Orbis er en database der indeholder information om virksomheder fra hele verden - omkring 400.000.000 selskaber. Databasen trækker data fra mere end 170 forskellige kilderm som standardiseres og linkes på en måde der muliggør sammenlinging. På virksomhedsniveau indeholder orbis blandt meget andet geografisk data, juridisk data, finansiel data, ejerskabsdata mv. om den enkelte virksomhed. Fra et netværksperspektiv er databasen interessant fordi den desuden indeholder (aktuel og historisk) data om virksomhedernes bestyrelse og direktion (m.v.). I det følgende skal vi se hvordan man trækker et bestyrelses-(netværks-)datasæt fra orbis.
+
+::: callout-note
+Som med al anden data (særligt data man ikke selv har frembragt), skal man med Orbis være opmærksom på en række
+
+Skim evt. [denne](https://www.oecd.org/content/dam/oecd/en/publications/reports/2020/05/coverage-and-representativeness-of-orbis-data_9628c322/c7bdaa03-en.pdf) rapport fra OECD om Orbis' dækningsgrad. Eller tag et kig på [(Heemskerk et al. 2018)](https://doi.org/10.1111/glob.12183) om bl.a. 'completeness' og problemer med 'entity resolution' - optræder det samme firma eller den samme person flere gange med forskllige versioner af det navn. Det er ikke problemer I behøver at løse, men noget det er værd at bemærke, når man præsenterer den data man analyserer!
+:::
+
+Orbis kan tilgås via jeres login til CBS's bibliotek: [**Orbis via cbs**](https://www.cbs.dk/bibliotek/databaser/orbis)
+
+### At 'bygge' et søgefilter på Orbis
+
+Det første man skal tænke over er hvilke filtre, der er nødvendige for at hente det subset af virksomheder man er interesseret i. Der er selvfølgelig et hav af muligheder.
+
+![Orbis forside](images/orbis.png){fig-align="center" width="600" fig.pos="H"}
+
+1.  Under *Company*, kan man under fx vælge *Standardized legal forms* vælge kun 'Private limited companies' eller også 'Public limited companies'. Man kan også under *Number of employees* vælge kun at kigge på virksomheder af en hvis størrelse.
+2.  Under *Location* kan man sætte forskellige geografiske filtre, både lande, regioner m.v., men også forskellige klassifikationer.
+3.  Under *Activities and industry* kan man under *Industri classifications* vælge mellem forskellige branche-klassifikationer og herunder udvælge en (eller flere) bestemt(e) branche(r). Man kan desuden under *Entity type* afgrænse virksomhedstype yderligere. En anden mulighed er at man definerer 'fritekst' søgning under *Activity text search*, hvor man under 'scope' vælger hvilke datafelter, der skal søges i og under 'Free text' skriver hvad der skal søges efter. ![Fritekstsøgning](images/fritekst%20orbis.png)
+
+Når man har 'bygget' sit filter kan man se hvad de forskellige filtre gør og hvad de til sammen giver af resultat. Næste skridt er *View results* ![Fritekstsøgning](images/search.png)
+
+### Tilføj bestyrelsesoplysninger til vores data
+
+Her kan vi se alle de virksomheder, der lever op til vores søgekriterier. Det vi gerne vil nu er at tilføje bestyrelsesdata. Klik på *Add/remove columns* øverst til højre. ![Fritekstsøgning](images/add_cols.png) Scroller man lidt ned i venstre kolonne og klikker på feltet *Directors and managers*, får man i den midsterste kolonne en række valgmuligheder: ![Tilføj Directors and managers](images/add_data.png) Vælg som minimum 1) Full name, 2) UCI, 3) Job title, 4) Current or previous.
+
+Under *Other personal information* og *Other role information* i venstre kolonne kan man tilføje yderligere information om personen og dennes rolle. På personniveau fx. køn og nationalitet mv. På rolleniveau kan det være nyttigt at tilføje 'Type of role' og 'Board, committee or department' og evt. 'Level of responsibility', da det kan give mulighed for at fokusere kun på bestyrelse og direktion.
+
+Hvis man klikker på det lille filter-ikon under fx 'Full name' i den venstre kolonne får man mulighed for at filtrere på rollerne. Det kan være nyttigt her at forholde sig til om man både vil have nuværende og tidligere roller med. Har man tilføjet variablen *Current or previous*, kan man altid filtrere senere, men hvis man ikke gør det her skal man være opmærksom på at data kommer til at indeholde mange rækker (!)
+
+Det er også muligt at tilføje yderligere virksomhedsdata.
+
+Når de variable man gerne vil have med er valg, trykker man *Apply* og så er vi klar til at eksportere data.
+
+### Eksporter data til xlsx
+
+Klik på "Excel".. I den eksport-menu, der kommer op er det vigtigt, at man under *Options for excel* vælger 'Repeat single item data' inden man trykker Export.
+
+::::: grid
+::: g-col-6
+![](images/save.png){width="100%"}
+:::
+
+::: g-col-6
+![](images/export.png){width="80%"}
+:::
+:::::
+
+Når Orbis har klargjort data, kan man downloade filen til sin computer.
+
+### Eksempel med alkohol og tobak fra Orbis
+
+Jeg har tidligere downloadet et datasæt med alle aktive, public limited companies med branchekoderne Alkohol og tobak ('Manufacture of beverages' NACE#11(-soft drinks 11.0.7) & 'Manufacture of tobacco products' NACE#12)
+
+I kan downloade datasættet her: [Download Data](data/tobaco_and_alcohol.xlsx){.btn .btn-primary} og lægge filen i data mappen i vores Rprojekt mappe. Filen kan også hentes på Canvas.
+
+Der er også en ny funktion i `custom_functions` scriptet, `read_orbisxlsx()`, det er en genvej til at indlæse datafiler fra Orbis. For at bruge den funktion skal I download en ny udgave af `custom_functions` her [Download file](functions/custom_functions.R){.btn .btn-primary} og lægge den i `functions/` mappen i Rprojekt mappen (dvs. erstatte den anden). Filen kan også hentes på Canvas. Når filen ligger i functions mappen kan vi "source" den og anvende funktionen.
+
+```{r}
+source("functions/custom_functions.R", echo = FALSE)
+```
+
+Nu kan vi indlæse orbis-filen `tobaco_and_alcohol.xlsx` ved at indsætten stien til filen (`data/tobaco_and_alcohol.xlsx`) med `read_orbisxlsx()`:
+
+```{r, echo = TRUE}
+df <- read_orbisxlsx(path = "data/tobaco_and_alcohol.xlsx")
+```
+
+read_orbisxlsx funktionen oversætter bl.a. variabelnavne fra orbis til noget mere meningsfuld og læseligt. Vigtigt: `Current or previous` variablen hedder nu `role_status`. Der er også en ny variabel, `person`, som ud fra identifikationsnummeret 'gætter' om personen faktisk er en person.
+
+Lad os til at begynde med reducere vores data til kun aktive/current poster og poster der faktisk er personer:
+
+```{r}
+df_current <- df %>% 
+  filter(person == TRUE & role_status == "Current")
+```
+
+En udfordring ved bestyrelsesdata fra Orbis er at det er uklart/varierende hvor mange individer, der er registreret for hver virksomhed:
+
+```{r}
+df_current %>% 
+  distinct(name, affiliation) %>% 
+  summarise(n = n_distinct(name), .by = affiliation) %>% 
+  summary(n)
+
+```
+
+Gennemsnittet har 4 'directors', der er en del en mandsbestyrelser og én virksomhed har `1140` (!) 'directors'. Det skyldes at alle mulige lavere direktører er registreret. Vi kan prøve at løse noget af det ved at kode en ny variabel, hvor vi prøver at indfange meningen af en rolle fra `role_level`-variablen (som i Orbis hed `DMLevel of responsibility`) og fra `role_type` (som i Orbis hed `DMType of role`)
+
+```{r}
+df_current <- df_current %>% 
+  mutate(role_level_rec = case_when(
+    grepl("member", role_level, ignore.case = T) ~ "member",
+    grepl("executive", role_level, ignore.case = T) ~ "executive",
+    grepl("vice (pres|chair)", role_level, ignore.case = T) ~ "vice chairman", 
+    grepl("president|chairman", role_level, ignore.case = T) ~ "chairman", 
+    .default = "other"))
+
+df_current <- df_current %>% 
+  mutate(role_level_rec = case_when(
+    role_level_rec == "other" & 
+      (grepl("SenMan", role_type, ignore.case = T) | 
+         grepl("manager", role_level, ignore.case = T)) ~ "executive",
+    role_level_rec == "other" & 
+      grepl("chief", role_level, ignore.case = T) ~ "executive",
+    .default = role_level_rec))
+```
+
+```{r}
+df_current <- df_current %>% 
+  filter(role_level_rec %in% c("member","chairman", "vice chairman","executive"))
+```
+
+```{r}
+df_current %>% ungroup() %>% count(role_level, sort = TRUE)
+```
+
+Vi kan starte med lige at se på hvor mange 'board members' hver virksomhed har: Som I kan se er der nogle meget store 'boards'. Det er et af problemerne med Orbis, nemlig at det er uklart hvad der er registreret per virksomhed.
+
+```{r}
+df_current %>% distinct(name, affiliation) %>% count(affiliation, sort = TRUE)
+```
+
+Vi kan lave en ny variabel i vores datasæt, der for hvert individ tæller hvor mange virksomeder, de er knyttet til:
+
+```{r}
+df_current <- df_current %>% group_by(name) %>% mutate(n_memberships = n_distinct(affiliation))
+df_current %>% ungroup() %>%  count(n_memberships)
+```
+
+Lad os slette personer, `n = 24333`, der 'kun' sidder i en enkelt virksomhed, da de alligevel ikke laver nogen forbindelser på tværs af virksomheder i vores netværk. Vi sletter så at sige folk i vores affiliation data, der ikke er 'linkere' (`filter()`) og samtidig sørger vi for at hvert individ kun optræder én gang per virksomhed (`distinct()`) - det kan jo være at nogen har mere end en rolle i samme bestyrelse (datasnavs?).
+
+```{r}
+df_current <- df_current %>% 
+  filter(n_memberships > 1) %>% 
+  distinct(name, affiliation, .keep_all = TRUE)
+```
+
+##### Fra data til netværk.
+
+Husk fra sidst [Session 1 (uge 6): Introduktion til netværksanalyse i R](session1.html), hvordan vi kommer fra et affiliation datasæt som vi har her, med rækker der forbinder "individer" til "organisationer". Her er et skematisk overblik.
+
+![](images/Notebook%202%20-%20page%201.png) R-kode til at lave 'biadjacency matricen' med individer i rækker og affiliations i kolonner (husk sparse!)
+
+```{r}
+bi_adj <- xtabs(data = df_current, formula = ~name + affiliation, sparse = TRUE)
+```
+
+I dette eksempel vil vi gerne se hvordan virksomheder der fremstiller tobak og alkohol er forbundet gennem overlappende bestyrelser. Derfor vil gerne 'udregne' $affiliation \times affiliation$ matricen ved at gange en transponeret udgave af vores biadjacency matrice med sig selv ($B^T \times B$)
+
+```{r}
+adj_c     <- t(bi_adj) %*% bi_adj
+```
+
+Som altid skal vi lige lave vores adjacency matrice om til et grafobjekt med `igraph`-funktionen `graph_from_adjacency_matrix()`. Her har vi et "undirected", "weighted" netværk, hvor vi ser bort fra diagonalen:
+
+```{r}
+gr <- graph_from_adjacency_matrix(adj_c, mode = "undirected", diag = FALSE, weighted = TRUE)
+```
+
+Lad os som det første kigge på et helt minimalistisk plot af vores netværk:
+
+```{r}
+gr %>% ggraph() +
+  geom_edge_link0() +
+  geom_node_point() +
+  theme_graph()
+```
+
+Som I kan se består netværket af flere 'klynger'. Det kaldes i netværksanalysesprog for komponenter. Det kommer vi tilbage til i løbet af kurset, men en netværkskomponent er et sammenhængende sæt af vertices. Lad os i første omgang prøve at bruge vores branchekode-variabel til at se om vi kan finde noget logik i hvordan komponenterne ser ud. Er der komponenter, hvor der er bestyrelsesoverlap (dvs. edges) mellem virksomheder der fremstiller hhv. alkohol og tobak. Det kræver at vi får lagt vores branchekode ind i grafobjektet som en vertex attribute.
+
+##### Tilføj vertice attributes
+
+Det gør vi ved først at lave et nyt datasæt, som vi kalder sector, der indeholder én række for hver virksomhed + branchekode (`distinct(affiliation, sector)`), dernæst overskriver vi sector, så vi kun har de to første cifre i branchekoden (da vi er ligeglade med underkategorier), altså en 'substring', `substr(sector, start = 1, stop = 2)`, endelig omkoder vi branchekodens talværdier til et label (`case_when(sector == "12"~"Tobak", sector == "11"~"Alkohol", .default = NA)`). Logikken i case_when-verbet er at man har et logisk udtryk efterfult af `~` hvad der så skal stå, et nyt logisk udtryk efterfulgt af `~` hvad der så skal stå. Altså formen, hvis\~så, hvis\~så osv., afsluttende med `.default =`, hvor vi definerer hvad værdien skal være, hvis ingen af de logisk udtryk passer.
+
+```{r}
+# add sector as attribute...
+sector     <- df_current %>% ungroup() %>% 
+  distinct(affiliation, sector) %>% 
+  mutate(sector = substr(sector, start = 1, stop = 2)) %>% 
+  mutate(sector = case_when(
+    sector == "12"~"Tobak",
+    sector == "11"~"Alkohol",
+    .default = NA))
+```
+
+Nu skal vi have 'merget' vores sector variabel på netværksobjektet. Til det formål skal vi først lige lave en lille data.frame, der indeholder navnene på vores vertices (altså virksomhedsnavnene), sorteret på samme måde som i grafobjektet. Husk fra sidst hvordan vi tilgår vertice attributes i vores grafobjekt vha. `V()`
+
+Vi laver her en data.frame med variablen `affiliation`, der indeholder virksohedsnavne fra vores grafobjekt.
+
+```{r }
+add_sector   <- data.frame(affiliation = V(gr)$name)
+```
+
+Nu mangler vi bare at flette sectorvariablen på så de rigtige værdier kommer til at stå ud for de rigtige virksomhedsnavne. Her har tidyverse en genial funktion, `left_join()`, som gør netop det. Hvis vi har datasæt x, vores data.frame med virksomhedsnavne, og datasæt y, vores sector datasæt med virksomhedsnavne og branchelabel, så gør left_join det at den ved at matche på virksomhedsnavnet, `by = "affiliation`, fletter den anden variabel i y på x, altså left_join'er y på x.
+
+```{r}
+add_sector   <- left_join(add_sector, sector, by = "affiliation")
+```
+
+Nu har vi et datasæt med branchekoder i, der er ordnet ligesom vores grafobjekt, og vi kan derfor assign'e `<-` variablen med branche koder som en ny vertex attribute i vores grafobjekt.
+
+```{r}
+V(gr)$sector <- add_sector$sector
+```
+
+Lad os nu lave vores visualisering igen, hvor vi farvelægger noderne efter branche. Vi kommer senere til detaljer i plot funktionerne. Kort fortalt om visualisering:
+
+1)  funktionen `ggraph()` opretter et tilsyneladende tomt plot (tilsyneladende fordi den faktisk udregner et layout for vertices i vores data)
+2)  funktionen `geom_edge_link0()` plotter vores edges som en 'streg'/et link. Der er også andre muligheder fx. `geom_edge_arc()` der plotter dem som en bue.
+3)  funktionen `geom_node_point()` der plotter vores noder som en 'cirkel'/point.
+
+-   inden for hver af disse `geom'er` kan vi sætte en masse options. Blandt andet kan vi definere nogle `aesthetics`. lad os bruge sector til at sætte farven på vores punkter (`mapping = aes(color = sector)`). Det betyder at vi lader farven på punkter følge værdierne på en bestemt variabel.
+
+```{r}
+gr %>% ggraph() +
+  geom_edge_link0() +
+  geom_node_point(mapping = aes(color = sector)) +
+  theme_graph()
+```
+
+Med undtagelse af primært den største komponent ser komponenterne ud til at være ret branche homogene. Der sker noget andet i den største komponent, så lad os fokusere vores visualisering på den største komponent i netværket.
+
+`igraph` pakken har en funktion, der giver os netværkets største komponent `largest_component()`
+
+```{r }
+# 1) først trækker vi netværket ud for den største komponent
+gr %>% largest_component() %>% 
+# 2) laver et plot  
+  ggraph() + 
+# 3) tilføjer edges, som vi giver en fast farve og størrelse:
+  geom_edge_link0(color = "gray40", edge_width = .6) +
+# 4) tilføjer vertices, farvelagt efter sector og med en fast størrelse:
+  geom_node_point(aes(color = sector), size = 3) +
+# 5) Tilføjer labels for udvalgte vertices:
+   geom_node_label(aes(filter = grepl("british american tobacco plc|carlsberg a/S|PHILIP MORRIS INTERNATIONAL INC|HEINEKEN N\\.|diageo p", name, ignore.case = T), label = name, color = sector), size = 3, repel = TRUE) +
+# 6) Ændrer farver og labels.
+  scale_color_manual(values = c("salmon2", "steelblue", "grey"), 
+                     labels = c("Alkohol", "Tobak", "NA")) +
+# 7) Tilføjer overskrifter og navn på labels
+  labs(title = "'Corporate interlocks' i alkohol- og tobaksbrancherne", 
+       subtitle = "den største komponent",
+       color = "Branche") +
+# 8) Tilføjer et tema der er flot til netværk...
+  theme_graph()
+
+
+```
+
+## CVR
+
+En tredje kilde til bestyrelsesnetværk er **Det centrale virksomhedsregister i Danmark** (<https://datacvr.virk.dk/>). Her kan man lave afgrænsede søgninger på danske virksomheder ud fra bl.a. geografi: Kommune eller region, virksomhedsstatus (aktive, ophørt, under konkurs etc.), virksomhedsform (aktieselskab, anpartsselskab etc.), startdato og branche.
+
+![](images/CVR.png)
+
+I dette eksempel har jeg valgt "Region = Grønland", "Virksomhedsstatus = Aktive", "Virksomhedsform = Aktieselskab". Det giver os 199 virksomheder. Hvis man scroller ned kan man eksportere data som en xlsx fil.
+
+download filen her
+
+[Download Data](data/CVRudtræk_AS_Grønland_2025-02-17.xlsx){.btn .btn-primary}
+
+Hvis I lægger filen i datamappen under Rprojekt-mappen, kan den indlæses med `read_xlsx()` her
+
+```{r, warning=FALSE, message=FALSE}
+gronland_as <- read_xlsx("data/CVRudtræk_AS_Grønland_2025-02-17.xlsx")
+head(gronland_as)
+```
+
+Det kræver lidt mere arbejde at komme frem til et bestyrelsesnetværk her fra. Det er nemlig kun virksomhedsdata vi får ud her. Næste skridt er at gå ind på hver virksomhed på cvr og finde bestyrelsesmedlemmerne:
+
+1.  Søg på CVR nummer (eller virksomhedsnavn) i søgefeltet:
+
+2.  Klik på "Tegningsregel, personkreds og revisor"
+
+![](images/CVR_virksøg.png)
+
+3.  Kopier bestyrelsen til et excel-ark:
+
+![](images/xlsx.png) Og så fortsætter man ellers bare med alle 199 virksomheder, til man har et komplet excel ark med alle bestyrelsesmedlemmer for alle virksomheder.
+
+::: callout-note
+Det tager noget tid!! (Man kan evt. spørge øvelseslæreren om det evt. er muligt at trække data på en anden måde via fx Elitedatabasen eller direkte fra CVR!)
+:::

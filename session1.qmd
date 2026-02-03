@@ -1,0 +1,365 @@
+---
+title: "Introduktion til netværksanalyse i R"
+---
+
+```{r}
+
+```
+
+I denne øvelses-session skal vi indlæse et netværksdatasæt og lave den første simple netværksgraf. Datasættet vi kigger på er kommer vi i øvrigt til at gå meget mere i dybden med se [Session 2 (uge 7)](session2.html).
+
+[Download script](scripts%20til%20undervisning/Session1.R){.btn .btn-primary}
+
+Først indlæser vi de pakker vi kommer til at bruge:
+
+```{r, message=FALSE}
+library(tidyverse)
+library(igraph)
+library(ggraph)
+library(Matrix)
+```
+
+# Indlæs og udvælg data
+
+Dernæst indlæser vi og gemmer datasættet `den17-no-nordic-letters.csv`, som ligger mappen `"/data"` i R projketet. Det kan også downloades her: [Download den17](data/den17-no-nordic-letters.csv){.btn .btn-primary}
+
+Indlæs data med `read_csv()`
+
+```{r, warning=FALSE, message=FALSE}
+den <- read_csv("data/den17-no-nordic-letters.csv")
+```
+
+I ["Intro til R og Tidyverse"](intro.html) introducerede vi en række funktioner fra tidyverse's dplyr pakke. Dem skal vi bruge nogle af her.
+
+Først ser vi lige på hvad vores dataobjekt indeholder `glimpse()`. Det består af `56849` og `10` kolonner - eller variable:
+
+```{r}
+den %>% glimpse()
+```
+
+Lad os tjekke hvad sector variablen indeholder med `count()` - og også med `distinct()`, da vores data indeholde flere rækker for hver organisation (`affiliation`, som variablen med organisationsnavne hedder), da der er tale om et positionsdatasæt individ-rolle-organisation:
+
+-   Der er 9524 positioner i affiliations/organisationer, der har koden corporations.
+-   Det svarer til 1454 unikke corporations.
+
+```{r}
+den %>% count(sector, sort = TRUE)
+den %>% distinct(affiliation, sector) %>% count(sector, sort = TRUE)
+```
+
+Lad os bruge `filter()` til at lave et nyt dataobjekt, der kun indeholder de rækker, hvor sector er lig `Corporations`.
+
+```{r}
+den_corp <- den %>% 
+  filter(sector == "Corporations") 
+```
+
+```{r}
+den_corp %>% count(affiliation, sort = TRUE)
+```
+
+# Fra data til netværksobjekter
+
+Netværksdata er ofte indsamlet i den form vi finder i `den17` datasættet. Altså som en såkaldt `edge-list`, der i to kolonner repræsenterer forbindelser mellem 'noget'. I dette personer i en kolonne og organisationer. Det kunne for så vidt også være individer i en kolonne og individer i den anden (fx. facebook venskaber). Når vi skal omforme vores data til et format der muliggør netværksanalyse og -visualisering bruger vi R-pakken `igraph`.
+
+Her det er fordel lige at få styr på et par matrix regneregler og begreber:
+
+## Adjacency matricer
+
+Et at netværk (i matematiksprog en *graf* - som ikke er at forveksle med en graf som vi normalt kender den som fx en linje i et koordinatsystem) består af relationer mellem et eller to sæt af elementer, fx. relationer mellem individer (venskaber) eller relationer mellem individer og organisationer (poster/medlemskaber). Elementerne kalder vi *vertices* (eller noder) og forbindelserne kalder vi *edges*.
+
+### Et sæt vertices
+
+Hvis netværket består af ét sæt af elementer, fx. individer, kalder vi matrix repræsentationen for en adjacency matrice (adjacent betyder 'tilstødende', altså 'forbundet'). En adjacency matrice $A$ for et netværk med $n$elementer $V = \begin{pmatrix} v_1 & v_2 & \dots & v_n\end{pmatrix}$ definerer vi således som en $n \times n$ matrice $A$ hvor:
+
+$$
+a_{ij} =
+\begin{cases} 
+1, & \text{hvis der er en forbindelse mellem vertex } i \text{ og vertex } j \\
+0, & \text{eller}
+\end{cases}
+$$ dvs.
+
+$$A = 
+\begin{pmatrix}
+0 & 1 & 1 & 0 \\
+1 & 0 & 1 & 1 \\
+1 & 1 & 0 & 1 \\
+0 & 1 & 1 & 0
+\end{pmatrix}
+$$
+
+### To sæt vertices
+
+Hvis netværket derimod består af to distinkte sæt vertices, fx. individer og organisationer, hvor der kun er forbindelser på tværs af de to sæt om ikke indenfor dem, kalder vi det et *bipartite netværk*, kalder vi matrix repræsentationen en *biadjacency matrice* (nogen gange også incidence matrice).
+
+En biadjacency matrice for et bipartite netværk med to sæt vertices $V = \{ v_1, v_2, \dots, v_n \}\text{ og }U = \{ u_1, u_2, \dots, u_n \}$ er således en $n \times m$ matrice $B$ hvor: $$
+B_{ij} = 
+\begin{cases}
+1 & \text{hvis der er en edge/forbindelse mellem vertex } u_i \text{ i sættet } U \text{ og vertex } v_j \text{ i sættet } V, \\
+0 & \text{hvis der ikke er en edge/forbindelse mellem } u_i \text{ og vertex } v_j.
+\end{cases}
+$$
+
+dvs.
+
+$$
+B = \begin{pmatrix}
+1 & 1 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+1 & 0 & 1
+\end{pmatrix}
+$$
+
+### graf projektion
+
+Vores bipartite netværk har som bekendt to forskellige typer af vertices $V(individer) = \{ v_1, v_2, \dots, v_n \}\text{ og }U(organisationer) = \{ u_1, u_2, \dots, u_n \}$. Individ1 er forbundet til Organisation1 og Organisation2, Individ2 er forbundet til Organisation2... osv. Med lidt "simpel" matrix regning kan vi hurtigt udregne to nye netværk, nemlig $Individ \times Individ$ netværket (altså hvilke individer er forbundet 'gennem' en eller flere organisationer) og $Organisation \times Organisation$ netværket (altså hvilke organisationer er forbundet fordi de deler individer):
+
+#### individ x individ
+
+Ved at gange hele matricen $B$ med en transponeret version af $B$, $B^T$ får vi en $n \times n$ matrice for $V$ sættet, altså en $individ \times individ$:
+
+$$M_v = B \times B^T = \begin{pmatrix}
+\textcolor{red}{1} & \textcolor{red}{1} & \textcolor{red}{0} \\
+\textcolor{blue}{0} & \textcolor{blue}{1} & \textcolor{blue}{0} \\
+\textcolor{green}{0} & \textcolor{green}{0} & \textcolor{green}{1} \\
+\textcolor{purple}{1} & \textcolor{purple}{0} & \textcolor{purple}{1}
+\end{pmatrix}
+\times
+\begin{pmatrix}
+\textcolor{red}{1} & \textcolor{blue}{0} & \textcolor{green}{0} & \textcolor{purple}{1} \\
+\textcolor{red}{1} & \textcolor{blue}{1} & \textcolor{green}{0} & \textcolor{purple}{0} \\
+\textcolor{red}{0} & \textcolor{blue}{0} & \textcolor{green}{1} & \textcolor{purple}{1}
+\end{pmatrix} \text{farverne repræsenterer individrækkerne}$$ $$=\begin{pmatrix}
+\textcolor{red}{1} \times \textcolor{red}{1} + \textcolor{red}{1} \times \textcolor{red}{0} + \textcolor{red}{0} \times \textcolor{red}{0} &
+\textcolor{red}{1} \times \textcolor{blue}{0} + \textcolor{red}{1} \times \textcolor{blue}{1} + \textcolor{red}{0} \times \textcolor{blue}{0} &
+\textcolor{red}{1} \times \textcolor{green}{0} + \textcolor{red}{1} \times \textcolor{green}{0} + \textcolor{red}{0} \times \textcolor{green}{1} &
+\textcolor{red}{1} \times \textcolor{purple}{1} + \textcolor{red}{1} \times \textcolor{purple}{0} + \textcolor{red}{0} \times \textcolor{purple}{1} \\
+\textcolor{blue}{0} \times \textcolor{red}{1} + \textcolor{blue}{1} \times \textcolor{red}{0} + \textcolor{blue}{0} \times \textcolor{red}{0} &
+\textcolor{blue}{0} \times \textcolor{blue}{0} + \textcolor{blue}{1} \times \textcolor{blue}{1} + \textcolor{blue}{0} \times \textcolor{blue}{0} &
+\textcolor{blue}{0} \times \textcolor{green}{0} + \textcolor{blue}{1} \times \textcolor{green}{0} + \textcolor{blue}{0} \times \textcolor{green}{1} &
+\textcolor{blue}{0} \times \textcolor{purple}{1} + \textcolor{blue}{1} \times \textcolor{purple}{0} + \textcolor{blue}{0} \times \textcolor{purple}{1} \\
+\textcolor{green}{0} \times \textcolor{red}{1} + \textcolor{green}{0} \times \textcolor{red}{0} + \textcolor{green}{1} \times \textcolor{red}{0} &
+\textcolor{green}{0} \times \textcolor{blue}{0} + \textcolor{green}{0} \times \textcolor{blue}{1} + \textcolor{green}{1} \times \textcolor{blue}{0} &
+\textcolor{green}{0} \times \textcolor{green}{0} + \textcolor{green}{0} \times \textcolor{green}{0} + \textcolor{green}{1} \times \textcolor{green}{1} &
+\textcolor{green}{0} \times \textcolor{purple}{1} + \textcolor{green}{0} \times \textcolor{purple}{0} + \textcolor{green}{1} \times \textcolor{purple}{1} \\
+\textcolor{purple}{1} \times \textcolor{red}{1} + \textcolor{purple}{0} \times \textcolor{red}{0} + \textcolor{purple}{1} \times \textcolor{red}{0} &
+\textcolor{purple}{1} \times \textcolor{blue}{0} + \textcolor{purple}{0} \times \textcolor{blue}{1} + \textcolor{purple}{1} \times \textcolor{blue}{0} &
+\textcolor{purple}{1} \times \textcolor{green}{0} + \textcolor{purple}{0} \times \textcolor{green}{0} + \textcolor{purple}{1} \times \textcolor{green}{1} &
+\textcolor{purple}{1} \times \textcolor{purple}{1} + \textcolor{purple}{0} \times \textcolor{purple}{0} + \textcolor{purple}{1} \times \textcolor{purple}{1}  
+\end{pmatrix}
+$$
+
+$$= \begin{pmatrix}
+\textcolor{red}{2} & 1 & 0 & 1 \\
+1 & \textcolor{blue}{1} & 0 & 0 \\
+0 & 0 & \textcolor{green}{1} & 1 \\
+1 & 0 & 1 & \textcolor{purple}{2}
+\end{pmatrix}
+$$
+
+Matrix $M_v$ fortæller os i diagonalen, hvor mange gange hvert individ 'møder sig selv' (læs: hvor mange organisationer de er medlem af), uden for diagonalen fortæller det os at i1 (individ1) har fælles organisationer med både både i2 og i4 mens i2 kun deler organisation med én, nemlig i1. I4 har også to fælles organisationer, nemlig med i1 og i3, mens i3 også kun har én fælles tilknytning, nemlig med i4.
+
+#### organisation x organisation
+
+Vi kan også gøre det omvendt: Ved at en transponeret version af $B$, $B^T$, med $B$ får vi en $m \times m$ matrice for $U$ sættet, altså en $organisation \times organisation$:
+
+$$M_u = B^T \times  B= \begin{pmatrix}
+\textcolor{red}{1} & \textcolor{red}{0} & \textcolor{red}{0} & \textcolor{red}{1} \\
+\textcolor{blue}{1} & \textcolor{blue}{1} & \textcolor{blue}{0} & \textcolor{blue}{0} \\
+\textcolor{green}{0} & \textcolor{green}{0} & \textcolor{green}{1} & \textcolor{green}{1}
+\end{pmatrix}
+\times
+\begin{pmatrix}
+\textcolor{red}{1} & \textcolor{blue}{1} & \textcolor{green}{0} \\
+\textcolor{red}{0} & \textcolor{blue}{1} & \textcolor{green}{0} \\
+\textcolor{red}{0} & \textcolor{blue}{0} & \textcolor{green}{1} \\
+\textcolor{red}{1} & \textcolor{blue}{0} & \textcolor{green}{1}
+\end{pmatrix} \text{farverne repræsenterer organisationskolonnerne}$$
+
+$$=\begin{pmatrix}
+\textcolor{red}{1} \times \textcolor{red}{1} + \textcolor{red}{0} \times \textcolor{red}{0} + \textcolor{red}{0} \times \textcolor{red}{0} + \textcolor{red}{1} \times \textcolor{red}{1} &
+\textcolor{red}{1} \times \textcolor{blue}{1} + \textcolor{red}{0} \times \textcolor{blue}{1} + \textcolor{red}{0} \times \textcolor{blue}{0} + \textcolor{red}{1} \times \textcolor{blue}{0}&
+\textcolor{red}{1} \times \textcolor{green}{0} + \textcolor{red}{0} \times \textcolor{green}{0} + \textcolor{red}{0} \times \textcolor{green}{1} + \textcolor{red}{1} \times \textcolor{green}{1} \\
+\textcolor{blue}{1} \times \textcolor{red}{1} + \textcolor{blue}{1} \times \textcolor{red}{0} + \textcolor{blue}{0} \times \textcolor{red}{0} + \textcolor{blue}{0} \times \textcolor{red}{0} &
+\textcolor{blue}{1} \times \textcolor{blue}{1} + \textcolor{blue}{1} \times \textcolor{blue}{1} + \textcolor{blue}{0} \times \textcolor{blue}{0} + \textcolor{blue}{0} \times \textcolor{blue}{0} &
+\textcolor{blue}{1} \times \textcolor{green}{0} + \textcolor{blue}{1} \times \textcolor{green}{0} + \textcolor{blue}{0} \times \textcolor{green}{1}  + \textcolor{blue}{0} \times \textcolor{green}{1} \\
+\textcolor{green}{0} \times \textcolor{red}{1} + \textcolor{green}{0} \times \textcolor{red}{1} + \textcolor{green}{1} \times \textcolor{red}{0} + \textcolor{green}{1} \times \textcolor{red}{1} &
+\textcolor{green}{0} \times \textcolor{blue}{1} + \textcolor{green}{0} \times \textcolor{blue}{1} + \textcolor{green}{1} \times \textcolor{blue}{0} + \textcolor{green}{1} \times \textcolor{blue}{0} &
+\textcolor{green}{0} \times \textcolor{green}{0} + \textcolor{green}{0} \times \textcolor{green}{0} + \textcolor{green}{1} \times \textcolor{green}{1} + \textcolor{green}{1} \times \textcolor{green}{1} 
+\end{pmatrix}
+$$
+
+$$= \begin{pmatrix}
+\textcolor{red}{2} & 1 & 1 \\
+1 & \textcolor{blue}{2} & 0 \\
+1 & 0 & \textcolor{green}{2}
+\end{pmatrix}
+$$
+
+Matrix $M_u$ fortæller os i diagonalen, hvor mange gange hver medlemmer hver organisation har. Uden for diagonalen fortæller det os nu at o1 (organisation1) deler et medlem med både o2 og o3 mens o2 kun deler medlem med én organisation, nemlig o1. o3 har også et individ med en anden organisation, nemlig med o1.
+
+::: callout-note
+Ovenstående var eksempler på hvordan vi ved hjælp af matrix regning kommer fra en biadjaceny matrice, $B$ med fx individer i rækker og organisationer i kolonner, til to forskellige adjacency matricer $M_{individ \times individ}$ og $M_{organisation \times organisation}$.
+
+-   $M_{individ \times individ} = B \times B^T$
+-   $M_{organisation \times organisation} = B^T \times B$
+:::
+
+I R kode er det meget nemmere end det ser ud...
+
+```{r, echo= TRUE}
+x <- data.frame(i = c("ind1", "ind2", "ind3", "ind4"), org1 = c(1,0,0,1), org2= c(1,1,0,0), org3 = c(0,0,1,1), row.names = "i") %>% as.matrix()
+x
+t(x)
+x %*% t(x)
+t(x) %*% x
+```
+
+## Praktisk eksempel med *den17*
+
+lad os bruge det dataobjekt vi allerede har defineret, *den_corp*, som indeholder alle rækker fra *den17* som har `sector == "Corporations"`.
+
+vi kan lige se, hvordan kolonnerne `name` og `affiliation` ser ud:
+
+```{r}
+den_corp %>% select(name, affiliation) 
+```
+
+Det vil vi gerne lave til en biadjacency matrice med individer i rækker og affiliations i kolonnerne. Fordi det bliver en kæmpe tabel med `r den_corp %>% pull(name) %>% unique() %>% length()` rækker og `r den_corp %>% pull(affiliation) %>% unique() %>% length()` kolonner, bruger vi funktionen `xtabs()` som gemmer data i hukommelse på en smart måde (hvis vi sætter option `spare = TRUE`), så vi slipper på at bruge computerhukommelse på alle 'nullerne' (det skal I ikke bekymre jer om)
+
+```{r}
+den_corp_bi <- den_corp %>% xtabs(formula = ~name + affiliation, sparse = TRUE)
+```
+
+Som I kan se har den_corp_bi nu 7641 rækker og 1454 kolonner
+
+```{r}
+den_corp_bi %>% dim()
+```
+
+og matricen er fyldt med en masse `.` fordi den er sparse. De stedet i tabellen hvor der faktisk er en forbindelse mellem $Individ_{i}$ og $Organisation_{j}$ står der tilgengæld $1$.
+
+```{r}
+den_corp_bi[1:10, 750:770]
+```
+
+Lad os implementere den besværlige matrixregning, nu i effektiv R-kode og dermed lave to adjacency matricer:
+
+```{r}
+den_corp_ind <- den_corp_bi %*% t(den_corp_bi)
+den_corp_org <- t(den_corp_bi) %*% den_corp_bi
+```
+
+Det giver os to matricer med dimensionerne
+
+```{r}
+dim(den_corp_ind)
+```
+
+dvs individ x individ,
+
+og
+
+```{r}
+dim(den_corp_org)
+```
+
+dvs. organisation x organisation.
+
+# Netværksobjekter fra matricer (`igraph()`)
+
+Nu skal vi til at bruge `igraph()`-pakken, som har en masse funktioner til at lave og analysere netværksdata:
+
+## (Monopartite) netværk
+
+-   `graph_from_adjacency_matrix()` tager, som funktionens navn indikerer en adjacency matrice, som dem vi lige har lavet, og giver et netværksobjekt som output. Funktionen har tre vigtige options: `mode =`, `weighted =` og `diag =`,
+    -   mode kan være enten `mode = "directed"` eller `mode = "undirected"`, alt efter om netværket er retningsbestemt eller ej: er A - B og B - A det samme eller to forskellige ting.
+    -   weigthed kan være enten `weighted = TRUE` eller `weighted = FALSE`, alt efter om det har nogen betydning, hvor mange gange (eller hvor godt) A og B kender hinanden.
+    -   diag kan være enten `diagonal = TRUE` eller `diagonal = FALSE`, alt efter om vi er interesseret i diagonalen, dvs. A's forbindelse til sig selv.
+
+I dette tilfælde, hvor vores matrice er en projektion af en medlemskabsliste, har netværket ingen retning. A kender B på samme måde som B kender A, når de sidder sammen i en bestyrelse. Matricen er vægtet, fordi A og B kan kende hinanden flere steder. Og diagonalen, den er vi ikke interesseret i.
+
+```{r}
+g_ind <- den_corp_ind %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE)
+g_ind
+```
+
+Et grafobjekt fra Igraph er et særligt dataobjekt, som indeholder to forskellige elementer af data, nemlig vertices og edges. der er 7641 vertices i vores objekt og 42967 edges. Hver af disse elementer kan have forskellige attributes (se + attr:) Som I kan se har vi to attributes `name (v/c)` og `weight (e/n)`. (v/c) ved name betyder at det er en attribute til vores **v**ertices og at det er en `character` vektor (det er en vektor med navne). (e/n) ved weight betyder at det er en attribute til vores **e**dges og at det er en numerisk vektor (en vektor med tal, der indikerer styrken af forbindelsen) ![](images/Screenshot%20from%202025-02-04%2015-24-37.png){width="100%"} Hvis vi gerne vil tilgå vertex attrubutes i vores grafobjekt skal vi bruge funktionen `V()` fra `igraph` efterfulgt af `$` og navnet på den specifikke attribute her altså `$name`. Lad os se de første 20 navne.
+
+```{r}
+V(g_ind)$name %>% head(20)
+```
+
+Hvis vi gerne vil tilgå edge attributes i vores grafobjekt skal vi bruge funktionen `E()` fra `igraph` efterfulgt af `$` og navnet på den specifikke attribute her altså `$weight`. Lad os se de første 20 vægte og derefter et `table()` over fordelingen.
+
+```{r}
+E(g_ind)$weight %>% head(20)
+E(g_ind)$weight %>% table()
+```
+
+Der er altså mange, der kender hinanden fra en organisation, nogle kender hinanden fra to og ganske ganske få fra tre eller flere.
+
+vi kan også lave et graf-objekt for $organisation \times organisation$-matricen:
+
+```{r}
+g_org <- den_corp_org %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE)
+```
+
+lad os igen lige se vertex navne og edge vægte:
+
+```{r}
+V(g_org)$name %>% head(20)
+E(g_org)$weight %>% head(20)
+E(g_org)$weight %>% table()
+```
+
+Hovedparten forbindelserne mellem organisationer skyldes altså ét overlappende medlem, nogle skyldes to og ganske få skyldes mere end to overlappende medlemmer (en enkelt forbindelse skyldes hele 17 fælles medlemmer)
+
+## (Bipartite) netværk
+
+Endelig kan vi faktisk også lave et graf-objekt ud fra den oprindelige $individ \times organisation$ biadjacency matrice
+
+til det bruges funktionen:
+
+-   `graph_from_biadjacency_matrix()`
+
+```{r}
+g_bi <- den_corp_bi %>% graph_from_biadjacency_matrix()
+```
+
+# Netværksvisualisering
+
+Lad os lige kort se på et par visualiseringer. Til det formål bruger vi `ggraph()`-pakken. Den vender vi tilbage til i løbet af kurset, så det udfoldes ikke yderligere her
+
+$individ \times individ$ netværket
+
+```{r}
+g_ind_l <- largest_component(g_ind) 
+ggraph(g_ind_l, layout = "fr") +
+  geom_edge_link0(edge_alpha = 0.2, edge_width = 0.1) +
+  geom_node_point(size = 0.2) +
+  theme_graph() 
+```
+
+$organisation \times organisation$ netværket
+
+```{r}
+g_org_l <- largest_component(g_org) 
+ggraph(g_org_l, layout = "fr") +
+  geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+  geom_node_point(size = 0.1) + 
+  theme_graph() 
+```
+
+$individ \times organisation$-netværket
+
+```{r}
+g_bi_l <- largest_component(g_bi)
+ggraph(g_bi_l, layout = "fr") +
+  geom_edge_link0(edge_alpha = 0.8, edge_width = 0.1, color = "black") +
+  geom_node_point(aes(color = type), size = 0.2, alpha = 0.6) +
+  scale_color_manual(values=c("sienna1", "steelblue2"), labels=c("individuals", "companies")) +
+  theme_graph() 
+```

@@ -1,0 +1,59 @@
+---
+title: "Kursusmateriale"
+---
+
+Her er et overblik over de forskellige elementer vi skal igennem i løbet af kursets i alt 7 øvelsessessioner.
+
+---
+
+## Session 1 — [Intro til netværksanalyse i R](session1.qmd)
+Formålet med denne øvelsesgang er at lære grundlæggende netværkfunktioner i R. I skal have installeret R og Rstudio inden vi starter.
+Vi forventer at gennemgå, hvordan man konstruerer forskellige netværksobjekter og matricer, og hvordan man visualisere simple netværk i Rstudio, herunder hvordan man tilføjer illustrative egenskaber til netværksobjekter.
+Endelig vil vi diskutere, hvilke emner og netværk, I kan arbejde med i jeres eksamensopgaver og udarbejde foreløbige undersøgelsesspørgsmål.
+Gør jer selv den tjeneste, at brush-up jeres R skills: se [Intro til R og Tidyverse](intro.qmd). Selv to timer brugt på at genopfriske den basale syntaks er godt givet ud.
+
+Der er flere online ressourcer tilgængelige, som hjælper med dette, såsom:
+[codecademy](https://www.codecademy.com/learn/learn-r)
+Eller denne, mere traditionelle, gennemgang:
+r-[tutorial](https://www.guru99.com/r-tutorial.html) (første lektion “What is R Programming Language? Introduction & Basics” kan springes
+over, det er mere en slags salgstale for hvorfor man skal bruge R.)
+
+---
+
+## Session 2 — [Sammenhængskraft, korteste stier, kliker](session2.qmd)
+I denne session arbejder vi især med begreberne densitet, stilængde, diameter og komponenter vs isolerede noder. 
+
+---
+
+## Session 3 — [Indsamling af netværksdata og konstruktion af netværksobjekter](session3.qmd)
+Denne øvelsesgang vil fokusere på to ting; datakilder og transformering af forskellige dataformater til en netværksdatastruktur.
+
+---
+
+## Session 4 — [Centralitetsanalyse](session4.qmd)
+I denne øvelsesgang gennemgår vi, hvordan man måler noders overordnet centralitet i form af degree, closeness og betweenness samt graden af centralisering i et netværk. 
+Endelig ser vi også på, hvordan man kan visualisere centrale aktører i et netværk. I får, som altid, mulighed for at arbejde med at analysere netværksmålene på jeres egne data.
+
+---
+
+## Session 5 — [Analyse af strategiske netværksrolle](session5.qmd)
+I denne session har vi fokus på Burts constraint som et mål for brobygning vs indlejrethed i redundente forbindelser  
+
+---
+
+## Session 6 — [Identifikation af communities](session6.qmd)
+Denne øvelsesgang fokuserer på at lære at benytte de forskellige metoder til at finde
+communities i R samt at benytte mål som clustering coefficient. Vi vil ligeledes
+gennemgå, hvordan man plotter et netværk på forskellige communities og hvordan man
+kan undersøge karakteristika for forskellige communities.
+
+---
+
+## Session 7 — [Visualisering af netværk](session7.qmd)
+I denne øvelse vil I lære om mere avancerede teknikker til visualisering af netværk ved
+hjælp af ggraph-pakken i R. I vil lære, hvordan man anvender forskellige layouts,
+farvepaletter og labels for at gøre netværksvisualiseringerne mere informative. Vi vil
+gennemgå, hvordan man kan bruge forskellige typer af skalaer for at fremhæve
+bestemte aspekter af netværket.
+
+---

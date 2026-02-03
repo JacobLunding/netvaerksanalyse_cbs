@@ -1,0 +1,239 @@
+---
+title: "Intro til R og Tidyverse"
+---
+
+```{r}
+
+```
+
+# Introduktion
+
+Det følgende r-scripts er skrevet med afsæt i **`r R.version$version.string`**. Hvis I ikke allerede har installeret denne seneste version så følg guiden i [Install and setup R](Install_guide.html)
+
+Det er desuden en god ide at have downloadet zip-filen med r-projektet *virkstrat_netvaerk* her:
+
+[Download Data](data/virkstrat.zip){.btn .btn-primary}
+
+eller fra kursets canvas-side.
+
+Den fil indeholder følgende filer og mapper:
+
+![Indhold af zip-filen](images/Screenshot%20from%202025-02-03%2020-33-04.png){width="100%"}
+
+(og skal i øvrigt opdateres med filer, jeg løbende lægger op på Canvas):
+
+Download zip-filen og pak den ud et fornuftigt sted på jeres harddisk (så I ved hvor I har den), det kunne fx. være i den mappe i har jeres andre studierelevante ting i, så som noter o.l.
+
+Hvis I sørger for altid at åbne *virkstrat_netvaerk.Rproj* filen enten ved at dobbeltklikke på den, eller åbne den inde fra R-studio øverste højre hjørne (hvor den vil ligge som 'recent projects' hvis den *har* været åbnet før). Hvis ikke skal I finde den under *open project...* (hvor I 'browser' jer frem til der hvor filen ligger).
+
+# Installér og indlæs pakker
+
+For at kunne lave de analyser vi gerne vil skal vi bruge en række forskellige pakker ud over det, der ligger i *base R*. Det gælder fx. [**tidyverse**](https://www.tidyverse.org/packages/), som er en samling af R pakker specifikt designet til data analyse, [**igraph**](https://igraph.org/), som er en pakke til netværksanalyse, [**ggraph**](https://ggraph.data-imaginist.com/) (en udvidelse til plot-pakken ggplot2 fra tidyverse), som gør det lettere at visualisere relationelle data som fx. netværk, [**ggpubr**](https://rpkgs.datanovia.com/ggpubr/), (endnu en udvidelse til ggplot2), som tilføjer nogen funktionalitet ift at gøre ens plots mere lækre, læs: ***pub***lication ***r***eady!, samt [RColorBrewer](https://r-graph-gallery.com/38-rcolorbrewers-palettes.html), som er en pakke der indeholder farvepaletter til valg af farver på plots.
+
+En anden pakke, vi gerne vil bruge er [**writexl**](https://docs.ropensci.org/writexl/), som gør det muligt at gemme Excel-filer fra R.
+
+::: callout-note
+I R installeres pakker med funktionen `install.packages()`...
+
+Hvis du har problemer med at installere tidyverse (især på macOS, vist)?, så prøv nedenstående:
+
+-   Luk R og RStudio
+-   Åbne Terminal på din computer (Tryk Command + Mellemrum på tastaturet for at starte Spotlight -\> søg "Terminal" i Spotlight Search )
+-   Skriv: sudo xcode-select --install i terminalen og så taste din password ind.
+-   Åbne RStudio igen og prøv at installere tidyverse pakken igen med at skrive: install.packages("tidyverse")
+:::
+
+Det er **kun** nødvendigt at installere pakker *én* gang. Man kan sagtens lade kodelinjen stå i sit script, men sæt et \# foran. Det betyder at koden ikke 'køres'.
+
+```{r, eval=F, echo=T}
+install.packages("tidyverse")
+install.packages("igraph")
+install.packages("ggraph")
+install.packages("ggpubr")
+install.packages("RColorBrewer")
+```
+
+::: callout-note
+Når vi skal bruge installerede pakker skal de 'loades', til det bruges funktionen `library()`.
+:::
+
+```{r indlæs pakker, echo = T, warning=F, message=F}
+library(tidyverse)
+```
+
+------------------------------------------------------------------------
+
+# Tidyverse
+
+I løbet af dette kursus kommer vi til at skrive kode på 'tidyverse-måden'. Der findes rigtig mange gode tutorials på nettet, der introducerer til tidyverse, fx [denne](https://becoming-fluent-in-data.com/intro-to-tidyverse.html) eller [denne](https://r4ds.hadley.nz/), men lad mig kort introducere nogle kerneideer og begreber/funktioner fra dette 'univers'. Det er nemlig sådan at pakker i Tidyverse deler den samme underliggende filosofi i forhold til design, kode-grammatik og datastruktur.
+
+::: img-float
+![](images/tidyverse.png){style="float: left; ; margin: 5px; " width="32%"}
+:::
+
+Tidyverse er en samling af pakker til R, som alle sammen er designet specielt til data science. De vigtigste pakker for os er:
+
+[**Indlæsning af data:**]{.underline}
+
+**readr** som indlæser kommaseparerede datafiler (fx csv-filer) og **readxl** som læser filer fra Excel (.xlsx). Denne pakke er ikke core-tidyverse, så den skal loades selvstændigt.
+
+[**Behandling af data:**]{.underline}
+
+**dplyr** som har en masse redskaber til data behandling
+
+[**Visualisering af data**:]{.underline}
+
+**ggplot2** som har en masse funktioner til almindelig datavisualisering
+
+## Tidyverse-grammatikken
+
+### Læs data og assign '\<-'
+
+Først indlæser vi noget data med `read_csv()`. I mappen data ligger et eksempeldatasæt med flyafgangstider i NYC 2013 (ja, hvorfor ikke).
+
+Filen ligger i "data-mappen" i vores R-projekt.
+
+[Download Data](data/flights.csv){.btn .btn-primary}
+
+::: callout-note
+Hvis I downloader datafilen (csv) her, så læg den i 'data'-mappen i jeres Rprojekt-mappe
+:::
+
+Vi giver `read_csv()` stien til filen "data/fligths.csv" (vi kan undlade alt foran data/ fordi vi er i et Rprojekt, som har et working directory. Dvs R ved hvor på computeren, vi befinder os). Hvis vi bare 'kører' koden får vi læst data ind, men ikke gemt i hukommelsen.
+
+```{r}
+read_csv("data/flights.csv")
+```
+
+For at 'gemme' vores data i hukommelsen bruger vi '\<-' assign operatoren. Det betyder at vi læser data ind, men nu assigner det til et **objekt**, som vi kalder *flights*
+
+```{r, warning=F, message=F}
+flights <- read_csv("data/flights.csv")
+```
+
+### Databehandling med dplyr
+
+**dplyr** delen af Tidyverse består blandt andet af en lang række funktioner (**verber**) som udgør det centrale element i gramatikken. De 'gør' noget med vores **objekter**. Generalt er strukturen i en tidyverse kode altid: 1. et data-objekt 2. en række verber 3. et nyt ændret data-objet. En elegant måde at skrive kode på er at bruge den såkaldte *pipe* operator `%>%`. Den tager så at sige dét, der står til venstre, og sender videre til dét, der står til højre. Man kan skrive 'pipen' eller bruge en genvejstast som i Windows er [**`Control + Shift + M`**]{style="background-color: #f2f2f2; box-sizing: border-box"} og i MacOS [**`Cmd + Shift + M`**]{style="background-color: #f2f2f2; box-sizing: border-box"}
+
+![](images/Screenshot%20from%202025-01-30%2022-13-07.png){width="500"}
+
+Et simpelt verbum er fx. `head()`, som viser de første rækker af vores data
+
+```{r}
+flights %>% head()
+```
+
+eller `glimpse()`, der viser hvilke typer af variable etc vores objekt indeholder og samtidig giver eksempler på værdierne:
+
+```{r}
+flights %>% glimpse()
+```
+
+Vi kan inddele de mest almindelige verber i tre grupper: nogle der gør noget i forhold til **rækker**, nogle der gør noget i forhold til **kolonner** og nogle der gør noget i forhold til **grupper**
+
+#### Række orienterede verber/funktioner
+
+Lad os starte med en af de verber vi kommer til at bruge hele tiden, *`filter()`*. I forhold til måden at skrive kode på tager vi vores data.objekt `flights` og sender det videre `%>%` til verbet `filter()`, som filtrer data baseret på de betingelser vi giver det. `flights` indeholder en variable der hedder `dep_delay` (hvor meget var en afgang forsinket). Lad os sige vi kun vil se på de afgange der er forsinket med mere `>` end tre timer (180 min). Vi kunne også have brugt andre betingesler, fx. mindre end, `<`, eller lig med `==` (husk at vi altid bruger dobbelt =, når der er tale om logiske operationer), eller ikke lig med `!=`.
+
+```{r}
+flights %>% filter(dep_delay > 180)
+```
+
+Igen vil vi gerne gemme det data der kommer ud. Lige nu har vi bare 'vist' det. Derfor assigner vi vores outcome til et nyt objekt `fligths_delayed`, som nu kun indeholder de rækker vi har bedt om, baseret på `dep_delay`:
+
+```{r}
+flights_delayed <- flights %>% filter(dep_delay > 180)
+```
+
+Vi kan også basere vores filter på mere end en betingelse. I så fald bruger vi enten *og* `&` eller *eller* `|`, fx.
+
+```{r}
+flights_delayed <- flights %>% filter(dep_delay > 60 & dep_delay < 120)
+```
+
+Hvor vi reducerer vores data med flyafgange til alle fly der er mere end en time *og* mindre end to timer forsinket.
+
+#### Kolonne orienterede funktioner/verber
+
+En funktion vi kommer til at bruge meget, og som svarer til `filter()`, men gælder kolonnerne, er *`select()`*. Med select vælger vi de variable vi vil beholde. Lad os reducere vores data, så vi kun har afgangs- og ankomststed samt år, måned, dag og forsinkelse.
+
+```{r}
+flights_reduced <- flights %>% select(origin, dest, year, month, day, dep_delay)
+flights_reduced %>% head()
+```
+
+En anden nyttig kolonne-funktion er *`rename()`*. Måske vil vi gerne kalde vores kolonner noget andet. I det her tilfælde kunne det være vi gerne ville have det på dansk. `rename()` fungerer på den måde at man skriver det nye navn og fortæller funktionen at det skal være lig med `=` det gamle navn. Bemærk at vi her **ikke** assigner vores output til noget objekt, vi ser bare de første par rækker, `head()`. Dvs. flights_reduced objektet forbliver uforandret
+
+```{r}
+flights_reduced %>% rename(fra = origin, til = dest, år = year, måned = month, dag = day, forsinkelse = dep_delay) 
+```
+
+Hvis vi lige kigger på `flights_reduced` med `head()` kan vi konstatere at variablene stadig har de engelske navme
+
+```{r}
+flights_reduced %>% head()
+```
+
+Hvis vi gerne vil tage en smutvej til det samme, kan man faktisk godt bruge `select()` til både at udvælge og omdøbe kolonner. Denne gang assigner vi outputet til et objekt som vi kalder det samme som før (dvs. vi overskriver det gamle)
+
+```{r}
+flights_reduced <- flights_reduced %>% select(fra = origin, til = dest, år = year, måned = month, dag = day, forsinkelse = dep_delay)
+flights_reduced %>% head()
+```
+
+Funktionen/verbet *`mutate()`* er anden vigtig funktion som vi skal bruge hele tiden. Med `mutate()` kan vi 'ændre' vores dataobjekt, fx. lave nye variable eller omskrive gamle. lad os sige vi gerne vil have en ny variabel der fortæller os om et fly er mere end en halv time forsinket. Her skriver vi navnet på den variable vi vil lave og fortæller hvad den skal bestå af. Med forsinkelse \> 30 laver vi en logisk variabel der `TRUE` hvis forsinkelsen er over 30 min ellers `FALSE`.
+
+```{r}
+flights_reduced <- flights_reduced %>% mutate(forsinket_halv_time = forsinkelse > 30)
+flights_reduced %>% head()
+```
+
+Nu har vores dataobjekt fået en ny variabel.
+
+#### Grupper og 'opsummeringer'
+
+Hvis vi ikke bare vil ændre eller tilføje variable, men i stedet vil lave nogle beregninger på vores data, kan vi bruge verbet `summarise()`. Det kunne være vi gerne vil have den gennemsnitlige `mean()` forsinkelse på alle fly, og antallet af fly i det hele taget `n()` (tæller antal rækker), og antallet af fly, der er mere end en halv time forsinket:
+
+```{r}
+flights_reduced %>% summarise(gens_forsinkelse = mean(forsinkelse), fly = n(), halv_time = sum(forsinket_halv_time))
+```
+
+Hov!!! Hvorfor får vi værdien `NA`. Det skyldes at der åbenbart er flyafgange i data, hvor der ikke er registretet en tid. `NA` er (en af) R's måde(r) at håndtere `missing` værdier. Hvis vi gerne vil lave vores beregninger alligevel, skal vi specificere at der skal ses bort fra `missing`-værdier. Det gør vi ved at skrive `na.rm = TRUE` (læses som na.remove) i `mean()` og `sum()` funktionern. Lad os i den forbindelse også lige tilføje en beregning af andelen af fly der er mere end en halv tinme forsinket:
+
+```{r}
+flights_reduced %>% summarise(gens_forsinkelse = mean(forsinkelse, na.rm = T),  fly = n(), halv_time = sum(forsinket_halv_time, na.rm = T), halv_time_pct = halv_time / fly)
+
+```
+
+En sidste funktion der vil dukke op hele tiden er `group_by()`. Vi har lige opsummeret hele datasættet. Vi kunne jo i stedet være interesseret i at gruppere data før vi opsummerer. Det kunne fx være på måneder. Altså gennemsnitlig forsinkelse per måned. For at gøre det skal vi sætte verbet/funktionen `group_by()` ind før `summarise()`. Bemærk her at vi kan (men behøver ikke) lave linjeskift i koden efter en pipe.
+
+```{r}
+flights_reduced %>% 
+  group_by(måned) %>% 
+  summarise(gens_forsinkelse = mean(forsinkelse, na.rm = T),  fly = n(), halv_time = sum(forsinket_halv_time, na.rm = T), halv_time_pct = halv_time / fly) %>% 
+  head(12)
+```
+
+Man kan også gruppere data ud fra mere end en variabel. Vi kunne fx se på hvilke stærkninger, altså `fra` `til`, der er mest forsinkede. Her introduceres desuden en anden meget anvendlig funktion, nemlig `arrange()`, der sorterer data på en given variabel. Hvis vi bruger `desc()` omkring variable sorterer den faldende (dvs. fra størt til mindst, ellers sorterer den altid fra mindst til størst):
+
+```{r}
+flights_reduced %>% 
+  group_by(fra, til) %>% 
+  summarise(gens_forsinkelse = mean(forsinkelse, na.rm = T),  fly = n(), halv_time = sum(forsinket_halv_time, na.rm = T), halv_time_pct = halv_time / fly) %>% 
+  arrange(desc(gens_forsinkelse))
+  
+```
+
+Det er åbenbart forbindelsen fra Newark Liberty International Airport til McGhee Tyson Lufthavn der oplever mest forsinkelse. I gennemsnit ca. 42 min og 37.5% er mere end en halv time forsinket...
+
+::: callout-note
+**Take-away**
+
+Her har vi set på hvordan vi indlæser data med `read_csv()`, og hvordan vi assigner data til et objekt med `<-`. Vi har også introduceret `%>%` - *pipen* - som vi sender videre fra vensstre mod højre. Vi har desuden set på funktionaliteten i `dplyr`:
+
+Af **række-funktioner** har vi introduceret `filter()`, som bruges til at udvælge specifikke rækker baseret på logiske betingelser `>, <, ==, !=`, eller kombinationer af disse med `&, |`.
+
+Af **kolonne-funktioner** har vi introduceret `select()` og `rename()`, til at udvælge og eller omdøbe variable. Desuden har vi snuset til `mutate()`-funktionen som vi bruger til at ændre eller tilføje variable.
+
+På **gruppe-niveauet** har vi introduceret `summarise()` som for sig selv tilader opsummerende beregniger over hele data (opfattet som én gruppe), men som i kombination med `group_by()` kan lave opsummeringer baseret på en eller flere variable, der grupperer data.
+:::

@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Indsamling af netværksdata og konstruktion af netværksobjekter – Kursusmateriale til Virksomhedsstrategi i et netværksperspektiv</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-553db639d176b1f1e5eb8f34e19f9014.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Kursusmateriale til Virksomhedsstrategi i et netværksperspektiv</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./Install_guide.html"> 
+<span class="menu-text">Install and setup R</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./intro.html"> 
+<span class="menu-text">Intro til R og Tidyverse</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./kursusmateriale.html"> 
+<span class="menu-text">Kursusmateriale</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#vigtige-spørgsmål-ift-netværksdata" id="toc-vigtige-spørgsmål-ift-netværksdata" class="nav-link active" data-scroll-target="#vigtige-spørgsmål-ift-netværksdata">Vigtige spørgsmål ift netværksdata</a></li>
+  <li><a href="#kilder-til-netværksdata" id="toc-kilder-til-netværksdata" class="nav-link" data-scroll-target="#kilder-til-netværksdata">Kilder til Netværksdata:</a>
+  <ul class="collapse">
+  <li><a href="#danish-elite-network-2017-den17" id="toc-danish-elite-network-2017-den17" class="nav-link" data-scroll-target="#danish-elite-network-2017-den17">Danish Elite Network 2017 (den17)</a></li>
+  <li><a href="#orbis" id="toc-orbis" class="nav-link" data-scroll-target="#orbis">Orbis</a>
+  <ul class="collapse">
+  <li><a href="#at-bygge-et-søgefilter-på-orbis" id="toc-at-bygge-et-søgefilter-på-orbis" class="nav-link" data-scroll-target="#at-bygge-et-søgefilter-på-orbis">At ‘bygge’ et søgefilter på Orbis</a></li>
+  <li><a href="#tilføj-bestyrelsesoplysninger-til-vores-data" id="toc-tilføj-bestyrelsesoplysninger-til-vores-data" class="nav-link" data-scroll-target="#tilføj-bestyrelsesoplysninger-til-vores-data">Tilføj bestyrelsesoplysninger til vores data</a></li>
+  <li><a href="#eksporter-data-til-xlsx" id="toc-eksporter-data-til-xlsx" class="nav-link" data-scroll-target="#eksporter-data-til-xlsx">Eksporter data til xlsx</a></li>
+  <li><a href="#eksempel-med-alkohol-og-tobak-fra-orbis" id="toc-eksempel-med-alkohol-og-tobak-fra-orbis" class="nav-link" data-scroll-target="#eksempel-med-alkohol-og-tobak-fra-orbis">Eksempel med alkohol og tobak fra Orbis</a></li>
+  </ul></li>
+  <li><a href="#cvr" id="toc-cvr" class="nav-link" data-scroll-target="#cvr">CVR</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Indsamling af netværksdata og konstruktion af netværksobjekter</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="vigtige-spørgsmål-ift-netværksdata" class="level1">
+<h1>Vigtige spørgsmål ift netværksdata</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Som med al anden indsamling af samfundsvidenskabelig data er det også med netværksanalyse meget vigtig at man forholder sig til en række metodologiske og videnskabsteoretiske spørgsmål, allerede i den fase, hvor man overvejer hvilken data man vil indsamle(/bruge) og hvordan man vil indsamle(/bruge) det!</p>
+</div>
+</div>
+<p>I social netværksanalyse behandler vi data <em>relationelt</em>, dvs. vi har nogle enheder (mennesker, virksomheder, ‘ideer/begreber’, hjemmesider), som vi antager indgår i nogle relationer, som vi gerne vil strudere på en systematisk måde. Det betyder at vi på et visuelt plan hele tiden arbejder med punkter (vertices eller noder) der er forbundet (eller ikke forbundet) af streger (edges):</p>
+<div class="grid">
+<div class="g-col-6">
+<p><img src="images/Screenshot from 2025-02-17 11-43-34.png" class="img-fluid" style="width:50.0%"></p>
+</div>
+<div class="g-col-6">
+<p><img src="images/Screenshot from 2025-02-17 11-52-41.png" class="img-fluid" style="width:50.0%"></p>
+</div>
+</div>
+<p>Det rejser nogle vigtige spørgsmål:</p>
+<ol type="1">
+<li><p>Hvad er en relation?</p>
+<ul>
+<li>Er det medlemskaber (som i figuren til højre, de to blå punkter er begge medlem af det røde punkt), er det venskaber/kendskaber (som i figuren til venstre de tre blå punkter kender hinanden). Er relationen samtidig? dvs. Er de to blå punkter fx. medlem af den samme klub nu(!) eller er det nok (for vores analyse) at de begge har været med på et tidspunkt, men ikke nødvendigvis samtidig? En forbindelse kan også udtrykke udveklingsrelationer. Er det fx to virksomheder der sender penge eller varer til hinanden? Eller kampagnedonationer til politikere/partier? Relationer kan også være mere abstrakte, fx. relationer mellem ideer og begreber, fx semantiske relationer eller referencer - “forfatter B” trækker på “forfatter A”s ideer osv. På mange måder mulighederne uendelige. Det vigtigste er at man er eksplicit og tydelig omkring hvad man mener man kigger på. Det har nemlig stor betydning for om man faktisk viser det man tror man viser i sine analyser. Det er også afgørende om tænker at relationen har en <strong>retning</strong>, som i eksemlet med forfatter B, der trækker på forfatter As ideer. Der kan man sige at relationen fra B til A (eller den anden vej for den sags skyld; er det det at B <em>trækker</em> på A, der er afgørende eller er det det at ideen <em>flyder</em> fra A til B der er afgørende?). Eller er relationen gensidig, når A og B er vener. Har relationerne forskellig <strong>vægt</strong>? Kender A og B fx hinanden <em>mere</em> eller <em>bedre</em> end B kender C osv.?</li>
+</ul></li>
+<li><p>Hvad er et punkt?</p>
+<ul>
+<li>I skal også forholde jer til hvad enheden i analyserne er? Hvad er udgør et punkt? Og hvilke punkter skal med? Hvis vi kiggede på venskaber i en klasse, så er punkterne måske klassens elever. Men hvad hvis elev A og B ikke nævner hinanden som venner, men begge nævner X fra parallelklassen? Skal X så med? Skal hele parallelklassen med? Eller hele skolen? Og måske også naboskolen? Det er et helt afgørende spørgsmål i netværksanalyse: Hvor starter og slutter netværket?</li>
+</ul></li>
+<li><p>Hvilken slags netværk er det vi kigger på?</p>
+<ul>
+<li>Som vi tidligere har talt om kan vi have både netværk mellem en enkelt type af aktører og netværk mellem flere typer af ‘aktører’. Ofte har vi måske indsamlet et netværk med to distinkte typer (et bipartite netværk), fx bestyrelsespersoner og deres virksomheder, eller forfattere og deres begreber osv. I en analytisk sammenhæng kunne vi måske være interesseret i at rette blikket mod (de formidlede) relationer mellem én netværkets enheder. Det kræver en så kaldt projektion af netværket.</li>
+</ul></li>
+</ol>
+<p><img src="images/session2.png" class="img-fluid"></p>
+<p>En vigtig del af en netværksanalyse er at forholde sig til spørgsmål som disse. Hvilken mekanisme er vi interesseret i at studere. Er vi optaget af en epidemologisk kortlægning af risikoen for spredning af coronavirus? Ja men, så vi nødt til at tænke relationen som en eller anden grad af fysisk kontakt. Er vi interesseret i indflydelse på beslutninger, så er relationen måske medlemskab i organer, hvor der træffes beslutninger. Er vi interesseret i popularitet og anerkendelse, så er relationen vi skal lede efter måske oplevede venskaber. Vil vi studere muligheder for innovation i virksomheder, så skal vi måske forstå relationerne som et flow af vidensdeling mellem individer eller teams.</p>
+<p>Selvom netværksanalyse på papiret ‘bare’ er punkter og streger er det altså utrolig vigtigt at forholde sig til hvad punkterne og stregerne repræsenterer.</p>
+</section>
+<section id="kilder-til-netværksdata" class="level1">
+<h1>Kilder til Netværksdata:</h1>
+<p>Lod os kigge nærmere på hvilke typer af data I kan bruge i jeres eksamensopgaver. Der er grundlæggende tre muligheder:</p>
+<ul>
+<li>I kan bruge Danish Elite Network 2017 (Ellersgaard og Larsen m.fl), og finde et spændende subset af dette, I kan analysere</li>
+<li>I kan bruge CBS’ adgang til Orbis og definere og downloade et datasæt herfra.</li>
+<li>I kan bruge andre tilgængelige kilder eller indsamle jeres egen data (the sky is the limit!).</li>
+</ul>
+<p>I det følgende skal vi se nærmere på de forskellige mulighedre:</p>
+<p>men først indlæser vi lige de R-pakker vi får brug for (som altså skal installeres først, hvis de ikke allerede er det).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tidyverse")</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("igraph")</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("ggraph")</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("ggpubr")</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("readxl")</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("writexl")</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("RColorBrewer")</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Vi skal også indlæse et <em>script</em>, der indeholder funktioner skrevet specifikt til dette kursus. Det drejer sig om filen <em>custom_functions.R</em> i mappen “/functions”.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Et script indlæses med funktionen <code>source(, ...echo = FALSE)</code>, hvor <code>echo = FALSE</code> betyder at scriptet indlæses uden at vise indholdet.</p>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions/custom_functions.R"</span>, <span class="at">echo =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="danish-elite-network-2017-den17" class="level2">
+<h2 class="anchored" data-anchor-id="danish-elite-network-2017-den17">Danish Elite Network 2017 (den17)</h2>
+<p>I mappen <code>"/data"</code> i R projketet finder i filen <code>den17-no-nordic-letters.csv</code>. Den kan også downloades her:</p>
+<p><a href="data/den17-no-nordic-letters.csv" class="btn btn-primary">Download den17</a></p>
+<p>Indlæs data med <code>read_csv</code></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>den <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/den17-no-nordic-letters.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>den17 er et <em>affiliation</em> datasæt, som indeholder bestyrelsesposter og og andre medlemskaber i (stort set) alle (relevante) virksomheder, organisationer, fonde, insitutioner, råd, nævn, kommissioner osv. Dvs alt lige fra Kattens Vaern over A.P. Moeller - Maersk og Novo Nordisk til regeringens sikkerhedsudvalg osv. Hver række i datasættet repræsenterer en position, dvs. en person med en rolle i organisation:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 10
+  name    affiliation role  gender tags  sector type  cvr_person cvr_affiliation
+  &lt;chr&gt;   &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;      &lt;dbl&gt;           &lt;dbl&gt;
+1 Lars E… &amp; co        Memb… Men    Corp… Corpo… Virk… 4006470500        21705535
+2 Mikael… &amp; co        Exec… Men    Corp… Corpo… Virk… 4004059627        21705535
+3 Thomas… &amp; co        Chai… Men    Corp… Corpo… Virk… 4004304040        21705535
+4 Thomas… &amp; co        Memb… Men    Corp… Corpo… Virk… 4004062718        21705535
+5 Hans J… 15. juni f… Chai… Men    Char… Found… Fond…         NA        15232102
+6 Niels … 15. juni f… Vice… Men    Char… Found… Fond… 4000067364        15232102
+# ℹ 1 more variable: description &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>Vi kan bruge <code>glimpse()</code> til lige at se hvad data ellers indeholder:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">glimpse</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 56,849
+Columns: 10
+$ name            &lt;chr&gt; "Lars Eivind Kreken", "Mikael Ernst Joergensen", "Thom…
+$ affiliation     &lt;chr&gt; "&amp; co", "&amp; co", "&amp; co", "&amp; co", "15. juni fonden (Best…
+$ role            &lt;chr&gt; "Member", "Executive", "Chairman", "Member", "Chairman…
+$ gender          &lt;chr&gt; "Men", "Men", "Men", "Men", "Men", "Men", "Women", "Wo…
+$ tags            &lt;chr&gt; "Corporation, Media, Marketing, Commercials, Communica…
+$ sector          &lt;chr&gt; "Corporations", "Corporations", "Corporations", "Corpo…
+$ type            &lt;chr&gt; "Virksomhed (CVR)", "Virksomhed (CVR)", "Virksomhed (C…
+$ cvr_person      &lt;dbl&gt; 4006470500, 4004059627, 4004304040, 4004062718, NA, 40…
+$ cvr_affiliation &lt;dbl&gt; 21705535, 21705535, 21705535, 21705535, 15232102, 1523…
+$ description     &lt;chr&gt; "Automatisk CVR import at 2016-03-12 17:45:41: BESTYRE…</code></pre>
+</div>
+</div>
+<p>Alle ‘organisationer’ i datasættet er kodet med en række <code>tags</code> som kategoriserer organisationerne i forskellige emner.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">select</span>(name, affiliation, tags)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 56,849 × 3
+   name                    affiliation                  tags                    
+   &lt;chr&gt;                   &lt;chr&gt;                        &lt;chr&gt;                   
+ 1 Lars Eivind Kreken      &amp; co                         Corporation, Media, Mar…
+ 2 Mikael Ernst Joergensen &amp; co                         Corporation, Media, Mar…
+ 3 Thomas Hoegeboel        &amp; co                         Corporation, Media, Mar…
+ 4 Thomas Hoffmann         &amp; co                         Corporation, Media, Mar…
+ 5 Hans Joergen Rasmusen   15. juni fonden (Bestyrelse) Charity, Culture, Found…
+ 6 Niels Thomas Heering    15. juni fonden (Bestyrelse) Charity, Culture, Found…
+ 7 Else Mikkelsen 55281    15. juni fonden (Bestyrelse) Charity, Culture, Found…
+ 8 Helene K. Hjenner       15. juni fonden (Bestyrelse) Charity, Culture, Found…
+ 9 Jette Baagoee           15. juni fonden (Bestyrelse) Charity, Culture, Found…
+10 Zeb Meier Watz          2 Timer om ugen (Bestyrelse) Education, Youth, egmon…
+# ℹ 56,839 more rows</code></pre>
+</div>
+</div>
+<p>Disse emne-tags kan bruges til at udvælge subset af data til forskellige analyser. I <code>custom_functions.R</code> filen, vi indlæste tidligere, ligger en funktion der giver et overblik over hvilke tags <code>den17</code>-datasættet indeholder: nemlig <code>show.all.tags()</code>, som viser hvor mange positioner (poster) i hvor mange organisationer, der knytter sig til hvert tag.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">show.all.tags</span>() <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">15</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 Positions affiliations
+A-kasse                193           14
+Academics              927           71
+Actors                  65            7
+Administration         789           66
+Africa                  13            1
+Alternative             45            8
+Animals                397           50
+Architecture          1419          130
+Art                    753          100
+Artists                245           30
+Asia                     5            1
+Award                   40            6
+Baltic countries        11            2
+Banks                  899           69
+BILH                   190           45</code></pre>
+</div>
+</div>
+<p>hvis I skriver:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">show.all.tags</span>() <span class="sc">%&gt;%</span> <span class="fu">enframe</span>() </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>tags i kombination med <code>sector</code> og evt. også type <code>type</code> er en god mode at finde frem til et spændende subset af virksomheder og eller personer.</p>
+<p>…lad os se hvad variablen <code>sector</code> indeholder. Til det kan vi bruge verbet <code>count()</code>, som optæller cases på en given variabel.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">count</span>(sector)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 13 × 2
+   sector           n
+   &lt;chr&gt;        &lt;int&gt;
+ 1 Commissions    814
+ 2 Corporations  9524
+ 3 Events        2270
+ 4 Family         207
+ 5 Foundations   6993
+ 6 Municipal      320
+ 7 NGO          17720
+ 8 Organisation   227
+ 9 Parliament    1087
+10 Politics        37
+11 State        13764
+12 VL_networks   3803
+13 &lt;NA&gt;            83</code></pre>
+</div>
+</div>
+<p>…lad os også se på <code>type</code>, der giver en alternativ inddeling .</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">count</span>(type) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 2
+   type                     n
+   &lt;chr&gt;                &lt;int&gt;
+ 1 Begivenhed            2086
+ 2 Folketing              241
+ 3 Fond (CVR)            1783
+ 4 Kommission             772
+ 5 Netvaerk (VL-gruppe)  4318
+ 6 Organisation         14819
+ 7 Snowball                11
+ 8 Stat                 10419
+ 9 Virksomhed (CVR)      9722
+10 &lt;NA&gt;                 12678</code></pre>
+</div>
+</div>
+<p>For eksemplets skyld lad os begynde med at ‘subsette’ datasættet, så vi kun beholder de <em>7989</em> rækker hvor en ‘affiliation’ har værdien <code>Corporations</code> på sector variablen.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>den_corp <span class="ot">&lt;-</span> den <span class="sc">%&gt;%</span> <span class="fu">filter</span>(sector <span class="sc">==</span> <span class="st">"Corporations"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>lad os se på hvilke <strong>tags</strong> vi kan finde her:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show.all.tags</span>(den_corp) <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             Positions affiliations
+Animals             37            4
+Architecture        93           14
+Banks              384           40
+BILH               190           45
+Business            96           14
+BYGG               282           43
+Charity             16            1
+Children             8            1
+Clothing            11            1
+Commerce            46            6</code></pre>
+</div>
+</div>
+<p>funktionen <code>has.tags()</code> er en hjælpefunktion, der giver os enten (<code>... result = "affil"</code>) en liste af navne på de <em>organisationer</em>, der har det eller et af de pågældende tags, eller (<code>... result = "name"</code>) en liste af navne på <em>individer</em> der er i en af disse organisationer, eller (<code>... result = "den"</code>) et nyt datasæt med kun poster i organisationer med de relevante tags. Option’en <code>...mode =</code> bruges til at fortælle om vi vil have alle de poster der har der har et af tags’ne (<code>...mode = "or"</code>), eller om vi ønsker at posterne skal have alle tags’ne (<code>...mode = "and"</code>):</p>
+<p>Lad os lave en streng vector med de Tags vi gerne vil kigge efter.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>tags <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Banks"</span>, <span class="st">"FINA"</span>, <span class="st">"Finance"</span>, <span class="st">"Investment"</span>, <span class="st">"Insurance"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Hvis vi bruger <code>result = "affil"</code> sammen med <code>mode = "or"</code> får vi alle de <em>virksomheder</em>, der har et af de pågældende tags:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>den_corp <span class="sc">%&gt;%</span> <span class="fu">has.tags</span>(tags, <span class="at">result =</span> <span class="st">"affil"</span>, <span class="at">silent =</span> <span class="cn">TRUE</span>, <span class="at">mode =</span> <span class="st">"or"</span>) <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "A/S DANSK ERHVERVSINVESTERING" "ALD Automotive"               
+ [3] "Aleris (Bestyrelse)"           "Alm. Brand"                   
+ [5] "Alpha Holding"                 "ALTOR EQUITY PARTNERS A/S"    
+ [7] "AP Pension"                    "Arbejdernes Landsbank"        
+ [9] "Axcelfuture (Advisory Board)"  "Bank DNB Nord"                </code></pre>
+</div>
+</div>
+<p>Hvis vi bruger <code>result = "name"</code> sammen med <code>mode = "or"</code> får vi alle de <em>personer</em>, der har poster i virksomheder med et af de pågældende tags:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>den_corp <span class="sc">%&gt;%</span> <span class="fu">has.tags</span>(tags, <span class="at">result =</span> <span class="st">"name"</span>, <span class="at">silent =</span> <span class="cn">TRUE</span>, <span class="at">mode =</span> <span class="st">"or"</span>) <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Asger Ib Mardahl-Hansen"            "Hans Ole Jensen"                   
+ [3] "Lars Groenborg Eskesen"             "Michael Noergaard"                 
+ [5] "Thorkild Engell Jensen"             "Gilles Jean-Noël Momper"           
+ [7] "Guillaume Joseph Emile de Leobardy" "Michael John Masterson"            
+ [9] "Tim Torben Albertsen"               "Björn Nordenvall"                  </code></pre>
+</div>
+</div>
+<p>Hvis vi bruger <code>result = "den"</code> sammen med <code>mode = "or"</code> får vi et subset af data med alle de poster der har et af de pågældende tags. Det data assigner vi (<code>&lt;-</code>) til et nyt dataobjekt <code>den_fina</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>den_fina <span class="ot">&lt;-</span> den_corp <span class="sc">%&gt;%</span> <span class="fu">has.tags</span>(tags, <span class="at">result =</span> <span class="st">"den"</span>, <span class="at">silent =</span> <span class="cn">TRUE</span>, <span class="at">mode =</span> <span class="st">"or"</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(den_fina)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 989  10</code></pre>
+</div>
+</div>
+</section>
+<section id="orbis" class="level2">
+<h2 class="anchored" data-anchor-id="orbis">Orbis</h2>
+<p>En anden kilde til (netværks-)data om virksomheder er <em>Orbis</em>. Orbis er en database der indeholder information om virksomheder fra hele verden - omkring 400.000.000 selskaber. Databasen trækker data fra mere end 170 forskellige kilderm som standardiseres og linkes på en måde der muliggør sammenlinging. På virksomhedsniveau indeholder orbis blandt meget andet geografisk data, juridisk data, finansiel data, ejerskabsdata mv. om den enkelte virksomhed. Fra et netværksperspektiv er databasen interessant fordi den desuden indeholder (aktuel og historisk) data om virksomhedernes bestyrelse og direktion (m.v.). I det følgende skal vi se hvordan man trækker et bestyrelses-(netværks-)datasæt fra orbis.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Som med al anden data (særligt data man ikke selv har frembragt), skal man med Orbis være opmærksom på en række</p>
+<p>Skim evt. <a href="https://www.oecd.org/content/dam/oecd/en/publications/reports/2020/05/coverage-and-representativeness-of-orbis-data_9628c322/c7bdaa03-en.pdf">denne</a> rapport fra OECD om Orbis’ dækningsgrad. Eller tag et kig på <a href="https://doi.org/10.1111/glob.12183">(Heemskerk et al.&nbsp;2018)</a> om bl.a. ‘completeness’ og problemer med ‘entity resolution’ - optræder det samme firma eller den samme person flere gange med forskllige versioner af det navn. Det er ikke problemer I behøver at løse, men noget det er værd at bemærke, når man præsenterer den data man analyserer!</p>
+</div>
+</div>
+<p>Orbis kan tilgås via jeres login til CBS’s bibliotek: <a href="https://www.cbs.dk/bibliotek/databaser/orbis"><strong>Orbis via cbs</strong></a></p>
+<section id="at-bygge-et-søgefilter-på-orbis" class="level3">
+<h3 class="anchored" data-anchor-id="at-bygge-et-søgefilter-på-orbis">At ‘bygge’ et søgefilter på Orbis</h3>
+<p>Det første man skal tænke over er hvilke filtre, der er nødvendige for at hente det subset af virksomheder man er interesseret i. Der er selvfølgelig et hav af muligheder.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/orbis.png" class="img-fluid figure-img" data-fig.pos="H" width="600"></p>
+<figcaption>Orbis forside</figcaption>
+</figure>
+</div>
+<ol type="1">
+<li>Under <em>Company</em>, kan man under fx vælge <em>Standardized legal forms</em> vælge kun ‘Private limited companies’ eller også ‘Public limited companies’. Man kan også under <em>Number of employees</em> vælge kun at kigge på virksomheder af en hvis størrelse.</li>
+<li>Under <em>Location</em> kan man sætte forskellige geografiske filtre, både lande, regioner m.v., men også forskellige klassifikationer.</li>
+<li>Under <em>Activities and industry</em> kan man under <em>Industri classifications</em> vælge mellem forskellige branche-klassifikationer og herunder udvælge en (eller flere) bestemt(e) branche(r). Man kan desuden under <em>Entity type</em> afgrænse virksomhedstype yderligere. En anden mulighed er at man definerer ‘fritekst’ søgning under <em>Activity text search</em>, hvor man under ‘scope’ vælger hvilke datafelter, der skal søges i og under ‘Free text’ skriver hvad der skal søges efter. <img src="images/fritekst orbis.png" class="img-fluid" alt="Fritekstsøgning"></li>
+</ol>
+<p>Når man har ‘bygget’ sit filter kan man se hvad de forskellige filtre gør og hvad de til sammen giver af resultat. Næste skridt er <em>View results</em> <img src="images/search.png" class="img-fluid" alt="Fritekstsøgning"></p>
+</section>
+<section id="tilføj-bestyrelsesoplysninger-til-vores-data" class="level3">
+<h3 class="anchored" data-anchor-id="tilføj-bestyrelsesoplysninger-til-vores-data">Tilføj bestyrelsesoplysninger til vores data</h3>
+<p>Her kan vi se alle de virksomheder, der lever op til vores søgekriterier. Det vi gerne vil nu er at tilføje bestyrelsesdata. Klik på <em>Add/remove columns</em> øverst til højre. <img src="images/add_cols.png" class="img-fluid" alt="Fritekstsøgning"> Scroller man lidt ned i venstre kolonne og klikker på feltet <em>Directors and managers</em>, får man i den midsterste kolonne en række valgmuligheder: <img src="images/add_data.png" class="img-fluid" alt="Tilføj Directors and managers"> Vælg som minimum 1) Full name, 2) UCI, 3) Job title, 4) Current or previous.</p>
+<p>Under <em>Other personal information</em> og <em>Other role information</em> i venstre kolonne kan man tilføje yderligere information om personen og dennes rolle. På personniveau fx. køn og nationalitet mv. På rolleniveau kan det være nyttigt at tilføje ‘Type of role’ og ‘Board, committee or department’ og evt. ‘Level of responsibility’, da det kan give mulighed for at fokusere kun på bestyrelse og direktion.</p>
+<p>Hvis man klikker på det lille filter-ikon under fx ‘Full name’ i den venstre kolonne får man mulighed for at filtrere på rollerne. Det kan være nyttigt her at forholde sig til om man både vil have nuværende og tidligere roller med. Har man tilføjet variablen <em>Current or previous</em>, kan man altid filtrere senere, men hvis man ikke gør det her skal man være opmærksom på at data kommer til at indeholde mange rækker (!)</p>
+<p>Det er også muligt at tilføje yderligere virksomhedsdata.</p>
+<p>Når de variable man gerne vil have med er valg, trykker man <em>Apply</em> og så er vi klar til at eksportere data.</p>
+</section>
+<section id="eksporter-data-til-xlsx" class="level3">
+<h3 class="anchored" data-anchor-id="eksporter-data-til-xlsx">Eksporter data til xlsx</h3>
+<p>Klik på “Excel”.. I den eksport-menu, der kommer op er det vigtigt, at man under <em>Options for excel</em> vælger ‘Repeat single item data’ inden man trykker Export.</p>
+<div class="grid">
+<div class="g-col-6">
+<p><img src="images/save.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+<div class="g-col-6">
+<p><img src="images/export.png" class="img-fluid" style="width:80.0%"></p>
+</div>
+</div>
+<p>Når Orbis har klargjort data, kan man downloade filen til sin computer.</p>
+</section>
+<section id="eksempel-med-alkohol-og-tobak-fra-orbis" class="level3">
+<h3 class="anchored" data-anchor-id="eksempel-med-alkohol-og-tobak-fra-orbis">Eksempel med alkohol og tobak fra Orbis</h3>
+<p>Jeg har tidligere downloadet et datasæt med alle aktive, public limited companies med branchekoderne Alkohol og tobak (‘Manufacture of beverages’ NACE#11(-soft drinks 11.0.7) &amp; ‘Manufacture of tobacco products’ NACE#12)</p>
+<p>I kan downloade datasættet her: <a href="data/tobaco_and_alcohol.xlsx" class="btn btn-primary">Download Data</a> og lægge filen i data mappen i vores Rprojekt mappe. Filen kan også hentes på Canvas.</p>
+<p>Der er også en ny funktion i <code>custom_functions</code> scriptet, <code>read_orbisxlsx()</code>, det er en genvej til at indlæse datafiler fra Orbis. For at bruge den funktion skal I download en ny udgave af <code>custom_functions</code> her <a href="functions/custom_functions.R" class="btn btn-primary">Download file</a> og lægge den i <code>functions/</code> mappen i Rprojekt mappen (dvs. erstatte den anden). Filen kan også hentes på Canvas. Når filen ligger i functions mappen kan vi “source” den og anvende funktionen.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions/custom_functions.R"</span>, <span class="at">echo =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Nu kan vi indlæse orbis-filen <code>tobaco_and_alcohol.xlsx</code> ved at indsætten stien til filen (<code>data/tobaco_and_alcohol.xlsx</code>) med <code>read_orbisxlsx()</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_orbisxlsx</span>(<span class="at">path =</span> <span class="st">"data/tobaco_and_alcohol.xlsx"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Unknown or uninitialised column: `assets`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Orbis variable names updated: 
+
+DMFull name                                       =&gt; name
+DMUCI (Unique Contact Identifier)                 =&gt; person_id
+Company name Latin alphabet                       =&gt; affiliation
+Country ISO code                                  =&gt; affiliation_country
+DMJob title (in English)                          =&gt; role
+DMBoard, committee or department                  =&gt; board_type
+DMType of role                                    =&gt; role_type
+DMLevel of responsibility                         =&gt; role_level
+DMAppointment date                                =&gt; appointment
+DMResignation date                                =&gt; resignation
+DMCurrent or previous                             =&gt; role_status
+NACE Rev. 2, core code (4 digits)                 =&gt; sector
+Operating revenue (Turnover) th USD Last avail. yr=&gt; revenue
+Number of employees Last avail. yr                =&gt; n_employees
+CSH - Orbis ID number                             =&gt; csh_orbis_id
+CSH - Name                                        =&gt; csh_name
+CSH - Country ISO code                            =&gt; csh_country
+GUO - Name                                        =&gt; guo_name
+GUO - Country ISO code                            =&gt; guo_country
+DUO - Name                                        =&gt; duo_name
+DUO - Country ISO code                            =&gt; duo_country
+
+
+New variables added: 
+person {TRUE/FALSE}</code></pre>
+</div>
+</div>
+<p>read_orbisxlsx funktionen oversætter bl.a. variabelnavne fra orbis til noget mere meningsfuld og læseligt. Vigtigt: <code>Current or previous</code> variablen hedder nu <code>role_status</code>. Der er også en ny variabel, <code>person</code>, som ud fra identifikationsnummeret ‘gætter’ om personen faktisk er en person.</p>
+<p>Lad os til at begynde med reducere vores data til kun aktive/current poster og poster der faktisk er personer:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(person <span class="sc">==</span> <span class="cn">TRUE</span> <span class="sc">&amp;</span> role_status <span class="sc">==</span> <span class="st">"Current"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>En udfordring ved bestyrelsesdata fra Orbis er at det er uklart/varierende hvor mange individer, der er registreret for hver virksomhed:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(name, affiliation) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(name), <span class="at">.by =</span> affiliation) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>(n)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> affiliation              n           
+ Length:5938        Min.   :   1.000  
+ Class :character   1st Qu.:   1.000  
+ Mode  :character   Median :   2.000  
+                    Mean   :   4.303  
+                    3rd Qu.:   4.000  
+                    Max.   :1140.000  </code></pre>
+</div>
+</div>
+<p>Gennemsnittet har 4 ‘directors’, der er en del en mandsbestyrelser og én virksomhed har <code>1140</code> (!) ‘directors’. Det skyldes at alle mulige lavere direktører er registreret. Vi kan prøve at løse noget af det ved at kode en ny variabel, hvor vi prøver at indfange meningen af en rolle fra <code>role_level</code>-variablen (som i Orbis hed <code>DMLevel of responsibility</code>) og fra <code>role_type</code> (som i Orbis hed <code>DMType of role</code>)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="ot">&lt;-</span> df_current <span class="sc">%&gt;%</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">role_level_rec =</span> <span class="fu">case_when</span>(</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"member"</span>, role_level, <span class="at">ignore.case =</span> T) <span class="sc">~</span> <span class="st">"member"</span>,</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"executive"</span>, role_level, <span class="at">ignore.case =</span> T) <span class="sc">~</span> <span class="st">"executive"</span>,</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"vice (pres|chair)"</span>, role_level, <span class="at">ignore.case =</span> T) <span class="sc">~</span> <span class="st">"vice chairman"</span>, </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"president|chairman"</span>, role_level, <span class="at">ignore.case =</span> T) <span class="sc">~</span> <span class="st">"chairman"</span>, </span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.default =</span> <span class="st">"other"</span>))</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>df_current <span class="ot">&lt;-</span> df_current <span class="sc">%&gt;%</span> </span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">role_level_rec =</span> <span class="fu">case_when</span>(</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>    role_level_rec <span class="sc">==</span> <span class="st">"other"</span> <span class="sc">&amp;</span> </span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>      (<span class="fu">grepl</span>(<span class="st">"SenMan"</span>, role_type, <span class="at">ignore.case =</span> T) <span class="sc">|</span> </span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>         <span class="fu">grepl</span>(<span class="st">"manager"</span>, role_level, <span class="at">ignore.case =</span> T)) <span class="sc">~</span> <span class="st">"executive"</span>,</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>    role_level_rec <span class="sc">==</span> <span class="st">"other"</span> <span class="sc">&amp;</span> </span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">grepl</span>(<span class="st">"chief"</span>, role_level, <span class="at">ignore.case =</span> T) <span class="sc">~</span> <span class="st">"executive"</span>,</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">.default =</span> role_level_rec))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="ot">&lt;-</span> df_current <span class="sc">%&gt;%</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(role_level_rec <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"member"</span>,<span class="st">"chairman"</span>, <span class="st">"vice chairman"</span>,<span class="st">"executive"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">count</span>(role_level, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 403 × 2
+   role_level                                             n
+   &lt;chr&gt;                                              &lt;int&gt;
+ 1 Member                                             10438
+ 2 Highest executive                                   2530
+ 3 President / Chairman                                2246
+ 4 Representative                                      2158
+ 5 Unspecified executive                                991
+ 6 Manager                                              879
+ 7 Executive                                            685
+ 8 Vice President / Vice Chairman                       589
+ 9 Chief Financial Officer (CFO); Financial executive   566
+10 Chief Officer; Executive                             445
+# ℹ 393 more rows</code></pre>
+</div>
+</div>
+<p>Vi kan starte med lige at se på hvor mange ‘board members’ hver virksomhed har: Som I kan se er der nogle meget store ‘boards’. Det er et af problemerne med Orbis, nemlig at det er uklart hvad der er registreret per virksomhed.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(name, affiliation) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5,927 × 2
+   affiliation                          n
+   &lt;chr&gt;                            &lt;int&gt;
+ 1 CONSTELLATION BRANDS, INC.         834
+ 2 BROWN FORMAN CORP                  300
+ 3 PHILIP MORRIS INTERNATIONAL INC.   187
+ 4 MOLSON COORS BEVERAGE COMPANY      172
+ 5 TREASURY WINE ESTATES LIMITED      110
+ 6 JAPAN TOBACCO INC                   75
+ 7 ALTRIA GROUP, INC.                  67
+ 8 TURNING POINT BRANDS, INC.          66
+ 9 TANZANIA BREWERIES LIMITED          53
+10 SECHABA BREWERY HOLDINGS LIMITED    52
+# ℹ 5,917 more rows</code></pre>
+</div>
+</div>
+<p>Vi kan lave en ny variabel i vores datasæt, der for hvert individ tæller hvor mange virksomeder, de er knyttet til:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="ot">&lt;-</span> df_current <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(name) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">n_memberships =</span> <span class="fu">n_distinct</span>(affiliation))</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span>  <span class="fu">count</span>(n_memberships)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 2
+  n_memberships     n
+          &lt;int&gt; &lt;int&gt;
+1             1 24333
+2             2  2623
+3             3   860
+4             4   368
+5             5   265
+6             6    66
+7             7    71
+8             8    48
+9             9    18</code></pre>
+</div>
+</div>
+<p>Lad os slette personer, <code>n = 24333</code>, der ‘kun’ sidder i en enkelt virksomhed, da de alligevel ikke laver nogen forbindelser på tværs af virksomheder i vores netværk. Vi sletter så at sige folk i vores affiliation data, der ikke er ‘linkere’ (<code>filter()</code>) og samtidig sørger vi for at hvert individ kun optræder én gang per virksomhed (<code>distinct()</code>) - det kan jo være at nogen har mere end en rolle i samme bestyrelse (datasnavs?).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="ot">&lt;-</span> df_current <span class="sc">%&gt;%</span> </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n_memberships <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(name, affiliation, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="fra-data-til-netværk." class="level5">
+<h5 class="anchored" data-anchor-id="fra-data-til-netværk.">Fra data til netværk.</h5>
+<p>Husk fra sidst <a href="session1.html">Session 1 (uge 6): Introduktion til netværksanalyse i R</a>, hvordan vi kommer fra et affiliation datasæt som vi har her, med rækker der forbinder “individer” til “organisationer”. Her er et skematisk overblik.</p>
+<p><img src="images/Notebook 2 - page 1.png" class="img-fluid"> R-kode til at lave ‘biadjacency matricen’ med individer i rækker og affiliations i kolonner (husk sparse!)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>bi_adj <span class="ot">&lt;-</span> <span class="fu">xtabs</span>(<span class="at">data =</span> df_current, <span class="at">formula =</span> <span class="sc">~</span>name <span class="sc">+</span> affiliation, <span class="at">sparse =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>I dette eksempel vil vi gerne se hvordan virksomheder der fremstiller tobak og alkohol er forbundet gennem overlappende bestyrelser. Derfor vil gerne ‘udregne’ <span class="math inline">\(affiliation \times affiliation\)</span> matricen ved at gange en transponeret udgave af vores biadjacency matrice med sig selv (<span class="math inline">\(B^T \times B\)</span>)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>adj_c     <span class="ot">&lt;-</span> <span class="fu">t</span>(bi_adj) <span class="sc">%*%</span> bi_adj</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Som altid skal vi lige lave vores adjacency matrice om til et grafobjekt med <code>igraph</code>-funktionen <code>graph_from_adjacency_matrix()</code>. Her har vi et “undirected”, “weighted” netværk, hvor vi ser bort fra diagonalen:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>gr <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(adj_c, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>, <span class="at">weighted =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Lad os som det første kigge på et helt minimalistisk plot af vores netværk:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>() <span class="sc">+</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>() <span class="sc">+</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>() <span class="sc">+</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Using "stress" as default layout</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Som I kan se består netværket af flere ‘klynger’. Det kaldes i netværksanalysesprog for komponenter. Det kommer vi tilbage til i løbet af kurset, men en netværkskomponent er et sammenhængende sæt af vertices. Lad os i første omgang prøve at bruge vores branchekode-variabel til at se om vi kan finde noget logik i hvordan komponenterne ser ud. Er der komponenter, hvor der er bestyrelsesoverlap (dvs. edges) mellem virksomheder der fremstiller hhv. alkohol og tobak. Det kræver at vi får lagt vores branchekode ind i grafobjektet som en vertex attribute.</p>
+</section>
+<section id="tilføj-vertice-attributes" class="level5">
+<h5 class="anchored" data-anchor-id="tilføj-vertice-attributes">Tilføj vertice attributes</h5>
+<p>Det gør vi ved først at lave et nyt datasæt, som vi kalder sector, der indeholder én række for hver virksomhed + branchekode (<code>distinct(affiliation, sector)</code>), dernæst overskriver vi sector, så vi kun har de to første cifre i branchekoden (da vi er ligeglade med underkategorier), altså en ‘substring’, <code>substr(sector, start = 1, stop = 2)</code>, endelig omkoder vi branchekodens talværdier til et label (<code>case_when(sector == "12"~"Tobak", sector == "11"~"Alkohol", .default = NA)</code>). Logikken i case_when-verbet er at man har et logisk udtryk efterfult af <code>~</code> hvad der så skal stå, et nyt logisk udtryk efterfulgt af <code>~</code> hvad der så skal stå. Altså formen, hvis~så, hvis~så osv., afsluttende med <code>.default =</code>, hvor vi definerer hvad værdien skal være, hvis ingen af de logisk udtryk passer.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># add sector as attribute...</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>sector     <span class="ot">&lt;-</span> df_current <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(affiliation, sector) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sector =</span> <span class="fu">substr</span>(sector, <span class="at">start =</span> <span class="dv">1</span>, <span class="at">stop =</span> <span class="dv">2</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sector =</span> <span class="fu">case_when</span>(</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    sector <span class="sc">==</span> <span class="st">"12"</span><span class="sc">~</span><span class="st">"Tobak"</span>,</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    sector <span class="sc">==</span> <span class="st">"11"</span><span class="sc">~</span><span class="st">"Alkohol"</span>,</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">.default =</span> <span class="cn">NA</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Nu skal vi have ‘merget’ vores sector variabel på netværksobjektet. Til det formål skal vi først lige lave en lille data.frame, der indeholder navnene på vores vertices (altså virksomhedsnavnene), sorteret på samme måde som i grafobjektet. Husk fra sidst hvordan vi tilgår vertice attributes i vores grafobjekt vha. <code>V()</code></p>
+<p>Vi laver her en data.frame med variablen <code>affiliation</code>, der indeholder virksohedsnavne fra vores grafobjekt.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>add_sector   <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">affiliation =</span> <span class="fu">V</span>(gr)<span class="sc">$</span>name)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Nu mangler vi bare at flette sectorvariablen på så de rigtige værdier kommer til at stå ud for de rigtige virksomhedsnavne. Her har tidyverse en genial funktion, <code>left_join()</code>, som gør netop det. Hvis vi har datasæt x, vores data.frame med virksomhedsnavne, og datasæt y, vores sector datasæt med virksomhedsnavne og branchelabel, så gør left_join det at den ved at matche på virksomhedsnavnet, <code>by = "affiliation</code>, fletter den anden variabel i y på x, altså left_join’er y på x.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>add_sector   <span class="ot">&lt;-</span> <span class="fu">left_join</span>(add_sector, sector, <span class="at">by =</span> <span class="st">"affiliation"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Nu har vi et datasæt med branchekoder i, der er ordnet ligesom vores grafobjekt, og vi kan derfor assign’e <code>&lt;-</code> variablen med branche koder som en ny vertex attribute i vores grafobjekt.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(gr)<span class="sc">$</span>sector <span class="ot">&lt;-</span> add_sector<span class="sc">$</span>sector</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Lad os nu lave vores visualisering igen, hvor vi farvelægger noderne efter branche. Vi kommer senere til detaljer i plot funktionerne. Kort fortalt om visualisering:</p>
+<ol type="1">
+<li>funktionen <code>ggraph()</code> opretter et tilsyneladende tomt plot (tilsyneladende fordi den faktisk udregner et layout for vertices i vores data)</li>
+<li>funktionen <code>geom_edge_link0()</code> plotter vores edges som en ‘streg’/et link. Der er også andre muligheder fx. <code>geom_edge_arc()</code> der plotter dem som en bue.</li>
+<li>funktionen <code>geom_node_point()</code> der plotter vores noder som en ‘cirkel’/point.</li>
+</ol>
+<ul>
+<li>inden for hver af disse <code>geom'er</code> kan vi sætte en masse options. Blandt andet kan vi definere nogle <code>aesthetics</code>. lad os bruge sector til at sætte farven på vores punkter (<code>mapping = aes(color = sector)</code>). Det betyder at vi lader farven på punkter følge værdierne på en bestemt variabel.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>() <span class="sc">+</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>() <span class="sc">+</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">color =</span> sector)) <span class="sc">+</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Using "stress" as default layout</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Med undtagelse af primært den største komponent ser komponenterne ud til at være ret branche homogene. Der sker noget andet i den største komponent, så lad os fokusere vores visualisering på den største komponent i netværket.</p>
+<p><code>igraph</code> pakken har en funktion, der giver os netværkets største komponent <code>largest_component()</code></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) først trækker vi netværket ud for den største komponent</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">largest_component</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) laver et plot  </span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>() <span class="sc">+</span> </span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) tilføjer edges, som vi giver en fast farve og størrelse:</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">color =</span> <span class="st">"gray40"</span>, <span class="at">edge_width =</span> .<span class="dv">6</span>) <span class="sc">+</span></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 4) tilføjer vertices, farvelagt efter sector og med en fast størrelse:</span></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> sector), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 5) Tilføjer labels for udvalgte vertices:</span></span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_node_label</span>(<span class="fu">aes</span>(<span class="at">filter =</span> <span class="fu">grepl</span>(<span class="st">"british american tobacco plc|carlsberg a/S|PHILIP MORRIS INTERNATIONAL INC|HEINEKEN N</span><span class="sc">\\</span><span class="st">.|diageo p"</span>, name, <span class="at">ignore.case =</span> T), <span class="at">label =</span> name, <span class="at">color =</span> sector), <span class="at">size =</span> <span class="dv">3</span>, <span class="at">repel =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 6) Ændrer farver og labels.</span></span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"salmon2"</span>, <span class="st">"steelblue"</span>, <span class="st">"grey"</span>), </span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Alkohol"</span>, <span class="st">"Tobak"</span>, <span class="st">"NA"</span>)) <span class="sc">+</span></span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 7) Tilføjer overskrifter og navn på labels</span></span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"'Corporate interlocks' i alkohol- og tobaksbrancherne"</span>, </span>
+<span id="cb54-16"><a href="#cb54-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"den største komponent"</span>,</span>
+<span id="cb54-17"><a href="#cb54-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Branche"</span>) <span class="sc">+</span></span>
+<span id="cb54-18"><a href="#cb54-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 8) Tilføjer et tema der er flot til netværk...</span></span>
+<span id="cb54-19"><a href="#cb54-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Using "stress" as default layout</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="cvr" class="level2">
+<h2 class="anchored" data-anchor-id="cvr">CVR</h2>
+<p>En tredje kilde til bestyrelsesnetværk er <strong>Det centrale virksomhedsregister i Danmark</strong> (<a href="https://datacvr.virk.dk/" class="uri">https://datacvr.virk.dk/</a>). Her kan man lave afgrænsede søgninger på danske virksomheder ud fra bl.a. geografi: Kommune eller region, virksomhedsstatus (aktive, ophørt, under konkurs etc.), virksomhedsform (aktieselskab, anpartsselskab etc.), startdato og branche.</p>
+<p><img src="images/CVR.png" class="img-fluid"></p>
+<p>I dette eksempel har jeg valgt “Region = Grønland”, “Virksomhedsstatus = Aktive”, “Virksomhedsform = Aktieselskab”. Det giver os 199 virksomheder. Hvis man scroller ned kan man eksportere data som en xlsx fil.</p>
+<p>download filen her</p>
+<p><a href="data/CVRudtræk_AS_Grønland_2025-02-17.xlsx" class="btn btn-primary">Download Data</a></p>
+<p>Hvis I lægger filen i datamappen under Rprojekt-mappen, kan den indlæses med <code>read_xlsx()</code> her</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>gronland_as <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">"data/CVRudtræk_AS_Grønland_2025-02-17.xlsx"</span>)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(gronland_as)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 12
+  `CVR-nummer/REG-nummer` Startdato  Ophørsdato Navn       Adresse Postnr. By   
+  &lt;chr&gt;                   &lt;chr&gt;      &lt;lgl&gt;      &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
+1 12486162                2008-06-01 NA         GREENLAND… Vatika… 3920    Qaqo…
+2 12706952                2013-12-23 NA         SIKUKI NU… Issort… 3905    Nuus…
+3 12036329                2002-07-01 NA         IMARTUNEQ… C/O Po… 3900    Nuuk 
+4 40976191                2019-10-15 NA         Nuuk Wate… Imaneq… 3900    Nuuk 
+5 45203573                2024-11-12 NA         Maniitsoq… C/O Ka… 3912    Mani…
+6 12579853                2009-12-01 NA         ILLIT FOR… Eqalug… 3905    Nuus…
+# ℹ 5 more variables: Virksomhedsform &lt;chr&gt;, Hovedbranche &lt;chr&gt;,
+#   Telefonnr &lt;chr&gt;, Email &lt;chr&gt;, Reklamebeskyttet &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>Det kræver lidt mere arbejde at komme frem til et bestyrelsesnetværk her fra. Det er nemlig kun virksomhedsdata vi får ud her. Næste skridt er at gå ind på hver virksomhed på cvr og finde bestyrelsesmedlemmerne:</p>
+<ol type="1">
+<li><p>Søg på CVR nummer (eller virksomhedsnavn) i søgefeltet:</p></li>
+<li><p>Klik på “Tegningsregel, personkreds og revisor”</p></li>
+</ol>
+<p><img src="images/CVR_virksøg.png" class="img-fluid"></p>
+<ol start="3" type="1">
+<li>Kopier bestyrelsen til et excel-ark:</li>
+</ol>
+<p><img src="images/xlsx.png" class="img-fluid"> Og så fortsætter man ellers bare med alle 199 virksomheder, til man har et komplet excel ark med alle bestyrelsesmedlemmer for alle virksomheder.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Det tager noget tid!! (Man kan evt. spørge øvelseslæreren om det evt. er muligt at trække data på en anden måde via fx Elitedatabasen eller direkte fra CVR!)</p>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

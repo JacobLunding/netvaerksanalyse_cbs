@@ -8,9 +8,13 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - href: about.qmd
-        text: Om mig
-
+      - href: Install_guide.qmd
+        text: "Install and setup R"
+      - href: intro.qmd
+        text: "Intro til R og Tidyverse"
+      - href: kursusmateriale.qmd
+        text: "Kursusmateriale"
+  
 format:
   html:
     theme:
