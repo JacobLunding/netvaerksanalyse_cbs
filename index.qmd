@@ -1,5 +1,5 @@
 ---
-title: "Virksomhedsstrategi i et netværksperspektiv"
+title: "Øvelsesplan og -introduktion"
 ---
 
 ```{r, echo = F}
