@@ -21,12 +21,12 @@ library(Matrix)
 
 # Indlæs og udvælg data
 
-Dernæst indlæser vi og gemmer datasættet `den17-no-nordic-letters.csv`, som ligger mappen `"/data"` i R projketet. Det kan også downloades her: [Download den17](data/den17-no-nordic-letters.csv){.btn .btn-primary}
+Dernæst indlæser vi og gemmer datasættet `danish_elitenetworks2025`, som ligger mappen `"/data"` i R projketet. Det kan også downloades her: [Download den17](data/danish_elitenetworks2025.csv){.btn .btn-primary}
 
 Indlæs data med `read_csv()`
 
 ```{r, warning=FALSE, message=FALSE}
-den <- read_csv("data/den17-no-nordic-letters.csv")
+den <- read_csv("data/danish_elitenetworks2025.csv")
 ```
 
 I ["Intro til R og Tidyverse"](intro.html) introducerede vi en række funktioner fra tidyverse's dplyr pakke. Dem skal vi bruge nogle af her.
