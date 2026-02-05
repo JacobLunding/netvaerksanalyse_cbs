@@ -358,18 +358,18 @@ person {TRUE/FALSE}</code></pre>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="co"># Vi tager 10 tilfældige rækker</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 2
-   person_countries         n
-   &lt;chr&gt;                &lt;int&gt;
- 1 Germany                 34
- 2 Bulgaria;Iceland         1
- 3 India                    1
- 4 Norway                 773
- 5 Sweden;South Africa      5
- 6 Ghana                    1
- 7 China                    5
- 8 Norway;United States     3
- 9 Sweden;Canada            1
-10 Denmark;Germany          5</code></pre>
+   person_countries               n
+   &lt;chr&gt;                      &lt;int&gt;
+ 1 Sweden;United Kingdom          3
+ 2 Iran (Islamic Republic of)    10
+ 3 United States;Netherlands      2
+ 4 United States;Finland          5
+ 5 United Kingdom;Japan;India     2
+ 6 Norway;Iceland                 9
+ 7 United Kingdom;Denmark         2
+ 8 Spain;Sweden                   1
+ 9 Ireland;Sweden                 6
+10 Netherlands;Norway             8</code></pre>
 </div>
 </div>
 <p>Lad os lave en geografi-variabel <code>person_gep</code>, hvor vi bruger nationalitet når fødested er <code>NA</code> (der, hvor der er flere adskilt af “;”, lad da tage den første) og ellers bruger fødested (<code>.default= person_country</code>):</p>
@@ -468,9 +468,9 @@ person {TRUE/FALSE}</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>net_virk <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">adjmatrix =</span> adj_virk, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>net_virk</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH c339f8d UN-- 596 266 -- 
+<pre><code>IGRAPH e62b14d UN-- 596 266 -- 
 + attr: name (v/c)
-+ edges from c339f8d (vertex names):
++ edges from e62b14d (vertex names):
  [1] A/S ORTHANA KEMISK FABRIK--BIOFAC A/S                 
  [2] A/S ORTHANA KEMISK FABRIK--DANIPHARM A/S              
  [3] A/S ORTHANA KEMISK FABRIK--PHARMADAN A/S              
@@ -488,9 +488,9 @@ person {TRUE/FALSE}</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>net_ind <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">adjmatrix =</span> adj_ind, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>net_ind</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH 799fa87 UN-- 261 433 -- 
+<pre><code>IGRAPH b6b94f5 UN-- 261 433 -- 
 + attr: name (v/c)
-+ edges from 799fa87 (vertex names):
++ edges from b6b94f5 (vertex names):
  [1] David Lawrence Stern     --Dr Henrijette Elisabeth Richter
  [2] David Lawrence Stern     --Mr Mark Smith                  
  [3] David Lawrence Stern     --Mr Nicholas Haft               

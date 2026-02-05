@@ -496,9 +496,9 @@ Venture- og kapitalfonde               130
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>net_twomode <span class="ot">&lt;-</span> <span class="fu">graph_from_biadjacency_matrix</span>(bi_adj, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">multiple =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>net_twomode</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH da07e3c UN-B 5147 5684 -- 
+<pre><code>IGRAPH 1d54cad UN-B 5147 5684 -- 
 + attr: type (v/l), name (v/c)
-+ edges from da07e3c (vertex names):
++ edges from 1d54cad (vertex names):
 [1] Aage Almtoft            --Middelfart Sparekasse                                                        
 [2] Aage B. Andersen        --Foreningen OEstifterne - Repraesentantskab (Medlemmer af delegeretforsamling)
 [3] AAge Dragsted           --VL gruppe 35 – Aarhus                                                        
@@ -515,9 +515,9 @@ Venture- og kapitalfonde               130
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>net_ind <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(adj_ind, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>net_ind</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH bb1bdb1 UN-- 4816 89658 -- 
+<pre><code>IGRAPH b63020d UN-- 4816 89658 -- 
 + attr: name (v/c)
-+ edges from bb1bdb1 (vertex names):
++ edges from b63020d (vertex names):
  [1] Aage Almtoft    --Allan Buch             
  [2] Aage Almtoft    --Bettina Joergensen     
  [3] Aage Almtoft    --Bo Skovby Rosendahl    
@@ -536,9 +536,9 @@ Venture- og kapitalfonde               130
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>net_affil <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(adj_affil, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>net_affil</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH ff66faa UN-- 331 984 -- 
+<pre><code>IGRAPH c818219 UN-- 331 984 -- 
 + attr: name (v/c)
-+ edges from ff66faa (vertex names):
++ edges from c818219 (vertex names):
 [1] A/S DANSK ERHVERVSINVESTERING--FAGBEVAEGELSENS ERHVERVSINVESTERING A/S (Bestyrelse)                   
 [2] A/S DANSK ERHVERVSINVESTERING--VL gruppe 4 - Koebenhavn                                               
 [3] Alm. Brand                   --Alm. brand - Repraesentantskab (Medlemmer)                             
