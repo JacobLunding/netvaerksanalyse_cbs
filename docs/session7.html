@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Finpudsning af analyse og visualisering af netværk – Kursusmateriale til Virksomhedsstrategi i et netværksperspektiv</title>
+<title>Finpudsning af analyse og visualisering af netværk – Virksomhedsstrategi i et netværksperspektiv</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-553db639d176b1f1e5eb8f34e19f9014.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-bd192f0b7177c10948837637c5954a59.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -118,7 +118,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a href="./index.html" class="navbar-brand navbar-brand-logo">
     </a>
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">Kursusmateriale til Virksomhedsstrategi i et netværksperspektiv</span>
+    <span class="navbar-title">Virksomhedsstrategi i et netværksperspektiv</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -270,11 +270,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.4     ✔ readr     2.1.6
-✔ forcats   1.0.1     ✔ stringr   1.6.0
-✔ ggplot2   4.0.1     ✔ tibble    3.3.0
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.2     ✔ tibble    3.2.1
 ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-✔ purrr     1.2.0     
+✔ purrr     1.0.4     
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
@@ -496,9 +496,9 @@ Venture- og kapitalfonde               130
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>net_twomode <span class="ot">&lt;-</span> <span class="fu">graph_from_biadjacency_matrix</span>(bi_adj, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">multiple =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>net_twomode</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH fbc4a48 UN-B 5147 5684 -- 
+<pre><code>IGRAPH da07e3c UN-B 5147 5684 -- 
 + attr: type (v/l), name (v/c)
-+ edges from fbc4a48 (vertex names):
++ edges from da07e3c (vertex names):
 [1] Aage Almtoft            --Middelfart Sparekasse                                                        
 [2] Aage B. Andersen        --Foreningen OEstifterne - Repraesentantskab (Medlemmer af delegeretforsamling)
 [3] AAge Dragsted           --VL gruppe 35 – Aarhus                                                        
@@ -515,9 +515,9 @@ Venture- og kapitalfonde               130
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>net_ind <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(adj_ind, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>net_ind</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH f0ebc15 UN-- 4816 89658 -- 
+<pre><code>IGRAPH bb1bdb1 UN-- 4816 89658 -- 
 + attr: name (v/c)
-+ edges from f0ebc15 (vertex names):
++ edges from bb1bdb1 (vertex names):
  [1] Aage Almtoft    --Allan Buch             
  [2] Aage Almtoft    --Bettina Joergensen     
  [3] Aage Almtoft    --Bo Skovby Rosendahl    
@@ -536,9 +536,9 @@ Venture- og kapitalfonde               130
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>net_affil <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(adj_affil, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>net_affil</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH a2d85dd UN-- 331 984 -- 
+<pre><code>IGRAPH ff66faa UN-- 331 984 -- 
 + attr: name (v/c)
-+ edges from a2d85dd (vertex names):
++ edges from ff66faa (vertex names):
 [1] A/S DANSK ERHVERVSINVESTERING--FAGBEVAEGELSENS ERHVERVSINVESTERING A/S (Bestyrelse)                   
 [2] A/S DANSK ERHVERVSINVESTERING--VL gruppe 4 - Koebenhavn                                               
 [3] Alm. Brand                   --Alm. brand - Repraesentantskab (Medlemmer)                             
@@ -1109,10 +1109,6 @@ Adding another scale for colour, which will replace the existing scale.</code></
 <p>Fordi vi ikke vil plotte alle label, bruger vi parameteret filter i aes():</p>
 <div class="cell" data-warnings="false" data-messages="false">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">geom_node_label</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">filter =</span> bet_rnk<span class="sc">&lt;=</span><span class="dv">3</span>, <span class="at">label =</span> name))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in geom_node_label(mapping = aes(filter = bet_rnk &lt;= 3, label = name)):
-Ignoring unknown parameters: `label.size`</code></pre>
-</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1123,7 +1119,7 @@ Ignoring unknown parameters: `label.size`</code></pre>
 </div>
 <p>Hvis labels ligger oven i hinanden kan det være nyttigt at tilføje parameteret <code>repel = TRUE</code>.</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">geom_node_label</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">filter =</span> bet_rnk<span class="sc">&lt;=</span><span class="dv">3</span>, <span class="at">label =</span> name), <span class="at">repel =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">geom_node_label</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">filter =</span> bet_rnk<span class="sc">&lt;=</span><span class="dv">3</span>, <span class="at">label =</span> name), <span class="at">repel =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1134,8 +1130,8 @@ Ignoring unknown parameters: `label.size`</code></pre>
 </div>
 <p>Måske er mine labels for store? Vi kan ændre på størrelsen og også på deres gennemsigtighed (alpha) samt på text typen <code>family</code> så den passer til resten af plottet</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">geom_node_label</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">filter =</span> bet_rnk<span class="sc">&lt;=</span><span class="dv">3</span>, <span class="at">label =</span> name), <span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">repel =</span> T) </span>
-<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>p</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">geom_node_label</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">filter =</span> bet_rnk<span class="sc">&lt;=</span><span class="dv">3</span>, <span class="at">label =</span> name), <span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">repel =</span> T) </span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>p</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1149,8 +1145,8 @@ Ignoring unknown parameters: `label.size`</code></pre>
 <section id="override-legend-aesthetics" class="level2">
 <h2 class="anchored" data-anchor-id="override-legend-aesthetics">Override legend aesthetics…</h2>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">4</span>)))</span>
-<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>p</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">4</span>)))</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>p</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1161,11 +1157,11 @@ Ignoring unknown parameters: `label.size`</code></pre>
 </div>
 <p>Lad os gemme det plot også :</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="at">filename =</span> <span class="st">"output/betweennescentralitet_plot.png"</span>, <span class="at">plot =</span> p, <span class="at">height =</span> <span class="dv">7</span>, <span class="at">width =</span> <span class="dv">9</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="at">filename =</span> <span class="st">"output/betweennescentralitet_plot.png"</span>, <span class="at">plot =</span> p, <span class="at">height =</span> <span class="dv">7</span>, <span class="at">width =</span> <span class="dv">9</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Standard units på height og width er inches (in). Måske er det lettere for os at bruge cm.</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="at">filename =</span> <span class="st">"output/betweennescentralitet_plot.png"</span>, <span class="at">plot =</span> p, <span class="at">height =</span> <span class="dv">16</span>, <span class="at">width =</span> <span class="dv">20</span>, <span class="at">units =</span> <span class="st">"cm"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="at">filename =</span> <span class="st">"output/betweennescentralitet_plot.png"</span>, <span class="at">plot =</span> p, <span class="at">height =</span> <span class="dv">16</span>, <span class="at">width =</span> <span class="dv">20</span>, <span class="at">units =</span> <span class="st">"cm"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Kig på filen og juster størrelsen, så forholdet mellem plot og lærred (og tekst- og punktstørrelse mv.) ser fornuftigt ud.</p>
 </section>
@@ -1174,22 +1170,22 @@ Ignoring unknown parameters: `label.size`</code></pre>
 <h1>Sammensætning af plots med ggarrange</h1>
 <p>Lad os efter samme fremgangsmåde som før lave et plot med closeness i stedet:</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>p_clo <span class="ot">&lt;-</span> layout <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(clo) <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>() <span class="sc">+</span> </span>
-<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">data =</span> <span class="fu">get_edge_coord</span>(net_affil_l, layout), <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">xend =</span> xend, <span class="at">yend =</span> yend), <span class="at">color =</span> <span class="st">"grey70"</span>, <span class="at">width =</span> <span class="fl">0.3</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
-<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">shape =</span> <span class="dv">21</span>, <span class="at">alpha =</span> <span class="fl">0.75</span>,</span>
-<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">size =</span> clo, <span class="at">fill =</span> sector)) <span class="sc">+</span> </span>
-<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_label</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">filter =</span> clo_rnk<span class="sc">&lt;=</span><span class="dv">3</span>, <span class="at">label =</span> name), <span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">repel =</span> T) <span class="sc">+</span></span>
-<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">name =</span> <span class="st">"Sektor"</span>, <span class="at">palette =</span> <span class="st">"Set1"</span>) <span class="sc">+</span></span>
-<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_continuous</span>(<span class="at">name =</span> <span class="st">"Closeness centrality"</span>, <span class="at">range =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">8</span>)) <span class="sc">+</span> </span>
-<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>(<span class="at">base_family =</span> <span class="st">"serif"</span>, </span>
-<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">base_size =</span> <span class="dv">12</span>, </span>
-<span id="cb91-10"><a href="#cb91-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">title_size =</span> <span class="dv">16</span>, </span>
-<span id="cb91-11"><a href="#cb91-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">subtitle_size =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb91-12"><a href="#cb91-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Virksomhedsnetværket i finanssektoren"</span>, </span>
-<span id="cb91-13"><a href="#cb91-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">"n = "</span>, <span class="fu">vcount</span>(net_affil_l)), </span>
-<span id="cb91-14"><a href="#cb91-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">caption =</span> <span class="st">"datakilde: Danish Elitenetwork 2017"</span>) <span class="sc">+</span></span>
-<span id="cb91-15"><a href="#cb91-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">4</span>)))</span>
-<span id="cb91-16"><a href="#cb91-16" aria-hidden="true" tabindex="-1"></a>p_clo</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>p_clo <span class="ot">&lt;-</span> layout <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(clo) <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>() <span class="sc">+</span> </span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">data =</span> <span class="fu">get_edge_coord</span>(net_affil_l, layout), <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">xend =</span> xend, <span class="at">yend =</span> yend), <span class="at">color =</span> <span class="st">"grey70"</span>, <span class="at">width =</span> <span class="fl">0.3</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">shape =</span> <span class="dv">21</span>, <span class="at">alpha =</span> <span class="fl">0.75</span>,</span>
+<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">size =</span> clo, <span class="at">fill =</span> sector)) <span class="sc">+</span> </span>
+<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_label</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">filter =</span> clo_rnk<span class="sc">&lt;=</span><span class="dv">3</span>, <span class="at">label =</span> name), <span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">repel =</span> T) <span class="sc">+</span></span>
+<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">name =</span> <span class="st">"Sektor"</span>, <span class="at">palette =</span> <span class="st">"Set1"</span>) <span class="sc">+</span></span>
+<span id="cb90-7"><a href="#cb90-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_continuous</span>(<span class="at">name =</span> <span class="st">"Closeness centrality"</span>, <span class="at">range =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">8</span>)) <span class="sc">+</span> </span>
+<span id="cb90-8"><a href="#cb90-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>(<span class="at">base_family =</span> <span class="st">"serif"</span>, </span>
+<span id="cb90-9"><a href="#cb90-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">base_size =</span> <span class="dv">12</span>, </span>
+<span id="cb90-10"><a href="#cb90-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">title_size =</span> <span class="dv">16</span>, </span>
+<span id="cb90-11"><a href="#cb90-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">subtitle_size =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb90-12"><a href="#cb90-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Virksomhedsnetværket i finanssektoren"</span>, </span>
+<span id="cb90-13"><a href="#cb90-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">"n = "</span>, <span class="fu">vcount</span>(net_affil_l)), </span>
+<span id="cb90-14"><a href="#cb90-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">caption =</span> <span class="st">"datakilde: Danish Elitenetwork 2017"</span>) <span class="sc">+</span></span>
+<span id="cb90-15"><a href="#cb90-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">4</span>)))</span>
+<span id="cb90-16"><a href="#cb90-16" aria-hidden="true" tabindex="-1"></a>p_clo</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1201,16 +1197,16 @@ Ignoring unknown parameters: `label.size`</code></pre>
 <p>Med funktionen <code>ggarrange()</code> fra ggpubr kan vi sætte plots sammen:</p>
 <p>Først vil vi måske gerne lige fjerne legends for size, da de nu betyder to forskellige ting:</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>p     <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">size =</span> <span class="st">"none"</span>)</span>
-<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>p_clo <span class="ot">&lt;-</span> p_clo <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">size =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>p     <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">size =</span> <span class="st">"none"</span>)</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>p_clo <span class="ot">&lt;-</span> p_clo <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">size =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>og ændre overskriften:</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>p      <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Betwenness"</span>, <span class="at">subtitle =</span> <span class="st">""</span>, <span class="at">caption =</span> <span class="st">""</span>)</span>
-<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>p_clo  <span class="ot">&lt;-</span> p_clo <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Closeness"</span>, <span class="at">subtitle =</span> <span class="st">""</span>, <span class="at">caption =</span> <span class="st">""</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>p      <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Betwenness"</span>, <span class="at">subtitle =</span> <span class="st">""</span>, <span class="at">caption =</span> <span class="st">""</span>)</span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>p_clo  <span class="ot">&lt;-</span> p_clo <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Closeness"</span>, <span class="at">subtitle =</span> <span class="st">""</span>, <span class="at">caption =</span> <span class="st">""</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggarrange</span>(<span class="at">plotlist =</span> <span class="fu">list</span>(p, p_clo), <span class="at">common.legend =</span> T, <span class="at">legend =</span> <span class="st">"right"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggarrange</span>(<span class="at">plotlist =</span> <span class="fu">list</span>(p, p_clo), <span class="at">common.legend =</span> T, <span class="at">legend =</span> <span class="st">"right"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1224,31 +1220,31 @@ Ignoring unknown parameters: `label.size`</code></pre>
 <h1>Visualisering af forskellige mål… (med ggplot)</h1>
 <p>Vi kan beregne en række centralitetsmål:</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name              =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>name,</span>
-<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">sector            =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>sector,</span>
-<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">tags              =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>tags,</span>
-<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">degree            =</span> <span class="fu">degree</span>(net_affil_l),</span>
-<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">betweenness       =</span> <span class="fu">betweenness</span>(net_affil_l, <span class="at">normalized =</span> T),</span>
-<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">local_betweenness =</span> <span class="fu">betweenness</span>(net_affil_l, <span class="at">cutoff =</span> <span class="dv">2</span>, <span class="at">normalized =</span> T),</span>
-<span id="cb95-8"><a href="#cb95-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">closeness         =</span> <span class="fu">closeness</span>(net_affil_l), </span>
-<span id="cb95-9"><a href="#cb95-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">brokerage         =</span> <span class="dv">1</span><span class="sc">/</span><span class="fu">constraint</span>(net_affil_l) </span>
-<span id="cb95-10"><a href="#cb95-10" aria-hidden="true" tabindex="-1"></a>)       </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name              =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>name,</span>
+<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">sector            =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>sector,</span>
+<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">tags              =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>tags,</span>
+<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">degree            =</span> <span class="fu">degree</span>(net_affil_l),</span>
+<span id="cb94-6"><a href="#cb94-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">betweenness       =</span> <span class="fu">betweenness</span>(net_affil_l, <span class="at">normalized =</span> T),</span>
+<span id="cb94-7"><a href="#cb94-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">local_betweenness =</span> <span class="fu">betweenness</span>(net_affil_l, <span class="at">cutoff =</span> <span class="dv">2</span>, <span class="at">normalized =</span> T),</span>
+<span id="cb94-8"><a href="#cb94-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">closeness         =</span> <span class="fu">closeness</span>(net_affil_l), </span>
+<span id="cb94-9"><a href="#cb94-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">brokerage         =</span> <span class="dv">1</span><span class="sc">/</span><span class="fu">constraint</span>(net_affil_l) </span>
+<span id="cb94-10"><a href="#cb94-10" aria-hidden="true" tabindex="-1"></a>)       </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="korrelationen-mellem-to-forskellige-mål" class="level2">
 <h2 class="anchored" data-anchor-id="korrelationen-mellem-to-forskellige-mål">Korrelationen mellem to forskellige mål</h2>
 <p>Vi kan fx plotte korrelationen mellem betweenness og brokerage</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="sc">%&gt;%</span> </span>
-<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> brokerage, <span class="at">y =</span> betweenness, <span class="at">color=</span>sector, <span class="at">size=</span>degree)) <span class="sc">+</span> </span>
-<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#geom_label(aes(x = brokerage, y = closeness, label = name2)) +</span></span>
-<span id="cb96-5"><a href="#cb96-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values=</span>colors) <span class="sc">+</span></span>
-<span id="cb96-6"><a href="#cb96-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>,<span class="fu">max</span>(metrics<span class="sc">$</span>brokerage), <span class="dv">1</span>), <span class="at">name =</span> <span class="st">"1/Burts constraint"</span>) <span class="sc">+</span></span>
-<span id="cb96-7"><a href="#cb96-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name =</span> <span class="st">"Betweenness"</span>) <span class="sc">+</span></span>
-<span id="cb96-8"><a href="#cb96-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">4</span>), <span class="at">title =</span> <span class="st">"Virksomhedstype"</span>),</span>
-<span id="cb96-9"><a href="#cb96-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">size =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Degree centralitet"</span>)) <span class="sc">+</span></span>
-<span id="cb96-10"><a href="#cb96-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_family =</span> <span class="st">"serif"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="sc">%&gt;%</span> </span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> brokerage, <span class="at">y =</span> betweenness, <span class="at">color=</span>sector, <span class="at">size=</span>degree)) <span class="sc">+</span> </span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#geom_label(aes(x = brokerage, y = closeness, label = name2)) +</span></span>
+<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values=</span>colors) <span class="sc">+</span></span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>,<span class="fu">max</span>(metrics<span class="sc">$</span>brokerage), <span class="dv">1</span>), <span class="at">name =</span> <span class="st">"1/Burts constraint"</span>) <span class="sc">+</span></span>
+<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name =</span> <span class="st">"Betweenness"</span>) <span class="sc">+</span></span>
+<span id="cb95-8"><a href="#cb95-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">4</span>), <span class="at">title =</span> <span class="st">"Virksomhedstype"</span>),</span>
+<span id="cb95-9"><a href="#cb95-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">size =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Degree centralitet"</span>)) <span class="sc">+</span></span>
+<span id="cb95-10"><a href="#cb95-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_family =</span> <span class="st">"serif"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1263,15 +1259,15 @@ Ignoring unknown parameters: `label.size`</code></pre>
 <p>Der er ikke ret mange noder i kategorierne Commissions og Unknown, så dem filterer vi lige fra her.</p>
 <p>Vi kan nu prøve at se hvor stor en andel af noderne i de forskellige sektorer, der ligger hhv. højt og lavt på fx brogerage.</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span>sector <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Commissions"</span>, <span class="st">"Unknown"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> brokerage, <span class="at">fill=</span>sector)) <span class="sc">+</span> </span>
-<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">'share'</span>) <span class="sc">+</span> </span>
-<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>sector) <span class="sc">+</span> </span>
-<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values=</span>colors) <span class="sc">+</span> </span>
-<span id="cb97-7"><a href="#cb97-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb97-8"><a href="#cb97-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_family =</span> <span class="st">"serif"</span>) <span class="sc">+</span> </span>
-<span id="cb97-9"><a href="#cb97-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">face =</span> <span class="st">"bold"</span>)) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span>sector <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Commissions"</span>, <span class="st">"Unknown"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> brokerage, <span class="at">fill=</span>sector)) <span class="sc">+</span> </span>
+<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">'share'</span>) <span class="sc">+</span> </span>
+<span id="cb96-5"><a href="#cb96-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>sector) <span class="sc">+</span> </span>
+<span id="cb96-6"><a href="#cb96-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values=</span>colors) <span class="sc">+</span> </span>
+<span id="cb96-7"><a href="#cb96-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb96-8"><a href="#cb96-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_family =</span> <span class="st">"serif"</span>) <span class="sc">+</span> </span>
+<span id="cb96-9"><a href="#cb96-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">face =</span> <span class="st">"bold"</span>)) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1285,8 +1281,8 @@ Ignoring unknown parameters: `label.size`</code></pre>
 <h2 class="anchored" data-anchor-id="en-masse-mål-i-forhold-til-hinanden">En masse mål i forhold til hinanden</h2>
 <p>Her kan I bruge min cor_plots funktion, husk at droppe variable i <code>metrics</code>&nbsp;der ikke er centralitetsvariable (her <code>name</code> og <code>sector</code>)</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>p_cor <span class="ot">&lt;-</span> <span class="fu">cor_plots</span>(<span class="at">metrics_table =</span> metrics <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>name,<span class="sc">-</span>sector, <span class="sc">-</span>tags))</span>
-<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>p_cor</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>p_cor <span class="ot">&lt;-</span> <span class="fu">cor_plots</span>(<span class="at">metrics_table =</span> metrics <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>name,<span class="sc">-</span>sector, <span class="sc">-</span>tags))</span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>p_cor</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1302,14 +1298,14 @@ Ignoring unknown parameters: `label.size`</code></pre>
 <p>Lad os kigge på tags, er der forskel på centralitetsmålene, hvis vi deler noderne op efter deres tags:</p>
 <p><strong>Første</strong> skal vi lige <strong>huske</strong> at en node kan have flere tags. Men <code>separate_longer_delim()</code>&nbsp;laver vi en nu data tibble, med en række for hver virksomhed for hver tag.</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>metrics_long <span class="ot">&lt;-</span> metrics <span class="sc">%&gt;%</span> <span class="fu">separate_longer_delim</span>(tags, <span class="at">delim =</span> <span class="st">", "</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>metrics_long <span class="ot">&lt;-</span> metrics <span class="sc">%&gt;%</span> <span class="fu">separate_longer_delim</span>(tags, <span class="at">delim =</span> <span class="st">", "</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Vi vil gerne nøjes med at kigge på vores finans tags, så vi nøjes med de rækker:</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>metrics_long <span class="ot">&lt;-</span> metrics_long <span class="sc">%&gt;%</span> <span class="fu">filter</span>(tags <span class="sc">%in%</span> finans_tags)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>metrics_long <span class="ot">&lt;-</span> metrics_long <span class="sc">%&gt;%</span> <span class="fu">filter</span>(tags <span class="sc">%in%</span> finans_tags)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>metrics_long <span class="sc">%&gt;%</span> <span class="fu">count</span>(tags)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>metrics_long <span class="sc">%&gt;%</span> <span class="fu">count</span>(tags)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 2
   tags                         n
@@ -1324,13 +1320,13 @@ Ignoring unknown parameters: `label.size`</code></pre>
 </div>
 <p>Vi lægger lige FINA og Finance sammen og tager kun unikke name + tags kombinationer (for at slette den ene række for dem, der havde både FINA og Finance. <code>.keep_all = TRUE</code> gør at vi beholder alle kolonner.</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>metrics_long <span class="ot">&lt;-</span> metrics_long <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">tags =</span> <span class="fu">case_when</span>(tags <span class="sc">==</span> <span class="st">"FINA"</span><span class="sc">~</span> <span class="st">"Finance"</span>, <span class="at">.default =</span> tags)) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(name, tags, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>metrics_long <span class="ot">&lt;-</span> metrics_long <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">tags =</span> <span class="fu">case_when</span>(tags <span class="sc">==</span> <span class="st">"FINA"</span><span class="sc">~</span> <span class="st">"Finance"</span>, <span class="at">.default =</span> tags)) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(name, tags, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Nu kan vi med <code>group_by</code> og <code>summarise</code> beregne hhv mean max og min for udvalgte centralitetsmål opdelt på tags (som vi gruppere efter)</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>metrics_long <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(tags) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(name), </span>
-<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">across</span>(<span class="at">.cols =</span> <span class="fu">c</span>(<span class="st">"degree"</span>, <span class="st">"closeness"</span>,<span class="st">"betweenness"</span>, <span class="st">"brokerage"</span>), </span>
-<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">.fns =</span> <span class="fu">list</span>(<span class="st">"Mean"</span> <span class="ot">=</span> mean, <span class="st">"Max"</span> <span class="ot">=</span> max, <span class="st">"Min"</span> <span class="ot">=</span> min)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>metrics_long <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(tags) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(name), </span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">across</span>(<span class="at">.cols =</span> <span class="fu">c</span>(<span class="st">"degree"</span>, <span class="st">"closeness"</span>,<span class="st">"betweenness"</span>, <span class="st">"brokerage"</span>), </span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">.fns =</span> <span class="fu">list</span>(<span class="st">"Mean"</span> <span class="ot">=</span> mean, <span class="st">"Max"</span> <span class="ot">=</span> max, <span class="st">"Min"</span> <span class="ot">=</span> min)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 14
   tags          n degree_Mean degree_Max degree_Min closeness_Mean closeness_Max
@@ -1350,24 +1346,24 @@ Ignoring unknown parameters: `label.size`</code></pre>
 <h1>Bonus: Hvordan linker virksomheder med forskellige egenskaber til hinanden</h1>
 <p>Lad os kigge på sektor</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Forholdet mellem ties indenfor og mellem tags</span></span>
-<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a><span class="co"># vi henter en edgelist ud fra netværksobjektet</span></span>
-<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">as_data_frame</span>(net_affil_l, <span class="at">what =</span> <span class="st">"edges"</span>)</span>
-<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a><span class="co"># fordi det er undirected vil vi gerne 'fordoble' det så from-to og to-from er med</span></span>
-<span id="cb106-5"><a href="#cb106-5" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">from =</span> <span class="fu">c</span>(e<span class="sc">$</span>from, e<span class="sc">$</span>to), </span>
-<span id="cb106-6"><a href="#cb106-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">to   =</span> <span class="fu">c</span>(e<span class="sc">$</span>to, e<span class="sc">$</span>from))</span>
-<span id="cb106-7"><a href="#cb106-7" aria-hidden="true" tabindex="-1"></a><span class="co"># dernæst kan vi left_join'e tags på for henholdsvis from variablen og to variablen.</span></span>
-<span id="cb106-8"><a href="#cb106-8" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> e <span class="sc">%&gt;%</span> </span>
-<span id="cb106-9"><a href="#cb106-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">tibble</span>(<span class="at">from =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>name, <span class="at">from_sector =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>sector)) <span class="sc">%&gt;%</span> </span>
-<span id="cb106-10"><a href="#cb106-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">tibble</span>(<span class="at">to =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>name, <span class="at">to_sector =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>sector))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Forholdet mellem ties indenfor og mellem tags</span></span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a><span class="co"># vi henter en edgelist ud fra netværksobjektet</span></span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">as_data_frame</span>(net_affil_l, <span class="at">what =</span> <span class="st">"edges"</span>)</span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a><span class="co"># fordi det er undirected vil vi gerne 'fordoble' det så from-to og to-from er med</span></span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">from =</span> <span class="fu">c</span>(e<span class="sc">$</span>from, e<span class="sc">$</span>to), </span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">to   =</span> <span class="fu">c</span>(e<span class="sc">$</span>to, e<span class="sc">$</span>from))</span>
+<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a><span class="co"># dernæst kan vi left_join'e tags på for henholdsvis from variablen og to variablen.</span></span>
+<span id="cb105-8"><a href="#cb105-8" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> e <span class="sc">%&gt;%</span> </span>
+<span id="cb105-9"><a href="#cb105-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">tibble</span>(<span class="at">from =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>name, <span class="at">from_sector =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>sector)) <span class="sc">%&gt;%</span> </span>
+<span id="cb105-10"><a href="#cb105-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., <span class="fu">tibble</span>(<span class="at">to =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>name, <span class="at">to_sector =</span> <span class="fu">V</span>(net_affil_l)<span class="sc">$</span>sector))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Joining with `by = join_by(from)`
 Joining with `by = join_by(to)`</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="co"># og lave en summarise(....., .by = from_tag), hvor vi 1. tæller hvor mange der har tag'et og dernæst hvor mange af hvert tags forbindelser, der er til det samme tag og hvor mange der er til et andet tag.</span></span>
-<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a>e <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">nodes     =</span> <span class="fu">n_distinct</span>(from) , <span class="at">ties_within =</span> <span class="fu">sum</span>(from_sector <span class="sc">==</span> to_sector),</span>
-<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">ties_out  =</span> <span class="fu">sum</span>(from_sector <span class="sc">!=</span> to_sector),</span>
-<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">share_out =</span> ties_out <span class="sc">/</span> (ties_within <span class="sc">+</span> ties_out), <span class="at">.by =</span> from_sector)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="co"># og lave en summarise(....., .by = from_tag), hvor vi 1. tæller hvor mange der har tag'et og dernæst hvor mange af hvert tags forbindelser, der er til det samme tag og hvor mange der er til et andet tag.</span></span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>e <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">nodes     =</span> <span class="fu">n_distinct</span>(from) , <span class="at">ties_within =</span> <span class="fu">sum</span>(from_sector <span class="sc">==</span> to_sector),</span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">ties_out  =</span> <span class="fu">sum</span>(from_sector <span class="sc">!=</span> to_sector),</span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">share_out =</span> ties_out <span class="sc">/</span> (ties_within <span class="sc">+</span> ties_out), <span class="at">.by =</span> from_sector)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 8 × 5
   from_sector  nodes ties_within ties_out share_out
@@ -1384,9 +1380,9 @@ Joining with `by = join_by(to)`</code></pre>
 </div>
 <p>Eller hvad med andel af out-going ties fra sektor til sektor:</p>
 <div class="cell" data-warnings="false" data-messages="false">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a>sector_tie_table <span class="ot">&lt;-</span> <span class="fu">xtabs</span>(e, <span class="at">formula =</span> <span class="sc">~</span>from_sector <span class="sc">+</span> to_sector)</span>
-<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a><span class="fu">diag</span>(sector_tie_table) <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb110-3"><a href="#cb110-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(sector_tie_table, <span class="at">margin =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>sector_tie_table <span class="ot">&lt;-</span> <span class="fu">xtabs</span>(e, <span class="at">formula =</span> <span class="sc">~</span>from_sector <span class="sc">+</span> to_sector)</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a><span class="fu">diag</span>(sector_tie_table) <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(sector_tie_table, <span class="at">margin =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>              to_sector
 from_sector    Commissions Corporations Family Foundations   NGO State Unknown

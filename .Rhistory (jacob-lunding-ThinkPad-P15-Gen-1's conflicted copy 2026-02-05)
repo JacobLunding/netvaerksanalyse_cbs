@@ -1,0 +1,512 @@
+g_org
+V(g_org)$name %>% head(20)
+E(g_org)$weight %>% head(20)
+E(g_org)$weight %>% table()
+g_bi <- den_corp_bi %>% graph_from_biadjacency_matrix()
+##################################################/
+# 6. Netværksvisualisering med ggraph ----
+##################################################/
+# individ x organisations netværket
+g_bi_l <- largest_component(g_bi)
+ggraph(g_bi_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.8, edge_width = 0.1, color = "black") +
+geom_node_point(aes(color = type), size = 0.2, alpha = 0.6) +
+scale_color_manual(values=c("sienna1", "steelblue2"), labels=c("individuals", "companies")) +
+theme_graph()
+# individ projektionen
+g_ind_l <- largest_component(g_ind)
+ggraph(g_ind_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.2, edge_width = 0.1) +
+geom_node_point(size = 0.2) +
+theme_graph()
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+ggraph(g_org_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+theme_graph()
+closeness(g_org_l)
+closeness(g_org_l) %>% sort() %>% tail()
+closeness(g_in_l) %>% sort() %>% tail()
+closeness(g_ind_l) %>% sort() %>% tail()
+# individ projektionen
+g_ind_l <- largest_component(g_ind)
+ggraph(g_ind_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.2, edge_width = 0.1) +
+geom_node_point(size = 0.2) +
+theme_graph()
+# Filter
+den_corp <- den %>%
+filter(grepl("landbrug", org_tags, ignore.case = TRUE) | grepl("landbrug", org_tags_full, ignore.case = TRUE))
+den_corp %>% slice_sample(n = 10)
+# Når nu vi kun har virksomheder, kan vi kigge på hvilke brancher der optræder i data
+den_corp %>% distinct(AFFILIATION, org_cvr_branche) %>% count(org_cvr_branche, sort = TRUE)
+# select()
+den_corp <- den_corp %>% select(NAME, AFFILIATION)
+# biadjacency matrice individer ('name') i rækker og organisationer ('affiliation') i kolonner.
+# sparte = TRUE fordi det er et megt stort data
+den_corp_bi <- den_corp %>% xtabs(formula = ~NAME + AFFILIATION, sparse = TRUE)
+den_corp_bi
+# adjacency matrix for rækkerne (indvid x individ)
+den_corp_ind <- den_corp_bi %*% t(den_corp_bi)
+# adjacency matrix for kolonnerne (organisation x organisation)
+den_corp_org <- t(den_corp_bi) %*% den_corp_bi
+g_ind <- den_corp_ind %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE)
+g_ind
+V(g_ind)$name %>% head(20)
+E(g_ind)$weight %>% head(20)
+E(g_ind)$weight %>% table()
+g_org <- den_corp_org %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE)
+g_org
+V(g_org)$name %>% head(20)
+E(g_org)$weight %>% head(20)
+E(g_org)$weight %>% table()
+g_bi <- den_corp_bi %>% graph_from_biadjacency_matrix()
+##################################################/
+# 6. Netværksvisualisering med ggraph ----
+##################################################/
+# individ x organisations netværket
+g_bi_l <- largest_component(g_bi)
+ggraph(g_bi_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.8, edge_width = 0.1, color = "black") +
+geom_node_point(aes(color = type), size = 0.2, alpha = 0.6) +
+scale_color_manual(values=c("sienna1", "steelblue2"), labels=c("individuals", "companies")) +
+theme_graph()
+# individ projektionen
+g_ind_l <- largest_component(g_ind)
+ggraph(g_ind_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.2, edge_width = 0.1) +
+geom_node_point(size = 0.2) +
+theme_graph()
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+ggraph(g_org_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+theme_graph()
+closeness(g_ind_l) %>% sort() %>% tail()
+closeness(g_org_l) %>% sort() %>% tail()
+V(g_org_l)$betweenness <- betweenness(g_org_l)
+rank(betweenness(g_org_l))
+-rank(betweenness(g_org_l))
+rank(desc(betweenness(g_org_l)))
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(aes(filter= betweenness <=5)) +
+theme_graph()
+ggraph(g_org_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=5)) +
+theme_graph()
+ggraph(g_org_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=5), label = name) +
+theme_graph()
+ggraph(g_org_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=5, label = name)) +
+theme_graph()
+ggraph(g_org_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name)) +
+theme_graph()
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name)) +
+theme_graph()
+ggraph(g_org_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+V(g_org_l)$betweenness <- rank(desc(closeness(g_org_l)))
+ggraph(g_org_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+V(g_org_l)$betweenness <- rank(desc(degree(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+##################################################/
+# 6. Netværksvisualisering med ggraph ----
+##################################################/
+# individ x organisations netværket
+g_bi_l <- largest_component(g_bi)
+ggraph(g_bi_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.8, edge_width = 0.1, color = "black") +
+geom_node_point(aes(color = type), size = 0.2, alpha = 0.6) +
+scale_color_manual(values=c("sienna1", "steelblue2"), labels=c("individuals", "companies")) +
+theme_graph()
+g_bi <- den_corp_bi %>% graph_from_biadjacency_matrix(weighted = NULL)
+##################################################/
+# 6. Netværksvisualisering med ggraph ----
+##################################################/
+# individ x organisations netværket
+g_bi_l <- largest_component(g_bi)
+ggraph(g_bi_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.8, edge_width = 0.1, color = "black") +
+geom_node_point(aes(color = type), size = 0.2, alpha = 0.6) +
+scale_color_manual(values=c("sienna1", "steelblue2"), labels=c("individuals", "companies")) +
+theme_graph()
+g_bi
+View(den_corp)
+den %>% distinct(AFFILIATION, org_tags) %>% count(org_tags, sort = TRUE)
+den %>% distinct(AFFILIATION, org_tags, org_tags_full) %>% count(org_tags, org_tags_full, sort = TRUE) %>% View()
+den %>% distinct(AFFILIATION, org_tags, org_tags_full, org_sector) %>% count(org_tags, org_tags_full, org_sector, sort = TRUE) %>% View()
+# Filter
+den_corp <- den %>%
+filter(grepl("Analyse-Grøn", org_tags, ignore.case = TRUE) | grepl("Analyse-Grøn", org_tags_full, ignore.case = TRUE))
+den_corp %>% slice_sample(n = 10)
+# Når nu vi kun har virksomheder, kan vi kigge på hvilke brancher der optræder i data
+den_corp %>% distinct(AFFILIATION, org_cvr_branche) %>% count(org_cvr_branche, sort = TRUE)
+# select()
+den_corp <- den_corp %>% select(NAME, AFFILIATION)
+# biadjacency matrice individer ('name') i rækker og organisationer ('affiliation') i kolonner.
+# sparte = TRUE fordi det er et megt stort data
+den_corp_bi <- den_corp %>% xtabs(formula = ~NAME + AFFILIATION, sparse = TRUE)
+den_corp_bi
+# adjacency matrix for rækkerne (indvid x individ)
+den_corp_ind <- den_corp_bi %*% t(den_corp_bi)
+# adjacency matrix for kolonnerne (organisation x organisation)
+den_corp_org <- t(den_corp_bi) %*% den_corp_bi
+g_ind <- den_corp_ind %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE)
+g_ind
+V(g_ind)$name %>% head(20)
+E(g_ind)$weight %>% head(20)
+E(g_ind)$weight %>% table()
+g_org <- den_corp_org %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE)
+g_org
+V(g_org)$name %>% head(20)
+E(g_org)$weight %>% head(20)
+E(g_org)$weight %>% table()
+g_bi <- den_corp_bi %>% graph_from_biadjacency_matrix(weighted = NULL)
+##################################################/
+# 6. Netværksvisualisering med ggraph ----
+##################################################/
+# individ x organisations netværket
+g_bi_l <- largest_component(g_bi)
+ggraph(g_bi_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.8, edge_width = 0.1, color = "black") +
+geom_node_point(aes(color = type), size = 0.2, alpha = 0.6) +
+scale_color_manual(values=c("sienna1", "steelblue2"), labels=c("individuals", "companies")) +
+theme_graph()
+# individ projektionen
+g_ind_l <- largest_component(g_ind)
+ggraph(g_ind_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.2, edge_width = 0.1) +
+geom_node_point(size = 0.2) +
+theme_graph()
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+V(g_org_l)$betweenness <- rank(desc(degree(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+V(g_org_l)$betweenness <- rank(desc(closeness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+g_org_l <- g_org_l - which(degree(g_org_l) == 1)
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=5, label = name)) +
+theme_graph()
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=3, label = name)) +
+theme_graph()
+library(tidyverse)
+library(igraph)
+library(ggraph)
+library(Matrix)
+den <- read_csv("data/den17-no-nordic-letters.csv")
+den %>% glimpse()
+den_corp <- den %>%
+filter(sector == "Corporations")
+##########################/
+#
+#  Øvelse 1: Introduktion til netværksanalyse
+#
+###########################/
+######################/
+# 1. Setting up -----
+######################/
+# Først skal vi have installeret de pakker vi kommer til at bruge (skal kun gøres første gang)
+install.packages("tidyverse")
+library(tidyverse)
+library(ggraph)
+library(igraph)
+library(Matrix)
+################################/
+# 2. Indlæs og udfors data -----
+################################/
+# Vi indlæser dernæst data med read_csv() | fordi vi er i et R-project mappe, opfatter R denne mappe som working directory,
+# så vi behøver ikke give hele stien. Vi kan nøjes med at fortælle at den ligger i data-mappen:
+den <- read_csv("data/danish_elitenetworks2024.csv")
+# Lad os ligge lidt på data
+den %>% glimpse()
+# Count
+den %>% count(org_sector, sort = TRUE)
+den %>% distinct(AFFILIATION, org_tags, org_tags_full, org_sector) %>% count(org_tags, org_tags_full, org_sector, sort = TRUE) %>% View()
+#######################/
+# 3. Subset data -----
+#######################/
+# Filter
+den_corp <- den %>%
+filter(grepl("landbrug", org_tags, ignore.case = TRUE) | grepl("landbrug", org_tags_full, ignore.case = TRUE))
+den_corp %>% slice_sample(n = 10)
+# Når nu vi kun har virksomheder, kan vi kigge på hvilke brancher der optræder i data
+den_corp %>% distinct(AFFILIATION, org_cvr_branche) %>% count(org_cvr_branche, sort = TRUE)
+# select()
+den_corp <- den_corp %>% select(NAME, AFFILIATION)
+#########################/
+# 4. Adjacency matricer ----
+#########################/
+# biadjacency matrice individer ('name') i rækker og organisationer ('affiliation') i kolonner.
+# sparte = TRUE fordi det er et megt stort data
+den_corp_bi <- den_corp %>% xtabs(formula = ~NAME + AFFILIATION, sparse = TRUE)
+den_corp_bi
+# adjacency matrix for rækkerne (indvid x individ)
+den_corp_ind <- den_corp_bi %*% t(den_corp_bi)
+# adjacency matrix for kolonnerne (organisation x organisation)
+den_corp_org <- t(den_corp_bi) %*% den_corp_bi
+##################################################/
+# 5. Netværksobjekter ----
+##################################################/
+#####################/
+# individ x individ #/
+#####################/
+g_ind <- den_corp_ind %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE)
+g_ind
+V(g_ind)$name %>% head(20)
+E(g_ind)$weight %>% head(20)
+E(g_ind)$weight %>% table()
+################################/
+# organisation x organisation  #/
+################################/
+g_org <- den_corp_org %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE)
+g_org
+V(g_org)$name %>% head(20)
+E(g_org)$weight %>% head(20)
+E(g_org)$weight %>% table()
+##############################################/
+# (Bipartite) netværk individ x organisation #/
+##############################################/
+g_bi <- den_corp_bi %>% graph_from_biadjacency_matrix(weighted = NULL)
+##################################################/
+# 6. Netværksvisualisering med ggraph ----
+##################################################/
+# individ x organisations netværket
+g_bi_l <- largest_component(g_bi)
+ggraph(g_bi_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.8, edge_width = 0.1, color = "black") +
+geom_node_point(aes(color = type), size = 0.2, alpha = 0.6) +
+scale_color_manual(values=c("sienna1", "steelblue2"), labels=c("individuals", "companies")) +
+theme_graph()
+# individ projektionen
+g_ind_l <- largest_component(g_ind)
+ggraph(g_ind_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.2, edge_width = 0.1) +
+geom_node_point(size = 0.2) +
+theme_graph()
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+g_org_l <- g_org_l - which(degree(g_org_l) == 1)
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=3, label = name)) +
+theme_graph()
+closeness(g_org_l) %>% sort() %>% tail()
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=6, label = name)) +
+theme_graph()
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name)) +
+theme_graph()
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_point(mapping = aes(filter= betweenness <=10), size = 1, color = "sienna1") +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name)) +
+theme_graph()
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name)) +
+geom_node_point(mapping = aes(filter= betweenness <=10), size = 1, color = "sienna1") +
+theme_graph()
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name), repel = TRUE) +
+geom_node_point(mapping = aes(filter= betweenness <=10), size = 1, color = "sienna1") +
+theme_graph()
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name), repel = TRUE) +
+geom_node_point(mapping = aes(filter= betweenness <=10), size = 2, color = "sienna1") +
+theme_graph()
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+#g_org_l <- g_org_l - which(degree(g_org_l) == 1)
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name), repel = TRUE) +
+geom_node_point(mapping = aes(filter= betweenness <=10), size = 2, color = "sienna1") +
+theme_graph()
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+g_org_l <- g_org_l - which(degree(g_org_l) <3)
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name), repel = TRUE) +
+geom_node_point(mapping = aes(filter= betweenness <=10), size = 2, color = "sienna1") +
+theme_graph()
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+g_org_l <- g_org_l - which(degree(g_org_l) <4)
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name), repel = TRUE) +
+geom_node_point(mapping = aes(filter= betweenness <=10), size = 2, color = "sienna1") +
+theme_graph()
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+g_org_l <- g_org_l - which(degree(g_org_l) <2)
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.1) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name), repel = TRUE) +
+geom_node_point(mapping = aes(filter= betweenness <=10), size = 2, color = "sienna1") +
+theme_graph()
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.5) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name), repel = TRUE) +
+geom_node_point(mapping = aes(filter= betweenness <=10), size = 2, color = "sienna1") +
+theme_graph()
+g_org <- den_corp_org %>% graph_from_adjacency_matrix(mode = "undirected", weighted = FALSE, diag = FALSE)
+g_org <- den_corp_org %>% graph_from_adjacency_matrix(mode = "undirected", weighted = NULL, diag = FALSE)
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+g_org_l <- g_org_l - which(degree(g_org_l) <2)
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.5) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name), repel = TRUE) +
+geom_node_point(mapping = aes(filter= betweenness <=10), size = 2, color = "sienna1") +
+theme_graph()
+g_org_l
+g_org
+g_org <- den_corp_org %>% graph_from_adjacency_matrix(mode = "undirected", weighted = NULL, diag = FALSE) %>% simplify()
+g_org
+# organisations projektionen
+g_org_l <- largest_component(g_org)
+g_org_l <- g_org_l - which(degree(g_org_l) <2)
+V(g_org_l)$betweenness <- rank(desc(betweenness(g_org_l)))
+ggraph(g_org_l) +
+geom_edge_link0(edge_alpha = 0.6, edge_width = 0.1) +
+geom_node_point(size = 0.5) +
+geom_node_label(mapping = aes(filter= betweenness <=10, label = name), repel = TRUE) +
+geom_node_point(mapping = aes(filter= betweenness <=10), size = 2, color = "sienna1") +
+theme_graph()
+g_ind <- den_corp_ind %>% graph_from_adjacency_matrix(mode = "undirected", weighted = NULL, diag = FALSE) %>% simplify()
+# individ projektionen
+g_ind_l <- largest_component(g_ind)
+ggraph(g_ind_l, layout = "fr") +
+geom_edge_link0(edge_alpha = 0.2, edge_width = 0.1) +
+geom_node_point(size = 0.2) +
+theme_graph()
+g_ind_l
+E(g_org)$weight %>% head(20)
+g_ind <- den_corp_ind %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE) %>% simplify()
+g_ind
+V(g_ind)$name %>% head(20)
+E(g_ind)$weight %>% head(20)
+E(g_ind)$weight %>% table()
+E(g_ind)
+E(g_ind)[E(g_ind)$weight == 5]
+E(g_ind)[E(g_ind)$weight == 4]
+get.edge(g_ind, E(g_ind)$weight == 4)
+ends(g_ind, E(g_ind)$weight == 4)
+ends(g_ind, which(E(g_ind)$weight == 4))
+ends(g_ind, which(E(g_ind)$weight == 5))
+ends(g_ind)
+ends(g_ind, which(E(g_ind)$weight == 3))
+E(g_org)$weight %>% table()
+g_ind <- den_corp_ind %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE)
+g_ind
+library(tidyverse)

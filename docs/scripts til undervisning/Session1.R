@@ -28,8 +28,9 @@ library(Matrix)
 
 # Vi indlæser dernæst data med read_csv() | fordi vi er i et R-project mappe, opfatter R denne mappe som working directory, 
 # så vi behøver ikke give hele stien. Vi kan nøjes med at fortælle at den ligger i data-mappen:
-
+download.file(url = "https://jacoblunding.github.io/netvaerksanalyse_cbs/data/danish_elitenetworks2024.csv", destfile = "data/danish_elitenetworks2024.csv")
 den <- read_csv("data/danish_elitenetworks2024.csv")
+
 
 # Lad os ligge lidt på data
 den %>% glimpse()
@@ -207,3 +208,6 @@ ggraph(g_org_l) +
   geom_node_label(mapping = aes(filter= betweenness_rank <=10, label = name), repel = TRUE) +
   theme_graph() 
 
+
+g_ind_l <- g_ind_l %>% activate(nodes) %>% left_join(den_corp %>% group_by(NAME) %>% summarise(memberships = paste0(AFFILIATION, collapse = " | ")), by = c("name" = "NAME"))
+g_ind_l %>% as_tibble() %>% arrange(betweenness_rank) %>% View()

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Analyse af strategiske netværksroller – Kursusmateriale til Virksomhedsstrategi i et netværksperspektiv</title>
+<title>Analyse af strategiske netværksroller – Virksomhedsstrategi i et netværksperspektiv</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-553db639d176b1f1e5eb8f34e19f9014.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-bd192f0b7177c10948837637c5954a59.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -147,7 +147,7 @@ window.Quarto = {
     <a href="./index.html" class="navbar-brand navbar-brand-logo">
     </a>
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">Kursusmateriale til Virksomhedsstrategi i et netværksperspektiv</span>
+    <span class="navbar-title">Virksomhedsstrategi i et netværksperspektiv</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -358,18 +358,18 @@ person {TRUE/FALSE}</code></pre>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="co"># Vi tager 10 tilfældige rækker</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 2
-   person_countries                 n
-   &lt;chr&gt;                        &lt;int&gt;
- 1 United Kingdom;United States     9
- 2 United States;Canada             1
- 3 Switzerland                      5
- 4 United Kingdom                  90
- 5 Denmark;Norway;Sweden            3
- 6 Portugal                         1
- 7 Denmark;Norway                  16
- 8 Sweden;Norway                   18
- 9 Netherlands;Sweden               4
-10 Finland;United Kingdom           7</code></pre>
+   person_countries         n
+   &lt;chr&gt;                &lt;int&gt;
+ 1 Germany                 34
+ 2 Bulgaria;Iceland         1
+ 3 India                    1
+ 4 Norway                 773
+ 5 Sweden;South Africa      5
+ 6 Ghana                    1
+ 7 China                    5
+ 8 Norway;United States     3
+ 9 Sweden;Canada            1
+10 Denmark;Germany          5</code></pre>
 </div>
 </div>
 <p>Lad os lave en geografi-variabel <code>person_gep</code>, hvor vi bruger nationalitet når fødested er <code>NA</code> (der, hvor der er flere adskilt af “;”, lad da tage den første) og ellers bruger fødested (<code>.default= person_country</code>):</p>
@@ -468,9 +468,9 @@ person {TRUE/FALSE}</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>net_virk <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">adjmatrix =</span> adj_virk, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>net_virk</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH 4fcae8c UN-- 596 266 -- 
+<pre><code>IGRAPH c339f8d UN-- 596 266 -- 
 + attr: name (v/c)
-+ edges from 4fcae8c (vertex names):
++ edges from c339f8d (vertex names):
  [1] A/S ORTHANA KEMISK FABRIK--BIOFAC A/S                 
  [2] A/S ORTHANA KEMISK FABRIK--DANIPHARM A/S              
  [3] A/S ORTHANA KEMISK FABRIK--PHARMADAN A/S              
@@ -488,9 +488,9 @@ person {TRUE/FALSE}</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>net_ind <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">adjmatrix =</span> adj_ind, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>net_ind</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH ee6bad1 UN-- 261 433 -- 
+<pre><code>IGRAPH 799fa87 UN-- 261 433 -- 
 + attr: name (v/c)
-+ edges from ee6bad1 (vertex names):
++ edges from 799fa87 (vertex names):
  [1] David Lawrence Stern     --Dr Henrijette Elisabeth Richter
  [2] David Lawrence Stern     --Mr Mark Smith                  
  [3] David Lawrence Stern     --Mr Nicholas Haft               
@@ -745,10 +745,6 @@ person {TRUE/FALSE}</code></pre>
 <div class="cell-output cell-output-stderr">
 <pre><code>Using "stress" as default layout</code></pre>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in geom_node_label(aes(filter = {: Ignoring unknown parameters:
-`label.size`</code></pre>
-</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -759,12 +755,12 @@ person {TRUE/FALSE}</code></pre>
 </div>
 <p>Lad os tage en virksomhed og udvide netværket til 2., 3. og 4. nabolag. På den måde får vi et billede af det større netværk, men set fra denne virksomheds perspektiv.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>ego <span class="ot">&lt;-</span> <span class="st">"PILA PHARMA AB"</span></span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hvad er et ego netværk</span></span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>pl <span class="ot">&lt;-</span> <span class="fu">ego_neighborhoods</span>(comp1_virk, <span class="dv">4</span>, ego, <span class="at">labels =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>ggpubr<span class="sc">::</span><span class="fu">ggarrange</span>(<span class="at">plotlist =</span> pl, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"1st neighbourhood"</span>, <span class="st">"2nd neighbourhood"</span>, <span class="st">"3rd neighbourhood"</span>, <span class="st">"4th neighbourhood"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>ego <span class="ot">&lt;-</span> <span class="st">"PILA PHARMA AB"</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hvad er et ego netværk</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>pl <span class="ot">&lt;-</span> <span class="fu">ego_neighborhoods</span>(comp1_virk, <span class="dv">4</span>, ego, <span class="at">labels =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>ggpubr<span class="sc">::</span><span class="fu">ggarrange</span>(<span class="at">plotlist =</span> pl, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"1st neighbourhood"</span>, <span class="st">"2nd neighbourhood"</span>, <span class="st">"3rd neighbourhood"</span>, <span class="st">"4th neighbourhood"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -776,15 +772,15 @@ person {TRUE/FALSE}</code></pre>
 <p>Vi har talt om trekantslukninger (når A og B <em>og</em> B og C er venner, er der sandsynlighed for at A og C også med tiden bliver det) og om hvordan det skaber closure i et netværk og bidrager til lokal densitet og cohesion - som skaber grundlag for tillid, sammenhold, norm-konformitet osv. Social kapital som gruppe fænomen.</p>
 <p>Lad os begynde med at se på hvordan lokal transitivitet ser ud. For hver node i vores netværk kan vi se hvor mange af dens forbindelser der er lukkede (to venner der også kender hinanden) og hvor mange der er åbne (åbne/lukkede kalder vi transitivitet). Lad os tage 12 tilfældige noder (<code>sample()</code> på 12 fra vertex navne) og sortere dem, så den med højest transitivitet kommer først. Bemærk at <code>transitivity()</code> returnerer <code>NaN</code> - not a number - når en node ikke er en del af nogen triplets (så er der hverken faktisk lukkede eller mulige lukkede trekanter at regne på). Hvis vi gerne vil sortere er vi nødt til at erstatte <code>NaN</code> med <code>NA</code>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>random_nodes <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>name, <span class="dv">12</span>)</span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>random_nodes <span class="ot">&lt;-</span> <span class="fu">transitivity</span>(comp1_virk, <span class="at">type =</span> <span class="st">"local"</span>, <span class="at">vids =</span> random_nodes)</span>
-<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>random_nodes[<span class="fu">is.nan</span>(random_nodes)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>random_nodes <span class="ot">&lt;-</span> <span class="fu">sort</span>(random_nodes, <span class="at">decreasing =</span> T, <span class="at">na.last =</span> T)</span>
-<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>random_nodes <span class="ot">&lt;-</span> <span class="fu">names</span>(random_nodes)</span>
-<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>pl <span class="ot">&lt;-</span> <span class="fu">ego_net_plot</span>(<span class="at">graph =</span> comp1_virk, <span class="at">nodes =</span> random_nodes, <span class="at">mode =</span> <span class="st">"transitivity"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>random_nodes <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>name, <span class="dv">12</span>)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>random_nodes <span class="ot">&lt;-</span> <span class="fu">transitivity</span>(comp1_virk, <span class="at">type =</span> <span class="st">"local"</span>, <span class="at">vids =</span> random_nodes)</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>random_nodes[<span class="fu">is.nan</span>(random_nodes)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>random_nodes <span class="ot">&lt;-</span> <span class="fu">sort</span>(random_nodes, <span class="at">decreasing =</span> T, <span class="at">na.last =</span> T)</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>random_nodes <span class="ot">&lt;-</span> <span class="fu">names</span>(random_nodes)</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>pl <span class="ot">&lt;-</span> <span class="fu">ego_net_plot</span>(<span class="at">graph =</span> comp1_virk, <span class="at">nodes =</span> random_nodes, <span class="at">mode =</span> <span class="st">"transitivity"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Loading required package: tidygraph</code></pre>
 </div>
@@ -802,8 +798,8 @@ Attaching package: 'tidygraph'</code></pre>
 
     filter</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> ggpubr<span class="sc">::</span><span class="fu">ggarrange</span>(<span class="at">plotlist =</span> pl)</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>p</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> ggpubr<span class="sc">::</span><span class="fu">ggarrange</span>(<span class="at">plotlist =</span> pl)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>p</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -811,7 +807,7 @@ Attaching package: 'tidygraph'</code></pre>
 </figure>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="at">plot =</span> p, <span class="at">filename =</span> <span class="st">"output/network closure.pdf"</span>, <span class="at">height =</span> <span class="dv">6</span>, <span class="at">width =</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="at">plot =</span> p, <span class="at">filename =</span> <span class="st">"output/network closure.pdf"</span>, <span class="at">height =</span> <span class="dv">6</span>, <span class="at">width =</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Med closure følger imidlertid også muligheden for det R. Burt kalder strukturelle huller mellem ellers tætforbundne grupper. Det giver plads til en særlig netværks rolle, nemlig den at have ikke-redundente forbindelser. Altså forbindelser der rækker ud over den lukkede og dermed tæt forbundne gruppe man er en del af - og dermed få adgang til ny viden fx. Social kapital som brobygning.</p>
 </section>
@@ -837,64 +833,64 @@ Attaching package: 'tidygraph'</code></pre>
 <p>funktionen <code>constraint</code> i Igraph beregner Burt’s constraint, som er højere jo mere ‘constrained’ en node er. Dvs. lav constraint = høj brokerage.</p>
 <p>Det vil vi ofte gerne ‘vende om’ så det bliver et mål for brokerage evne.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>constr <span class="ot">&lt;-</span> <span class="fu">constraint</span>(comp1_virk)</span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>brokerage <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> constr</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>constr <span class="ot">&lt;-</span> <span class="fu">constraint</span>(comp1_virk)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>brokerage <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> constr</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="constraint-og-andre-centralitetsmål" class="level1">
 <h1>Constraint og andre centralitetsmål</h1>
 <p>Lad os beregne et par centralitetsmål, som vi tidligere har kigget på</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>deg     <span class="ot">&lt;-</span>  <span class="fu">degree</span>(comp1_virk)</span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>betw    <span class="ot">&lt;-</span>  <span class="fu">betweenness</span>(comp1_virk, <span class="at">normalized =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>close   <span class="ot">&lt;-</span>  <span class="fu">closeness</span>(comp1_virk, <span class="at">normalized =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>eig     <span class="ot">&lt;-</span>  <span class="fu">eigen_centrality</span>(comp1_virk, <span class="at">directed =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>vector</span>
-<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>core    <span class="ot">&lt;-</span>  <span class="fu">coreness</span>(comp1_virk)</span>
-<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>local_transitivity <span class="ot">&lt;-</span> <span class="fu">transitivity</span>(comp1_virk, <span class="at">type =</span> <span class="st">"local"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>deg     <span class="ot">&lt;-</span>  <span class="fu">degree</span>(comp1_virk)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>betw    <span class="ot">&lt;-</span>  <span class="fu">betweenness</span>(comp1_virk, <span class="at">normalized =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>close   <span class="ot">&lt;-</span>  <span class="fu">closeness</span>(comp1_virk, <span class="at">normalized =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>eig     <span class="ot">&lt;-</span>  <span class="fu">eigen_centrality</span>(comp1_virk, <span class="at">directed =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>vector</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>core    <span class="ot">&lt;-</span>  <span class="fu">coreness</span>(comp1_virk)</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>local_transitivity <span class="ot">&lt;-</span> <span class="fu">transitivity</span>(comp1_virk, <span class="at">type =</span> <span class="st">"local"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>og et ‘nyt’, nemlig lokal betweenness. Hvor betweenness almindeligvis optæller parvis korteste stier mellem alle noder i hele netværket og dermed fortæller os hvor stor en anden af disse, der går gennem en given node, er lokal betweenness et mere, ja, lokalt mål. Her beregner vi ‘kun’ stier inden for et givet nabolag omkring en node. Fx. 2. nabolag. Hvor mange korteste stier i egos udvidede netværk, venner og venners venner, går gennem ego. <code>cutoff =</code> bestemmer hvor langt ud vi skal kigge.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>local_betw    <span class="ot">&lt;-</span>  <span class="fu">betweenness</span>(comp1_virk, <span class="at">cutoff =</span> <span class="dv">2</span>, <span class="at">normalized =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>local_betw    <span class="ot">&lt;-</span>  <span class="fu">betweenness</span>(comp1_virk, <span class="at">cutoff =</span> <span class="dv">2</span>, <span class="at">normalized =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Lad os samle de nodespecifikke centralitetsmål for den største komponent og gemme dem i en xslx fil.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>cent_metrics <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name        =</span> <span class="fu">V</span>(comp1_virk)<span class="sc">$</span>name,</span>
-<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">degree      =</span> deg, </span>
-<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">betweenness =</span> betw,</span>
-<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">local_betweenness =</span> local_betw,</span>
-<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">closeness   =</span> close,</span>
-<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">eigen       =</span> eig,</span>
-<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">constraint  =</span> constr,</span>
-<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">brokerage   =</span> <span class="dv">1</span><span class="sc">/</span> constr,</span>
-<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">coreness    =</span> core,</span>
-<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">local_trans =</span> local_transitivity)</span>
-<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>cent_metrics <span class="ot">&lt;-</span> cent_metrics <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">degree_rank      =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(degree)),</span>
-<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">betw_rank        =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(betweenness)),</span>
-<span id="cb61-15"><a href="#cb61-15" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">local_betw_rank  =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(local_betweenness)),</span>
-<span id="cb61-16"><a href="#cb61-16" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">closeness_rank   =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(closeness)),</span>
-<span id="cb61-17"><a href="#cb61-17" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">brokerage_rank   =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(brokerage)),</span>
-<span id="cb61-18"><a href="#cb61-18" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">eigen_rank       =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(eigen)),</span>
-<span id="cb61-19"><a href="#cb61-19" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">local_trans_rank =</span> <span class="fu">dense_rank</span>(local_trans))</span>
-<span id="cb61-20"><a href="#cb61-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb61-21"><a href="#cb61-21" aria-hidden="true" tabindex="-1"></a><span class="fu">write_xlsx</span>(cent_metrics, <span class="st">"output/pharma_nordic_example_centralitymetrics.xlsx"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>cent_metrics <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name        =</span> <span class="fu">V</span>(comp1_virk)<span class="sc">$</span>name,</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">degree      =</span> deg, </span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">betweenness =</span> betw,</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">local_betweenness =</span> local_betw,</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">closeness   =</span> close,</span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">eigen       =</span> eig,</span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">constraint  =</span> constr,</span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">brokerage   =</span> <span class="dv">1</span><span class="sc">/</span> constr,</span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">coreness    =</span> core,</span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">local_trans =</span> local_transitivity)</span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a>cent_metrics <span class="ot">&lt;-</span> cent_metrics <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">degree_rank      =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(degree)),</span>
+<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">betw_rank        =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(betweenness)),</span>
+<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">local_betw_rank  =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(local_betweenness)),</span>
+<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">closeness_rank   =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(closeness)),</span>
+<span id="cb60-17"><a href="#cb60-17" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">brokerage_rank   =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(brokerage)),</span>
+<span id="cb60-18"><a href="#cb60-18" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">eigen_rank       =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(eigen)),</span>
+<span id="cb60-19"><a href="#cb60-19" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">local_trans_rank =</span> <span class="fu">dense_rank</span>(local_trans))</span>
+<span id="cb60-20"><a href="#cb60-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-21"><a href="#cb60-21" aria-hidden="true" tabindex="-1"></a><span class="fu">write_xlsx</span>(cent_metrics, <span class="st">"output/pharma_nordic_example_centralitymetrics.xlsx"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Inden vi går videre til næste del af denne øvelse gemmer vi lige alle centralitetsmålene som vertex attributes i grafobjektet: Husk I kan bruge <code>add_vertex_attr()</code> funktionen til det.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>comp1_virk <span class="ot">&lt;-</span> <span class="fu">add_vertex_attr</span>(<span class="at">graph=</span> comp1_virk, <span class="at">data =</span> cent_metrics, <span class="at">match_var =</span> <span class="st">"name"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>comp1_virk <span class="ot">&lt;-</span> <span class="fu">add_vertex_attr</span>(<span class="at">graph=</span> comp1_virk, <span class="at">data =</span> cent_metrics, <span class="at">match_var =</span> <span class="st">"name"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>I det følgende trækker vi et par eksempler ud og ser hvordan det lokale netværk kan være en constraint eller omvendt åbne muligheder for brokerage:</p>
 <p>Lad os udvælge nogle forskellige virksomheder fra brokerage fordelingen: nr 1, 5, 10, 15, 20, 30 fx</p>
 <p>Det gør vi fra det dataobjekt med centralitetsmål vi lige har gemt. Først sorterer vi data (<code>arrange()</code>) efter brokerage, dernæst tager vi (<code>filter()</code>) nr. 1, 5, 10, 15, 20, 30 og sørger for at der kun er en række for hver (to individer kan godt have samme værdi og dermed samme rank) <code>distinct()</code>. Tilsidst i vores <code>%&gt;%</code>-række bruger vi funktionen <code>pull()</code> til at tage den variabel vi skal bruge.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>brokers <span class="ot">&lt;-</span> cent_metrics <span class="sc">%&gt;%</span> </span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(brokerage_rank) <span class="sc">%&gt;%</span> </span>
-<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(brokerage_rank <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">10</span>,<span class="dv">15</span>, <span class="dv">20</span>, <span class="dv">30</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(brokerage_rank, <span class="at">.keep_all =</span> T) <span class="sc">%&gt;%</span> </span>
-<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(name)</span>
-<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>brokers</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>brokers <span class="ot">&lt;-</span> cent_metrics <span class="sc">%&gt;%</span> </span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(brokerage_rank) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(brokerage_rank <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">10</span>,<span class="dv">15</span>, <span class="dv">20</span>, <span class="dv">30</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(brokerage_rank, <span class="at">.keep_all =</span> T) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(name)</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>brokers</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "ALZINOVA AB"                       "ANNEXIN PHARMACEUTICALS AB (PUBL)"
 [3] "CCRM NORDIC AB (SVB)"              "ATROGI AB"                        
@@ -904,11 +900,11 @@ Attaching package: 'tidygraph'</code></pre>
 <p>nu har vi en vector kaldet brokers med navne på de virksomheder vi gerne vil kigge på.</p>
 <p>Jeg har skrevet en plotfunktion <code>ego_net_plot()</code>, som vi har sourcet fra <code>networkfunctions.R</code>. Den returnerer et plot-array med de udvalgte brokeres ego-netværk og nogle værdier:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>pl <span class="ot">&lt;-</span> <span class="fu">ego_net_plot</span>(<span class="at">graph =</span> comp1_virk, <span class="at">nodes =</span> brokers, <span class="at">mode =</span> <span class="st">"constraint"</span>)</span>
-<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> ggpubr<span class="sc">::</span><span class="fu">ggarrange</span>(<span class="at">plotlist =</span> pl, <span class="at">common.legend =</span> T, <span class="at">legend =</span> <span class="st">"none"</span>)</span>
-<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="at">plot =</span> p, <span class="at">filename =</span> <span class="st">"output/constraint_brokerage.pdf"</span>, <span class="at">height =</span> <span class="dv">6</span>, <span class="at">width =</span> <span class="dv">8</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>pl <span class="ot">&lt;-</span> <span class="fu">ego_net_plot</span>(<span class="at">graph =</span> comp1_virk, <span class="at">nodes =</span> brokers, <span class="at">mode =</span> <span class="st">"constraint"</span>)</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> ggpubr<span class="sc">::</span><span class="fu">ggarrange</span>(<span class="at">plotlist =</span> pl, <span class="at">common.legend =</span> T, <span class="at">legend =</span> <span class="st">"none"</span>)</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="at">plot =</span> p, <span class="at">filename =</span> <span class="st">"output/constraint_brokerage.pdf"</span>, <span class="at">height =</span> <span class="dv">6</span>, <span class="at">width =</span> <span class="dv">8</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="assortativity-assortative-mixing---homofili-i-netværk" class="level1">
@@ -920,11 +916,11 @@ Attaching package: 'tidygraph'</code></pre>
 <p>Funktion <code>assortativity()</code> bruges til at beregne assortativity for kontinuerte variable:</p>
 <p>Vi kan fx beregne assortativity for degree. Altså, tenderer velforbundne noder mod at være forbundne. “Populær tiltrækker populær”.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity</span>(comp1_virk, <span class="at">values =</span> <span class="fu">degree</span>(comp1_virk))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity</span>(comp1_virk, <span class="at">values =</span> <span class="fu">degree</span>(comp1_virk))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] -0.01553398</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity_degree</span>(comp1_virk)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity_degree</span>(comp1_virk)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] -0.01553398</code></pre>
 </div>
@@ -933,20 +929,20 @@ Attaching package: 'tidygraph'</code></pre>
 <p>I mange tilfælde vil det være interessant at beregne assortativity på netværks-eksterne egenskaber. Vi kunne fx. tage antal ansatte, omsætning og assets: er store virksomheder tilbøjelige til at skabe forbindelser til andre store virksomheder:</p>
 <p>først sætter vi lige missing (<code>NA</code>) til 0 på antal ansatte, omsætning og assets:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(comp1_virk)<span class="sc">$</span>n_employees[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>n_employees)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(comp1_virk)<span class="sc">$</span>revenue[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>revenue)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(comp1_virk)<span class="sc">$</span>total_assets[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>total_assets)] <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(comp1_virk)<span class="sc">$</span>n_employees[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>n_employees)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(comp1_virk)<span class="sc">$</span>revenue[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>revenue)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(comp1_virk)<span class="sc">$</span>total_assets[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>total_assets)] <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity</span>(comp1_virk, <span class="at">values =</span> <span class="fu">V</span>(comp1_virk)<span class="sc">$</span>n_employees)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity</span>(comp1_virk, <span class="at">values =</span> <span class="fu">V</span>(comp1_virk)<span class="sc">$</span>n_employees)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] -0.01537136</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity</span>(comp1_virk, <span class="at">values =</span> <span class="fu">V</span>(comp1_virk)<span class="sc">$</span>revenue)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity</span>(comp1_virk, <span class="at">values =</span> <span class="fu">V</span>(comp1_virk)<span class="sc">$</span>revenue)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] -0.01108428</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity</span>(comp1_virk, <span class="at">values =</span> <span class="fu">V</span>(comp1_virk)<span class="sc">$</span>total_assets)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity</span>(comp1_virk, <span class="at">values =</span> <span class="fu">V</span>(comp1_virk)<span class="sc">$</span>total_assets)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in assortativity_impl(graph, values, values.in, directed, normalized):
 NAs introduced by coercion</code></pre>
@@ -962,7 +958,7 @@ NAs introduced by coercion</code></pre>
 <p>funktionen <code>assortativity_nominal()</code> bruges til at beregne netværksassortativity for kategorielle variable</p>
 <p>Vi gemte fx virksomhedens nationalitet som en vertex attribute, lad os se om det betyder noget: Her skal man lige huske at variablen skal behandles som en factor for at funktionen virker.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity_nominal</span>(comp1_virk, <span class="at">types =</span> <span class="fu">factor</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>affiliation_country))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity_nominal</span>(comp1_virk, <span class="at">types =</span> <span class="fu">factor</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>affiliation_country))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.3333333</code></pre>
 </div>
@@ -970,10 +966,10 @@ NAs introduced by coercion</code></pre>
 <p>Ikke så overraskende er der en høj assortativity her. Hvis I scroller op, kan i måske huske at den største komponent i høj grad var en komponent af svenske virksomheder.</p>
 <p>En anden kategoriel variable kunne være Global Ultimate Owner (guo): Selskaber der ikke er en del af en koncern har <code>NA</code> på guo_name variablen, der sætter vi virksomhedens eget navn ind i stedet:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(comp1_virk)<span class="sc">$</span>guo_name[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>guo_name)] <span class="ot">&lt;-</span> <span class="fu">V</span>(comp1_virk)<span class="sc">$</span>name[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>guo_name)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(comp1_virk)<span class="sc">$</span>guo_name[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>guo_name)] <span class="ot">&lt;-</span> <span class="fu">V</span>(comp1_virk)<span class="sc">$</span>name[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>guo_name)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity_nominal</span>(comp1_virk, <span class="at">types =</span> <span class="fu">factor</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>guo_name))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assortativity_nominal</span>(comp1_virk, <span class="at">types =</span> <span class="fu">factor</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>guo_name))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.1660473</code></pre>
 </div>
