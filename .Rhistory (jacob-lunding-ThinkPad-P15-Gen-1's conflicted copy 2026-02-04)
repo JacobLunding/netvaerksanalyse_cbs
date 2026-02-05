@@ -1,0 +1,8 @@
+library(tidyverse)
+library(igraph)
+library(ggraph)
+library(Matrix)
+den <- read_csv("data/danish_elitenetworks2025.csv")
+den %>% glimpse()
+den %>% distinct(AFFILIATION, sektor) %>% count(sector, sort = TRUE)
+den %>% distinct(AFFILIATION, sektor) %>% count(sektor, sort = TRUE)

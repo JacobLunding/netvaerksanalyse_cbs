@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Introduktion til netværksanalyse i R – Kursusmateriale til Virksomhedsstrategi i et netværksperspektiv</title>
+<title>Introduktion til netværksanalyse i R – Virksomhedsstrategi i et netværksperspektiv</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -147,7 +147,7 @@ window.Quarto = {
     <a href="./index.html" class="navbar-brand navbar-brand-logo">
     </a>
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">Kursusmateriale til Virksomhedsstrategi i et netværksperspektiv</span>
+    <span class="navbar-title">Virksomhedsstrategi i et netværksperspektiv</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -197,7 +197,7 @@ window.Quarto = {
   <li><a href="#to-sæt-vertices" id="toc-to-sæt-vertices" class="nav-link" data-scroll-target="#to-sæt-vertices">To sæt vertices</a></li>
   <li><a href="#graf-projektion" id="toc-graf-projektion" class="nav-link" data-scroll-target="#graf-projektion">graf projektion</a></li>
   </ul></li>
-  <li><a href="#praktisk-eksempel-med-den17" id="toc-praktisk-eksempel-med-den17" class="nav-link" data-scroll-target="#praktisk-eksempel-med-den17">Praktisk eksempel med <em>den17</em></a></li>
+  <li><a href="#praktisk-eksempel-med-den24" id="toc-praktisk-eksempel-med-den24" class="nav-link" data-scroll-target="#praktisk-eksempel-med-den24">Praktisk eksempel med <em>den24</em></a></li>
   </ul></li>
   <li><a href="#netværksobjekter-fra-matricer-igraph" id="toc-netværksobjekter-fra-matricer-igraph" class="nav-link" data-scroll-target="#netværksobjekter-fra-matricer-igraph">Netværksobjekter fra matricer (<code>igraph()</code>)</a>
   <ul class="collapse">
@@ -235,109 +235,128 @@ window.Quarto = {
 <p>Først indlæser vi de pakker vi kommer til at bruge:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidygraph)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="indlæs-og-udvælg-data" class="level1">
 <h1>Indlæs og udvælg data</h1>
-<p>Dernæst indlæser vi og gemmer datasættet <code>den17-no-nordic-letters.csv</code>, som ligger mappen <code>"/data"</code> i R projketet. Det kan også downloades her: <a href="data/den17-no-nordic-letters.csv" class="btn btn-primary">Download den17</a></p>
+<p>Dernæst indlæser vi og gemmer datasættet <code>danish_elitenetworks2024.csv</code>, som ligger mappen <code>"/data"</code> i R projketet. Det kan også downloades her: <a href="data/danish_elitenetworks2024.csv" class="btn btn-primary">Download den24</a></p>
 <p>Indlæs data med <code>read_csv()</code></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>den <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/den17-no-nordic-letters.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>den <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/danish_elitenetworks2024.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>I <a href="intro.html">“Intro til R og Tidyverse”</a> introducerede vi en række funktioner fra tidyverse’s dplyr pakke. Dem skal vi bruge nogle af her.</p>
-<p>Først ser vi lige på hvad vores dataobjekt indeholder <code>glimpse()</code>. Det består af <code>56849</code> og <code>10</code> kolonner - eller variable:</p>
+<p>Først ser vi lige på hvad vores dataobjekt indeholder <code>glimpse()</code>. Det består af <code>81,429</code> og <code>30</code> kolonner - eller variable:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">glimpse</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Rows: 56,849
-Columns: 10
-$ name            &lt;chr&gt; "Lars Eivind Kreken", "Mikael Ernst Joergensen", "Thom…
-$ affiliation     &lt;chr&gt; "&amp; co", "&amp; co", "&amp; co", "&amp; co", "15. juni fonden (Best…
-$ role            &lt;chr&gt; "Member", "Executive", "Chairman", "Member", "Chairman…
-$ gender          &lt;chr&gt; "Men", "Men", "Men", "Men", "Men", "Men", "Women", "Wo…
-$ tags            &lt;chr&gt; "Corporation, Media, Marketing, Commercials, Communica…
-$ sector          &lt;chr&gt; "Corporations", "Corporations", "Corporations", "Corpo…
-$ type            &lt;chr&gt; "Virksomhed (CVR)", "Virksomhed (CVR)", "Virksomhed (C…
-$ cvr_person      &lt;dbl&gt; 4006470500, 4004059627, 4004304040, 4004062718, NA, 40…
-$ cvr_affiliation &lt;dbl&gt; 21705535, 21705535, 21705535, 21705535, 15232102, 1523…
-$ description     &lt;chr&gt; "Automatisk CVR import at 2016-03-12 17:45:41: BESTYRE…</code></pre>
+<pre><code>Rows: 81,429
+Columns: 30
+$ ...1                &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,…
+$ NAME                &lt;chr&gt; "Ernst-Albrecht von Hake 14129", "Mette Remmen Kri…
+$ navn                &lt;chr&gt; "Ernst-Albrecht von Hake", "Mette Remmen Kristians…
+$ person_enhedsnummer &lt;dbl&gt; 4008893382, 4006012019, 4003952401, 4006990486, 40…
+$ person_id           &lt;dbl&gt; 14129, 14137, 49860, 66665, 14169, 14187, 14193, 1…
+$ Gender              &lt;chr&gt; NA, "Women", "Men", "Men", "Men", "Women", "Men", …
+$ person_country      &lt;chr&gt; "DE", "DK", "DK", "DK", "DE", "DK", "IT", "GB", "G…
+$ person_postnumber   &lt;dbl&gt; NA, 2920, 2000, 2930, NA, 2840, NA, NA, NA, NA, 29…
+$ person_postdistrict &lt;chr&gt; NA, "Charlottenlund", "Frederiksberg", "Klampenbor…
+$ person_role         &lt;chr&gt; "Bestyrelsesleder", "Bestyrelsesleder", "Bestyrels…
+$ person_leader       &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TR…
+$ person_start        &lt;date&gt; 2021-05-28, 2023-07-01, NA, 2023-08-01, 2022-03-1…
+$ AFFILIATION         &lt;chr&gt; "AKTIESELSKABET TH. WESSEL &amp; VETT. MAGASIN DU NORD…
+$ org_name            &lt;chr&gt; "AKTIESELSKABET TH. WESSEL &amp; VETT. MAGASIN DU NORD…
+$ org_cvrnummer       &lt;dbl&gt; 58191213, 33368127, 10842255, 24256146, 61126228, …
+$ org_id              &lt;dbl&gt; 13928, 13929, 13931, 13933, 13935, 13936, 13937, 1…
+$ org_parent          &lt;chr&gt; NA, NA, "Kulturministeriet, Departementet", NA, NA…
+$ org_description     &lt;chr&gt; NA, NA, "Det Kongelige Teater er Danmarks ældste o…
+$ org_sector          &lt;chr&gt; "Virksomhed", "Virksomhed", "Kultur: Teater, Musee…
+$ org_cvr_branche     &lt;chr&gt; "Anden detailhandel fra ikke-specialiserede forret…
+$ org_founding_date   &lt;date&gt; 1999-10-16, 2010-12-17, 1967-07-03, 1990-06-14, 1…
+$ org_employees       &lt;chr&gt; "{'aar': 2018, 'antalInklusivEjere': None, 'antalA…
+$ org_assets          &lt;chr&gt; "184000001.00 DKK", "52000000.00 DKK", "None None"…
+$ org_purpose         &lt;chr&gt; "Selskabets formål er alene eller sammen med andre…
+$ org_tags            &lt;chr&gt; NA, NA, "Analyse-Kultur; Film &amp; Teater", NA, NA, N…
+$ org_tags_full       &lt;chr&gt; NA, NA, "Analyse-Kultur; Ideologi_Kultur_Film &amp; Te…
+$ first.tag           &lt;chr&gt; NA, NA, "Analyse-Kultur; Ideologi", NA, NA, NA, NA…
+$ org_country         &lt;chr&gt; "DK", "DK", "DK", "DK", "DK", "DK", "DK", "DK", "D…
+$ org_postcode        &lt;dbl&gt; 1050, 1050, 1055, 1060, 1060, 1069, 1100, 1100, 11…
+$ org_postdistrict    &lt;chr&gt; "København K", "København K", "København K", "Købe…</code></pre>
 </div>
 </div>
-<p>Lad os tjekke hvad sector variablen indeholder med <code>count()</code> - og også med <code>distinct()</code>, da vores data indeholde flere rækker for hver organisation (<code>affiliation</code>, som variablen med organisationsnavne hedder), da der er tale om et positionsdatasæt individ-rolle-organisation:</p>
-<ul>
-<li>Der er 9524 positioner i affiliations/organisationer, der har koden corporations.</li>
-<li>Det svarer til 1454 unikke corporations.</li>
-</ul>
+<p>Lad os tjekke hvad org_tags_full variablen indeholder med <code>count()</code> - og også med <code>distinct()</code>, da vores data indeholde flere rækker for hver organisation (<code>AFFILIATION</code>, som variablen med organisationsnavne hedder), da der er tale om et positionsdatasæt individ-rolle-organisation:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">count</span>(sector, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">count</span>(org_tags, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 13 × 2
-   sector           n
-   &lt;chr&gt;        &lt;int&gt;
- 1 NGO          17720
- 2 State        13764
- 3 Corporations  9524
- 4 Foundations   6993
- 5 VL_networks   3803
- 6 Events        2270
- 7 Parliament    1087
- 8 Commissions    814
- 9 Municipal      320
-10 Organisation   227
-11 Family         207
-12 &lt;NA&gt;            83
-13 Politics        37</code></pre>
+<pre><code># A tibble: 1,110 × 2
+   org_tags                                                                    n
+   &lt;chr&gt;                                                                   &lt;int&gt;
+ 1 &lt;NA&gt;                                                                    47255
+ 2 VL-grupper                                                               3561
+ 3 Humaniora; Netværk; Universiteter; Videregående uddannelse                653
+ 4 Netværk; Samfundsvidenskab; Universiteter; Videregående uddannelse        576
+ 5 Analyse-Grøn; Begivenhed; Centraladministration; Event                    572
+ 6 Naturvidenskab; Netværk; Universiteter; Videregående uddannelse           571
+ 7 Adelige; Event; Kongehus                                                  520
+ 8 Fagbevægelse                                                              470
+ 9 Naturvidenskab; Netværk; Teknologi; Universiteter; Videregående uddann…   354
+10 Erhvervsorganisationer; Landbrug; Netværk                                 347
+# ℹ 1,100 more rows</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(affiliation, sector) <span class="sc">%&gt;%</span> <span class="fu">count</span>(sector, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(AFFILIATION, org_tags) <span class="sc">%&gt;%</span> <span class="fu">count</span>(org_tags, <span class="at">sort =</span> <span class="cn">TRUE</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 13 × 2
-   sector           n
-   &lt;chr&gt;        &lt;int&gt;
- 1 NGO           1550
- 2 Corporations  1454
- 3 Foundations   1174
- 4 State         1085
- 5 VL_networks    114
- 6 Commissions     68
- 7 Family          51
- 8 Parliament      49
- 9 Organisation    23
-10 Municipal       22
-11 Events          17
-12 &lt;NA&gt;             9
-13 Politics         3</code></pre>
+<pre><code># A tibble: 1,110 × 2
+   org_tags                                                                    n
+   &lt;chr&gt;                                                                   &lt;int&gt;
+ 1 &lt;NA&gt;                                                                     8810
+ 2 VL-grupper                                                                114
+ 3 Netværk; Samfundsvidenskab; Universiteter; Videregående uddannelse         50
+ 4 Naturvidenskab; Netværk; Universiteter; Videregående uddannelse            44
+ 5 Humaniora; Netværk; Universiteter; Videregående uddannelse                 43
+ 6 Naturvidenskab; Netværk; Teknologi; Universiteter; Videregående uddann…    34
+ 7 Fonde                                                                      31
+ 8 Fagbevægelse                                                               28
+ 9 Erhvervsorganisationer; Industri                                           24
+10 Analyse-Grøn; Interesseorganisationer                                      23
+# ℹ 1,100 more rows</code></pre>
 </div>
 </div>
-<p>Lad os bruge <code>filter()</code> til at lave et nyt dataobjekt, der kun indeholder de rækker, hvor sector er lig <code>Corporations</code>.</p>
+<p>Lad os sige vi gerne vil kigge på netværk i landbruget: Til det har vi brug for at lave en variabel, der gør at vi kan identificere mødesteder, hvor ordet “landbrug” indgår i et “tag”</p>
+<p>Lad os lave to forskellige variable, som vi kan bruge til at finde landbrugsnetværket: én der fortæller os hvilke AFFILIATIONS, der har landbrug i tagget og én der fortæller os hvilke personer der er knyttet til (min.) en organisation/AFFILIATION, der er tagget som landbrug. Det gør vi ved at bruge <code>mutate()</code> - for at tilføje til vores data - og deri funktionen <code>str_detect()</code> og <code>regex()</code>. Med <code>str_detect</code> spørger vi om et string-pattern (her “landbrug”) findes i en string variabel og med <code>regex()</code> fortæller vi funktionen at det er en regular expression, den skal lede efter og at den skal ignorere store/små bogstaver. Når vi har gjort det kan vi lave den anden variabel ved at gruppere <code>group_by</code> vores data på NAME (altså unikke individer) og igen i en <code>mutate()</code> spørge om landbrug_org er TRUE for bare én af dette individs positioner. Hvis det er sandt får dette individ værdien TRUE i alle sine rækker.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>den_corp <span class="ot">&lt;-</span> den <span class="sc">%&gt;%</span> </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sector <span class="sc">==</span> <span class="st">"Corporations"</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>den <span class="ot">&lt;-</span> den <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">landbrug_org  =</span> <span class="fu">str_detect</span>(<span class="at">string =</span> org_tags_full, <span class="at">pattern =</span> <span class="fu">regex</span>(<span class="st">"landbrug"</span>, <span class="at">ignore_case =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>den <span class="ot">&lt;-</span> den <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(NAME) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">landbrug_pers =</span> <span class="fu">any</span>(landbrug_org)) <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Lad os bruge <code>filter()</code> til at lave et nyt dataobjekt, der kun indeholder de rækker med individer der har min. en position i noget der har med landbrug at gøre .</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>den_corp <span class="ot">&lt;-</span> den <span class="sc">%&gt;%</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(landbrug_pers <span class="sc">==</span> <span class="cn">TRUE</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>den_corp <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>den_corp <span class="sc">%&gt;%</span> <span class="fu">count</span>(AFFILIATION, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1,454 × 2
-   affiliation                                        n
-   &lt;chr&gt;                                          &lt;int&gt;
- 1 TRE-FOR (Repraesentantskab)                      119
- 2 Kromann Reumert                                   55
- 3 Bech-Bruun                                        54
- 4 Gorrissen Federspiel                              40
- 5 Plesner                                           40
- 6 EnergiMidt                                        31
- 7 Lett Law Firm                                     27
- 8 Koebenhavns Lufthavns Vaekstkomité (Medlemmer)    24
- 9 Syd Energi (SE)                                   24
-10 TDC (note)                                        24
-# ℹ 1,444 more rows</code></pre>
+<pre><code># A tibble: 1,310 × 2
+   AFFILIATION                                                           n
+   &lt;chr&gt;                                                             &lt;int&gt;
+ 1 Netværk for Fremtidens Planteproteiner (Medlemmer) 27269            206
+ 2 Danish Crown A/S (Repræsentantskab) 27052                           116
+ 3 DANSK LANDBRUGS GROVVARESELSKAB A.M.B.A. (Repræsentantskab) 27441    89
+ 4 LANDBRUG &amp; FØDEVARER (Hovedbestyrelse) 26621                         76
+ 5 ARLA FOODS AMBA (Repræsentantskab) 27648                             72
+ 6 DET DANSKE HEDESELSKAB (Repræsentantskab) 27277                      62
+ 7 DANISH AGRO A.M.B.A. (Repræsentantskab) 27642                        35
+ 8 LANDBRUG &amp; FØDEVARER (Forretningsudvalg) 26623                       30
+ 9 § 6a Udvalget for Muslingeproduktion 25941                           29
+10 Økologisk Landsforening (Repræsentantskab) 27155                     29
+# ℹ 1,300 more rows</code></pre>
 </div>
 </div>
 </section>
 <section id="fra-data-til-netværksobjekter" class="level1">
 <h1>Fra data til netværksobjekter</h1>
-<p>Netværksdata er ofte indsamlet i den form vi finder i <code>den17</code> datasættet. Altså som en såkaldt <code>edge-list</code>, der i to kolonner repræsenterer forbindelser mellem ‘noget’. I dette personer i en kolonne og organisationer. Det kunne for så vidt også være individer i en kolonne og individer i den anden (fx. facebook venskaber). Når vi skal omforme vores data til et format der muliggør netværksanalyse og -visualisering bruger vi R-pakken <code>igraph</code>.</p>
+<p>Netværksdata er ofte indsamlet i den form vi finder i <code>den24</code> datasættet. Altså som en såkaldt <code>edge-list</code>, der i to kolonner repræsenterer forbindelser mellem ‘noget’. I dette personer i en kolonne og organisationer. Det kunne for så vidt også være individer i en kolonne og individer i den anden (fx. facebook venskaber). Når vi skal omforme vores data til et format der muliggør netværksanalyse og -visualisering bruger vi R-pakken <code>igraph</code>.</p>
 <p>Her det er fordel lige at få styr på et par matrix regneregler og begreber:</p>
 <section id="adjacency-matricer" class="level2">
 <h2 class="anchored" data-anchor-id="adjacency-matricer">Adjacency matricer</h2>
@@ -479,8 +498,8 @@ Note
 </div>
 <p>I R kode er det meget nemmere end det ser ud…</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">i =</span> <span class="fu">c</span>(<span class="st">"ind1"</span>, <span class="st">"ind2"</span>, <span class="st">"ind3"</span>, <span class="st">"ind4"</span>), <span class="at">org1 =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">org2=</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="at">org3 =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="at">row.names =</span> <span class="st">"i"</span>) <span class="sc">%&gt;%</span> <span class="fu">as.matrix</span>()</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">i =</span> <span class="fu">c</span>(<span class="st">"ind1"</span>, <span class="st">"ind2"</span>, <span class="st">"ind3"</span>, <span class="st">"ind4"</span>), <span class="at">org1 =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">org2=</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="at">org3 =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="at">row.names =</span> <span class="st">"i"</span>) <span class="sc">%&gt;%</span> <span class="fu">as.matrix</span>()</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     org1 org2 org3
 ind1    1    1    0
@@ -488,14 +507,14 @@ ind2    0    1    0
 ind3    0    0    1
 ind4    1    0    1</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     ind1 ind2 ind3 ind4
 org1    1    0    0    1
 org2    1    1    0    0
 org3    0    0    1    1</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">%*%</span> <span class="fu">t</span>(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>x <span class="sc">%*%</span> <span class="fu">t</span>(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     ind1 ind2 ind3 ind4
 ind1    2    1    0    1
@@ -503,7 +522,7 @@ ind2    1    1    0    0
 ind3    0    0    1    1
 ind4    1    0    1    2</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(x) <span class="sc">%*%</span> x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(x) <span class="sc">%*%</span> x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     org1 org2 org3
 org1    2    1    1
@@ -514,82 +533,82 @@ org3    1    0    2</code></pre>
 </section>
 </section>
 </section>
-<section id="praktisk-eksempel-med-den17" class="level2">
-<h2 class="anchored" data-anchor-id="praktisk-eksempel-med-den17">Praktisk eksempel med <em>den17</em></h2>
-<p>lad os bruge det dataobjekt vi allerede har defineret, <em>den_corp</em>, som indeholder alle rækker fra <em>den17</em> som har <code>sector == "Corporations"</code>.</p>
-<p>vi kan lige se, hvordan kolonnerne <code>name</code> og <code>affiliation</code> ser ud:</p>
+<section id="praktisk-eksempel-med-den24" class="level2">
+<h2 class="anchored" data-anchor-id="praktisk-eksempel-med-den24">Praktisk eksempel med <em>den24</em></h2>
+<p>lad os bruge det dataobjekt vi allerede har defineret, <em>den_corp</em>, som indeholder alle rækker fra <em>den24</em> som er personer med min. en position i noget med landbrug.</p>
+<p>vi kan lige se, hvordan kolonnerne <code>NAME</code> og <code>AFFILIATION</code> ser ud:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>den_corp <span class="sc">%&gt;%</span> <span class="fu">select</span>(name, affiliation) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>den_corp <span class="sc">%&gt;%</span> <span class="fu">select</span>(NAME, AFFILIATION) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9,524 × 2
-   name                       affiliation
-   &lt;chr&gt;                      &lt;chr&gt;      
- 1 Lars Eivind Kreken         &amp; co       
- 2 Mikael Ernst Joergensen    &amp; co       
- 3 Thomas Hoegeboel           &amp; co       
- 4 Thomas Hoffmann            &amp; co       
- 5 Niels Thorborg             3C Groups  
- 6 Soeren Melanchton Pedersen 3C Groups  
- 7 Nicoline E. Hyldahl        3C Groups  
- 8 Maurizio Botta             3M         
- 9 Nicolas Nees Henriksson    3M         
-10 Niels Roeddik              3M         
-# ℹ 9,514 more rows</code></pre>
+<pre><code># A tibble: 4,746 × 2
+   NAME                                       AFFILIATION                       
+   &lt;chr&gt;                                      &lt;chr&gt;                             
+ 1 Gregers Christian Wedell-Wedellsborg 14226 GYLDENDAL A/S 58200115            
+ 2 Jens Aaløse 14415                          STICKS 'N' SUSHI A/S 73342619     
+ 3 Søren Søndergaard 15013                    LANDBRUG &amp; FØDEVARER F.M.B.A. 255…
+ 4 Jais Valeur 56746                          DAT-SCHAUB A/S 33353170           
+ 5 Niels Dengsø Jensen 15327                  AP PENSION LIVSFORSIKRINGSAKTIESE…
+ 6 Jesper Uggerhøj 14625                      Meyers Contract Catering A/S 2663…
+ 7 Anders Wilhjelm 16515                      DISA INDUSTRIES A/S 18802996      
+ 8 Gregers Christian Wedell-Wedellsborg 14226 MATAS OPERATIONS A/S 27528430     
+ 9 Christian Høegh-Andersen 15008             DLF Seeds A/S 62556013            
+10 Jørgen Hesselbjerg Mikkelsen 75179         DANISH AGRO A.M.B.A. (Bestyrelse …
+# ℹ 4,736 more rows</code></pre>
 </div>
 </div>
-<p>Det vil vi gerne lave til en biadjacency matrice med individer i rækker og affiliations i kolonnerne. Fordi det bliver en kæmpe tabel med 7641 rækker og 1454 kolonner, bruger vi funktionen <code>xtabs()</code> som gemmer data i hukommelse på en smart måde (hvis vi sætter option <code>spare = TRUE</code>), så vi slipper på at bruge computerhukommelse på alle ‘nullerne’ (det skal I ikke bekymre jer om)</p>
+<p>Det vil vi gerne lave til en biadjacency matrice med individer i rækker og affiliations i kolonnerne. Fordi det bliver en kæmpe tabel med 2267 rækker og 1310 kolonner, bruger vi funktionen <code>xtabs()</code> som gemmer data i hukommelse på en smart måde (hvis vi sætter option <code>spare = TRUE</code>), så vi slipper på at bruge computerhukommelse på alle ‘nullerne’ (det skal I ikke bekymre jer om)</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>den_corp_bi <span class="ot">&lt;-</span> den_corp <span class="sc">%&gt;%</span> <span class="fu">xtabs</span>(<span class="at">formula =</span> <span class="sc">~</span>name <span class="sc">+</span> affiliation, <span class="at">sparse =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>den_corp_bi <span class="ot">&lt;-</span> den_corp <span class="sc">%&gt;%</span> <span class="fu">xtabs</span>(<span class="at">formula =</span> <span class="sc">~</span>NAME <span class="sc">+</span> AFFILIATION, <span class="at">sparse =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Som I kan se har den_corp_bi nu 7641 rækker og 1454 kolonner</p>
+<p>Som I kan se har den_corp_bi nu 2267 rækker og 1310 kolonner</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>den_corp_bi <span class="sc">%&gt;%</span> <span class="fu">dim</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>den_corp_bi <span class="sc">%&gt;%</span> <span class="fu">dim</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 7641 1454</code></pre>
+<pre><code>[1] 2267 1310</code></pre>
 </div>
 </div>
 <p>og matricen er fyldt med en masse <code>.</code> fordi den er sparse. De stedet i tabellen hvor der faktisk er en forbindelse mellem <span class="math inline">\(Individ_{i}\)</span> og <span class="math inline">\(Organisation_{j}\)</span> står der tilgengæld <span class="math inline">\(1\)</span>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>den_corp_bi[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="dv">750</span><span class="sc">:</span><span class="dv">770</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>den_corp_bi[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="dv">360</span><span class="sc">:</span><span class="dv">370</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>10 x 21 sparse Matrix of class "dgCMatrix"</code></pre>
+<pre><code>10 x 11 sparse Matrix of class "dgCMatrix"</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>  [[ suppressing 21 column names 'KHR arkitekter', 'Kilroy International', 'Kim Johansen' ... ]]</code></pre>
+<pre><code>  [[ suppressing 11 column names 'Den grønne trepart 29199', 'Den nationale arbejdsgruppe for interessenter tilknyttet nationalparkerne 25884', 'Den Operative Kontaktgruppe for Søredningstjenesten 27359' ... ]]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                          affiliation
-name                                                                
-  Aage Almtoft             . . . . . . . . . . . . . . . . . . . . .
-  Aage Juhl Joergensen     . . . . . . . . . . . . . . . . . . . . .
-  Aage Kjaer Soerensen     . . . . . . . . . . . . . . . . . . . . .
-  Aage Laurids Andreasen   . . . . . . . . . . . . . . . . . . . . .
-  AAke Fredriksson         . . . . . . . . . . . . 1 . . . . . . . .
-  AAke Hantoft             . . . . . . . . . . . . . . . . . . . . .
-  AAke Marcus Wärring      . . . . . . . . . . . . . . . . . . . . .
-  AAke Per-Urban Bäckström . . . . . . . . . . . . . . . . . . . . .
-  Aalipaaraq Kreutzmann    . . . . . . . . . . . . . . . . . . . . .
-  Aaron Todd Church        . . . . . . . . . . . . . . . . . . . . .</code></pre>
+<pre><code>                                     AFFILIATION
+NAME                                                       
+  A. Jørgensen 69797                  . . . . . . . . . . .
+  Aage Lauritzen 71670                . . . . . . . . . . .
+  Adam Carl Moltke-Huitfeldt 38972    . . . . . . . . . . .
+  Adam Paul Kybird 20002              . . . . . . . . . . .
+  Adèle Stærkær de la Motte 57286     . . . . . . . . . . .
+  Ahmed Jahoor 64777                  . . . . . . . . . . .
+  Alex Christian Pabst Pichardt 27234 . . . . . . . . . . .
+  Alex Ostersen 19728                 . . . . . . . . . . .
+  Alexander Gamborg 69611             . . . . . . . . . . 1
+  Alfred Hansen 70694                 . . 1 . . . . . . . .</code></pre>
 </div>
 </div>
 <p>Lad os implementere den besværlige matrixregning, nu i effektiv R-kode og dermed lave to adjacency matricer:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>den_corp_ind <span class="ot">&lt;-</span> den_corp_bi <span class="sc">%*%</span> <span class="fu">t</span>(den_corp_bi)</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>den_corp_org <span class="ot">&lt;-</span> <span class="fu">t</span>(den_corp_bi) <span class="sc">%*%</span> den_corp_bi</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>den_corp_ind <span class="ot">&lt;-</span> den_corp_bi <span class="sc">%*%</span> <span class="fu">t</span>(den_corp_bi)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>den_corp_org <span class="ot">&lt;-</span> <span class="fu">t</span>(den_corp_bi) <span class="sc">%*%</span> den_corp_bi</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Det giver os to matricer med dimensionerne</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(den_corp_ind)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(den_corp_ind)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 7641 7641</code></pre>
+<pre><code>[1] 2267 2267</code></pre>
 </div>
 </div>
 <p>dvs individ x individ,</p>
 <p>og</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(den_corp_org)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(den_corp_org)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1454 1454</code></pre>
+<pre><code>[1] 1310 1310</code></pre>
 </div>
 </div>
 <p>dvs. organisation x organisation.</p>
@@ -610,101 +629,91 @@ name
 </ul>
 <p>I dette tilfælde, hvor vores matrice er en projektion af en medlemskabsliste, har netværket ingen retning. A kender B på samme måde som B kender A, når de sidder sammen i en bestyrelse. Matricen er vægtet, fordi A og B kan kende hinanden flere steder. Og diagonalen, den er vi ikke interesseret i.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>g_ind <span class="ot">&lt;-</span> den_corp_ind <span class="sc">%&gt;%</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">weighted =</span> <span class="cn">TRUE</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>g_ind</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>g_ind <span class="ot">&lt;-</span> den_corp_ind <span class="sc">%&gt;%</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">weighted =</span> <span class="cn">TRUE</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>g_ind</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH 145365d UNW- 7641 42967 -- 
+<pre><code>IGRAPH 4d6275f UNW- 2267 53636 -- 
 + attr: name (v/c), weight (e/n)
-+ edges from 145365d (vertex names):
- [1] Aage Almtoft        --Allan Buch             
- [2] Aage Almtoft        --Bettina Joergensen     
- [3] Aage Almtoft        --Bo Skovby Rosendahl    
- [4] Aage Almtoft        --Bo Smith 4493          
- [5] Aage Almtoft        --Claus Nielsen 50129    
- [6] Aage Almtoft        --Jan Melgaard           
- [7] Aage Almtoft        --Martin Noerholm Baltser
- [8] Aage Almtoft        --Michael Frandsen       
++ edges from 4d6275f (vertex names):
+ [1] A. Jørgensen 69797--Anette Rosholm 70201               
+ [2] A. Jørgensen 69797--Anika Walker 69547                 
+ [3] A. Jørgensen 69797--Anna Bak Jäpelt 54483              
+ [4] A. Jørgensen 69797--Anne Louise Dannesboe Nielsen 70151
+ [5] A. Jørgensen 69797--Anne-Marie Jensen Kerstens 69795   
+ [6] A. Jørgensen 69797--Astrid Dahl 70028                  
+ [7] A. Jørgensen 69797--Astrid Hypolit Hansen 70030        
+ [8] A. Jørgensen 69797--Astrid Kaae Søgaard 70059          
 + ... omitted several edges</code></pre>
 </div>
 </div>
 <p>Et grafobjekt fra Igraph er et særligt dataobjekt, som indeholder to forskellige elementer af data, nemlig vertices og edges. der er 7641 vertices i vores objekt og 42967 edges. Hver af disse elementer kan have forskellige attributes (se + attr:) Som I kan se har vi to attributes <code>name (v/c)</code> og <code>weight (e/n)</code>. (v/c) ved name betyder at det er en attribute til vores <strong>v</strong>ertices og at det er en <code>character</code> vektor (det er en vektor med navne). (e/n) ved weight betyder at det er en attribute til vores <strong>e</strong>dges og at det er en numerisk vektor (en vektor med tal, der indikerer styrken af forbindelsen) <img src="images/Screenshot from 2025-02-04 15-24-37.png" class="img-fluid" style="width:100.0%"> Hvis vi gerne vil tilgå vertex attrubutes i vores grafobjekt skal vi bruge funktionen <code>V()</code> fra <code>igraph</code> efterfulgt af <code>$</code> og navnet på den specifikke attribute her altså <code>$name</code>. Lad os se de første 20 navne.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g_ind)<span class="sc">$</span>name <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g_ind)<span class="sc">$</span>name <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] "Aage Almtoft"                        
- [2] "Aage Juhl Joergensen"                
- [3] "Aage Kjaer Soerensen"                
- [4] "Aage Laurids Andreasen"              
- [5] "AAke Fredriksson"                    
- [6] "AAke Hantoft"                        
- [7] "AAke Marcus Wärring"                 
- [8] "AAke Per-Urban Bäckström"            
- [9] "Aalipaaraq Kreutzmann"               
-[10] "Aaron Todd Church"                   
-[11] "AAse Aulie Michelet"                 
-[12] "AAse Kogsboell"                      
-[13] "Abdelmottaleb Doulan"                
-[14] "Abdulkareem Hamad A Alayuni"         
-[15] "Adam Christian Harhoff"              
-[16] "Adam Christoffer Knuth"              
-[17] "Adam Hugh Warby"                     
-[18] "Adam Price"                          
-[19] "Adam Troels Bjerg"                   
-[20] "Adamangelo Cavalié Engelhardt 196867"</code></pre>
+<pre><code> [1] "A. Jørgensen 69797"                  "Aage Lauritzen 71670"               
+ [3] "Adam Carl Moltke-Huitfeldt 38972"    "Adam Paul Kybird 20002"             
+ [5] "Adèle Stærkær de la Motte 57286"     "Ahmed Jahoor 64777"                 
+ [7] "Alex Christian Pabst Pichardt 27234" "Alex Ostersen 19728"                
+ [9] "Alexander Gamborg 69611"             "Alfred Hansen 70694"                
+[11] "Alice Schou Nørgaard 25900"          "Allan Buch 22800"                   
+[13] "Allan Christiansen 57789"            "Allan Gammelgård 64146"             
+[15] "Allan Kjær Ringe 69363"              "Allan Nielsen 19195"                
+[17] "Allan Nordahl 64147"                 "Allan Pedersen 59539"               
+[19] "Allan Smærup 68382"                  "Allan Staub Jensen 57965"           </code></pre>
 </div>
 </div>
 <p>Hvis vi gerne vil tilgå edge attributes i vores grafobjekt skal vi bruge funktionen <code>E()</code> fra <code>igraph</code> efterfulgt af <code>$</code> og navnet på den specifikke attribute her altså <code>$weight</code>. Lad os se de første 20 vægte og derefter et <code>table()</code> over fordelingen.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g_ind)<span class="sc">$</span>weight <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g_ind)<span class="sc">$</span>weight <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g_ind)<span class="sc">$</span>weight <span class="sc">%&gt;%</span> <span class="fu">table</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g_ind)<span class="sc">$</span>weight <span class="sc">%&gt;%</span> <span class="fu">table</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>.
-    1     2     3     4     5     9 
-41325  1441   158    30    12     1 </code></pre>
+    1     2     3     4     5     6     7 
+52063  1387   140    26    17     1     2 </code></pre>
 </div>
 </div>
 <p>Der er altså mange, der kender hinanden fra en organisation, nogle kender hinanden fra to og ganske ganske få fra tre eller flere.</p>
 <p>vi kan også lave et graf-objekt for <span class="math inline">\(organisation \times organisation\)</span>-matricen:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>g_org <span class="ot">&lt;-</span> den_corp_org <span class="sc">%&gt;%</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">weighted =</span> <span class="cn">TRUE</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>g_org <span class="ot">&lt;-</span> den_corp_org <span class="sc">%&gt;%</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">weighted =</span> <span class="cn">TRUE</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>lad os igen lige se vertex navne og edge vægte:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g_org)<span class="sc">$</span>name <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g_org)<span class="sc">$</span>name <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] "&amp; co"                                
- [2] "3C Groups"                           
- [3] "3M"                                  
- [4] "3xN"                                 
- [5] "5E Byg (Bestyrelse)"                 
- [6] "7N"                                  
- [7] "A-pressen"                           
- [8] "A. Enggaard Holding"                 
- [9] "A.P. Moeller - Maersk"               
-[10] "A.R. HOLDING AF 1999 A/S"            
-[11] "A/S DANSK ERHVERVSINVESTERING"       
-[12] "A/S POLITIKEN HOLDING"               
-[13] "A/S Silvagra"                        
-[14] "A2SEA A/S"                           
-[15] "AAGE OG JOHANNE LOUIS-HANSENS FOND"  
-[16] "Aalborg Engineering (bestyrelse)"    
-[17] "Aalborg Forsyning"                   
-[18] "Aalborg Portland"                    
-[19] "Aalborg Stiftstidende"               
-[20] "Aalborg Zoologiske Have (Bestyrelse)"</code></pre>
+<pre><code> [1] "'ROSENHOLMFONDEN' 21165190"                                                
+ [2] "[S] ADAMSHØJ GODS A/S 28970838"                                            
+ [3] "[S] Bornholms Energi og Forsyning A/S 34722293"                            
+ [4] "[S] BRØDR. EWERS A/S 45484815"                                             
+ [5] "[S] DANOIL EXPLORATION A/S 10608147"                                       
+ [6] "[S] EJENDOMS- OG FINANSIERINGSFONDEN FOR NORDJYLLANDS VIDENPARK 12751931"  
+ [7] "[S] F. SALLING HOLDING A/S 41940115"                                       
+ [8] "[S] HALBERG HOTELS A/S 82550712"                                           
+ [9] "[S] LØGISMOSE A/S 21924679"                                                
+[10] "[S] MUP 2021 Holding A/S 42683906"                                         
+[11] "[S] MWG ManCo ApS 43318489"                                                
+[12] "[S] NLM A/S 44506289"                                                      
+[13] "[S] PENSIONSKASSEN FOR SUNDHEDSFAGLIGE 71973514"                           
+[14] "§ 6 Udvalget for Erhvervsfiskeri 25935"                                    
+[15] "§ 6a Udvalget for Muslingeproduktion 25941"                                
+[16] "§ 7 Udvalget for Rekreativt Fiskeri, Ferskvandsfiskeri og Fiskepleje 27523"
+[17] "§5 EU-fiskeriudvalget 27310"                                               
+[18] "15.JUNI FONDEN 15232102"                                                   
+[19] "2030-panelet (Medlemmer) 27048"                                            
+[20] "2030beyond 41504684"                                                       </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g_org)<span class="sc">$</span>weight <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g_org)<span class="sc">$</span>weight <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] 1 1 1 1 1 1 1 1 1 1 4 1 2 2 1 1 1 1 1 1</code></pre>
+<pre><code> [1] 1 1 1 1 1 1 2 4 2 4 2 1 1 1 1 1 2 2 2 2</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g_org)<span class="sc">$</span>weight <span class="sc">%&gt;%</span> <span class="fu">table</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g_org)<span class="sc">$</span>weight <span class="sc">%&gt;%</span> <span class="fu">table</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>.
-   1    2    3    4    5    6    7    8    9   10   11   13   15   17 
-2247  229   98   35   24   14    9    4    5    3    1    2    1    1 </code></pre>
+   1    2    3    4    5    6    7    8    9   10   11   12   14   29 
+6131  428   90   35   27   12    4    3    2    4    2    1    1    1 </code></pre>
 </div>
 </div>
 <p>Hovedparten forbindelserne mellem organisationer skyldes altså ét overlappende medlem, nogle skyldes to og ganske få skyldes mere end to overlappende medlemmer (en enkelt forbindelse skyldes hele 17 fælles medlemmer)</p>
@@ -717,7 +726,7 @@ name
 <li><code>graph_from_biadjacency_matrix()</code></li>
 </ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>g_bi <span class="ot">&lt;-</span> den_corp_bi <span class="sc">%&gt;%</span> <span class="fu">graph_from_biadjacency_matrix</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>g_bi <span class="ot">&lt;-</span> den_corp_bi <span class="sc">%&gt;%</span> <span class="fu">graph_from_biadjacency_matrix</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -726,25 +735,10 @@ name
 <p>Lad os lige kort se på et par visualiseringer. Til det formål bruger vi <code>ggraph()</code>-pakken. Den vender vi tilbage til i løbet af kurset, så det udfoldes ikke yderligere her</p>
 <p><span class="math inline">\(individ \times individ\)</span> netværket</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>g_ind_l <span class="ot">&lt;-</span> <span class="fu">largest_component</span>(g_ind) </span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggraph</span>(g_ind_l, <span class="at">layout =</span> <span class="st">"fr"</span>) <span class="sc">+</span></span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_alpha =</span> <span class="fl">0.2</span>, <span class="at">edge_width =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>() </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="session1_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p><span class="math inline">\(organisation \times organisation\)</span> netværket</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>g_org_l <span class="ot">&lt;-</span> <span class="fu">largest_component</span>(g_org) </span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggraph</span>(g_org_l, <span class="at">layout =</span> <span class="st">"fr"</span>) <span class="sc">+</span></span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_alpha =</span> <span class="fl">0.6</span>, <span class="at">edge_width =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
-<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span> </span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>g_ind_l <span class="ot">&lt;-</span> <span class="fu">largest_component</span>(g_ind) </span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggraph</span>(g_ind_l, <span class="at">layout =</span> <span class="st">"fr"</span>) <span class="sc">+</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_alpha =</span> <span class="fl">0.2</span>, <span class="at">edge_width =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
 <span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>() </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
@@ -754,18 +748,33 @@ name
 </div>
 </div>
 </div>
-<p><span class="math inline">\(individ \times organisation\)</span>-netværket</p>
+<p><span class="math inline">\(organisation \times organisation\)</span> netværket</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>g_bi_l <span class="ot">&lt;-</span> <span class="fu">largest_component</span>(g_bi)</span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggraph</span>(g_bi_l, <span class="at">layout =</span> <span class="st">"fr"</span>) <span class="sc">+</span></span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_alpha =</span> <span class="fl">0.8</span>, <span class="at">edge_width =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> type), <span class="at">size =</span> <span class="fl">0.2</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">"sienna1"</span>, <span class="st">"steelblue2"</span>), <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"individuals"</span>, <span class="st">"companies"</span>)) <span class="sc">+</span></span>
-<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>() </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>g_org_l <span class="ot">&lt;-</span> <span class="fu">largest_component</span>(g_org) </span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggraph</span>(g_org_l, <span class="at">layout =</span> <span class="st">"fr"</span>) <span class="sc">+</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_alpha =</span> <span class="fl">0.6</span>, <span class="at">edge_width =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span> </span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>() </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="session1_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><span class="math inline">\(individ \times organisation\)</span>-netværket</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>g_bi_l <span class="ot">&lt;-</span> <span class="fu">largest_component</span>(g_bi)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggraph</span>(g_bi_l, <span class="at">layout =</span> <span class="st">"fr"</span>) <span class="sc">+</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_alpha =</span> <span class="fl">0.8</span>, <span class="at">edge_width =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> type), <span class="at">size =</span> <span class="fl">0.2</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">"sienna1"</span>, <span class="st">"steelblue2"</span>), <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"individuals"</span>, <span class="st">"companies"</span>)) <span class="sc">+</span></span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>() </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session1_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>

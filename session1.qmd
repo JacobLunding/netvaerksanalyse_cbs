@@ -14,53 +14,61 @@ Først indlæser vi de pakker vi kommer til at bruge:
 
 ```{r, message=FALSE}
 library(tidyverse)
-library(igraph)
+library(tidygraph)
 library(ggraph)
+library(igraph)
 library(Matrix)
 ```
 
 # Indlæs og udvælg data
 
-Dernæst indlæser vi og gemmer datasættet `danish_elitenetworks2025`, som ligger mappen `"/data"` i R projketet. Det kan også downloades her: [Download den17](data/danish_elitenetworks2025.csv){.btn .btn-primary}
+Dernæst indlæser vi og gemmer datasættet `danish_elitenetworks2024.csv`, som ligger mappen `"/data"` i R projketet. Det kan også downloades her: [Download den24](data/danish_elitenetworks2024.csv){.btn .btn-primary}
 
 Indlæs data med `read_csv()`
 
 ```{r, warning=FALSE, message=FALSE}
-den <- read_csv("data/danish_elitenetworks2025.csv")
+den <- read_csv("data/danish_elitenetworks2024.csv")
 ```
 
 I ["Intro til R og Tidyverse"](intro.html) introducerede vi en række funktioner fra tidyverse's dplyr pakke. Dem skal vi bruge nogle af her.
 
-Først ser vi lige på hvad vores dataobjekt indeholder `glimpse()`. Det består af `56849` og `10` kolonner - eller variable:
+Først ser vi lige på hvad vores dataobjekt indeholder `glimpse()`. Det består af `81,429` og `30` kolonner - eller variable:
 
 ```{r}
 den %>% glimpse()
 ```
 
-Lad os tjekke hvad sector variablen indeholder med `count()` - og også med `distinct()`, da vores data indeholde flere rækker for hver organisation (`affiliation`, som variablen med organisationsnavne hedder), da der er tale om et positionsdatasæt individ-rolle-organisation:
-
--   Der er 9524 positioner i affiliations/organisationer, der har koden corporations.
--   Det svarer til 1454 unikke corporations.
+Lad os tjekke hvad org_tags_full variablen indeholder med `count()` - og også med `distinct()`, da vores data indeholde flere rækker for hver organisation (`AFFILIATION`, som variablen med organisationsnavne hedder), da der er tale om et positionsdatasæt individ-rolle-organisation:
 
 ```{r}
-den %>% count(sector, sort = TRUE)
-den %>% distinct(affiliation, sector) %>% count(sector, sort = TRUE)
+den %>% count(org_tags, sort = TRUE)
+den %>% distinct(AFFILIATION, org_tags) %>% count(org_tags, sort = TRUE) 
+```
+Lad os sige vi gerne vil kigge på netværk i landbruget:
+Til det har vi brug for at lave en variabel, der gør at vi kan identificere mødesteder, hvor ordet  "landbrug" indgår i et "tag"
+
+Lad os lave to forskellige variable, som vi kan bruge til at finde landbrugsnetværket: én der fortæller os hvilke AFFILIATIONS, der har landbrug i tagget og én der fortæller os hvilke personer der er knyttet til (min.) en organisation/AFFILIATION, der er tagget som landbrug. Det gør vi ved at bruge `mutate()` - for at tilføje til vores data - og deri funktionen `str_detect()` og `regex()`. Med `str_detect` spørger vi om et string-pattern (her "landbrug") findes i en string variabel og med `regex()` fortæller vi funktionen at det er en regular expression, den skal lede efter og at den skal ignorere store/små bogstaver. Når vi har gjort det kan vi lave den anden variabel ved at gruppere `group_by` vores data på NAME (altså unikke individer) og igen i en `mutate()` spørge om landbrug_org er TRUE for bare én af dette individs positioner. Hvis det er sandt får dette individ værdien TRUE i alle sine rækker.
+
+```{r}
+den <- den %>% mutate(landbrug_org  = str_detect(string = org_tags_full, pattern = regex("landbrug", ignore_case = TRUE)))
+den <- den %>% group_by(NAME) %>% mutate(landbrug_pers = any(landbrug_org)) %>% ungroup()
 ```
 
-Lad os bruge `filter()` til at lave et nyt dataobjekt, der kun indeholder de rækker, hvor sector er lig `Corporations`.
+
+Lad os bruge `filter()` til at lave et nyt dataobjekt, der kun indeholder de rækker med individer der har min. en position i noget der har med landbrug at gøre .
 
 ```{r}
 den_corp <- den %>% 
-  filter(sector == "Corporations") 
+  filter(landbrug_pers == TRUE) 
 ```
 
 ```{r}
-den_corp %>% count(affiliation, sort = TRUE)
+den_corp %>% count(AFFILIATION, sort = TRUE)
 ```
 
 # Fra data til netværksobjekter
 
-Netværksdata er ofte indsamlet i den form vi finder i `den17` datasættet. Altså som en såkaldt `edge-list`, der i to kolonner repræsenterer forbindelser mellem 'noget'. I dette personer i en kolonne og organisationer. Det kunne for så vidt også være individer i en kolonne og individer i den anden (fx. facebook venskaber). Når vi skal omforme vores data til et format der muliggør netværksanalyse og -visualisering bruger vi R-pakken `igraph`.
+Netværksdata er ofte indsamlet i den form vi finder i `den24` datasættet. Altså som en såkaldt `edge-list`, der i to kolonner repræsenterer forbindelser mellem 'noget'. I dette personer i en kolonne og organisationer. Det kunne for så vidt også være individer i en kolonne og individer i den anden (fx. facebook venskaber). Når vi skal omforme vores data til et format der muliggør netværksanalyse og -visualisering bruger vi R-pakken `igraph`.
 
 Her det er fordel lige at få styr på et par matrix regneregler og begreber:
 
@@ -217,23 +225,23 @@ x %*% t(x)
 t(x) %*% x
 ```
 
-## Praktisk eksempel med *den17*
+## Praktisk eksempel med *den24*
 
-lad os bruge det dataobjekt vi allerede har defineret, *den_corp*, som indeholder alle rækker fra *den17* som har `sector == "Corporations"`.
+lad os bruge det dataobjekt vi allerede har defineret, *den_corp*, som indeholder alle rækker fra *den24* som er personer med min. en position i noget med landbrug.
 
-vi kan lige se, hvordan kolonnerne `name` og `affiliation` ser ud:
-
-```{r}
-den_corp %>% select(name, affiliation) 
-```
-
-Det vil vi gerne lave til en biadjacency matrice med individer i rækker og affiliations i kolonnerne. Fordi det bliver en kæmpe tabel med `r den_corp %>% pull(name) %>% unique() %>% length()` rækker og `r den_corp %>% pull(affiliation) %>% unique() %>% length()` kolonner, bruger vi funktionen `xtabs()` som gemmer data i hukommelse på en smart måde (hvis vi sætter option `spare = TRUE`), så vi slipper på at bruge computerhukommelse på alle 'nullerne' (det skal I ikke bekymre jer om)
+vi kan lige se, hvordan kolonnerne `NAME` og `AFFILIATION` ser ud:
 
 ```{r}
-den_corp_bi <- den_corp %>% xtabs(formula = ~name + affiliation, sparse = TRUE)
+den_corp %>% select(NAME, AFFILIATION) 
 ```
 
-Som I kan se har den_corp_bi nu 7641 rækker og 1454 kolonner
+Det vil vi gerne lave til en biadjacency matrice med individer i rækker og affiliations i kolonnerne. Fordi det bliver en kæmpe tabel med `r den_corp %>% pull(NAME) %>% unique() %>% length()` rækker og `r den_corp %>% pull(AFFILIATION) %>% unique() %>% length()` kolonner, bruger vi funktionen `xtabs()` som gemmer data i hukommelse på en smart måde (hvis vi sætter option `spare = TRUE`), så vi slipper på at bruge computerhukommelse på alle 'nullerne' (det skal I ikke bekymre jer om)
+
+```{r}
+den_corp_bi <- den_corp %>% xtabs(formula = ~NAME + AFFILIATION, sparse = TRUE)
+```
+
+Som I kan se har den_corp_bi nu 2267 rækker og 1310 kolonner
 
 ```{r}
 den_corp_bi %>% dim()
@@ -242,7 +250,7 @@ den_corp_bi %>% dim()
 og matricen er fyldt med en masse `.` fordi den er sparse. De stedet i tabellen hvor der faktisk er en forbindelse mellem $Individ_{i}$ og $Organisation_{j}$ står der tilgengæld $1$.
 
 ```{r}
-den_corp_bi[1:10, 750:770]
+den_corp_bi[1:10, 360:370]
 ```
 
 Lad os implementere den besværlige matrixregning, nu i effektiv R-kode og dermed lave to adjacency matricer:
