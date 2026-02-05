@@ -207,3 +207,6 @@ ggraph(g_org_l) +
   geom_node_label(mapping = aes(filter= betweenness_rank <=10, label = name), repel = TRUE) +
   theme_graph() 
 
+
+g_ind_l <- g_ind_l %>% activate(nodes) %>% left_join(den_corp %>% group_by(NAME) %>% summarise(memberships = paste0(AFFILIATION, collapse = " | ")), by = c("name" = "NAME"))
+g_ind_l %>% as_tibble() %>% arrange(betweenness_rank) %>% View()
