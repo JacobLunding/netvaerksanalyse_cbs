@@ -3,11 +3,12 @@
 #############################################/
 
 library(tidyverse)
+library(tidygraph)
 library(ggraph)
 library(igraph)
 library(Matrix)
 
-source("functions/custom_functions.R", echo = FALSE)
+source("functions/read_orbis_xlsx.R", echo = FALSE)
 
 #read_orbisxlsx funktionen oversætter bl.a. variabelnavne fra orbis til noget mere meningsfuld og læseligt. Vigtigt: `Current or previous` variablen hedder nu `role_status`. Der er også en ny variabel, `person`, som ud fra identifikationsnummeret 'gætter' om personen faktisk er en person.
 
@@ -89,7 +90,9 @@ adj_c     <- t(bi_adj) %*% bi_adj
   
 gr <- graph_from_adjacency_matrix(adj_c, mode = "undirected", diag = FALSE, weighted = TRUE)
 
-gr
+# Derefter laver vi graf objektet 'gr' om til et tidygraph objekt:
+# 
+gr <- gr %>% as_tbl_graph()
 #Lad os som det første kigge på et helt minimalistisk plot af vores netværk:
 gr %>% ggraph() +
   geom_edge_link0() +
@@ -112,21 +115,13 @@ sector     <- df_current %>% ungroup() %>%
     sector == "11"~"Alkohol",
     .default = NA))
 
-
-#Nu skal vi have 'merget' vores sector variabel på netværksobjektet. Til det formål skal vi først lige lave en lille data.frame, der indeholder navnene på vores vertices (altså virksomhedsnavnene), sorteret på samme måde som i grafobjektet. Husk fra sidst hvordan vi tilgår vertice attributes i vores grafobjekt vha. `V()`
-# Vi laver her en data.frame med variablen `affiliation`, der indeholder virksohedsnavne fra vores grafobjekt.
-
-add_sector   <- data.frame(affiliation = V(gr)$name)
-
 #Nu mangler vi bare at flette sectorvariablen på så de rigtige værdier kommer til at stå ud for de rigtige virksomhedsnavne. Her har tidyverse en genial funktion, `left_join()`, som gør netop det. Hvis vi har datasæt x, vores data.frame med virksomhedsnavne, og datasæt y, vores sector datasæt med virksomhedsnavne og branchelabel, så gør left_join det at den ved at matche på virksomhedsnavnet, `by = "affiliation`, fletter den anden variabel i y på x, altså left_join'er y på x.
 
-add_sector   <- left_join(add_sector, sector, by = "affiliation")
-
-#Nu har vi et datasæt med branchekoder i, der er ordnet ligesom vores grafobjekt, og vi kan derfor assign'e `<-` variablen med branche koder som en ny vertex attribute i vores grafobjekt.
-
-V(gr)$sector <- add_sector$sector
+gr <- gr %>% activate(nodes) %>% 
+  left_join(sector, by = c("name" = "affiliation"))
 
 gr
+
 ### 
 # Lad os nu lave vores visualisering igen, hvor vi farvelægger noderne efter branche. Vi kommer senere til detaljer i plot funktionerne. Kort fortalt om visualisering:
   
@@ -145,9 +140,16 @@ gr %>% ggraph() +
 
 #Med undtagelse af primært den største komponent ser komponenterne ud til at være ret branche homogene. Der sker noget andet i den største komponent, så lad os fokusere vores visualisering på den største komponent i netværket.
 
-# `igraph` pakken har en funktion, der giver os netværkets største komponent `largest_component()`
-gr_lc <- gr %>% largest_component()
-gr_lc
+# `tidygraph` pakken har en funktion, der giver os netværkets komponenter `group_components()`: den bruger vi ved at aktivere node-delen af grafdataen 'activate(nodes)' og lave en variabel med 'mutate', som vi kalder 'comp' og som vi fylder med resultatet af funktionen 'group_components()'.
+gr <- gr %>% 
+  activate(nodes) %>% 
+  mutate(comp = group_components())
+
+# ved at aktivere node-delen af grafdataen 'activate(nodes)' og lave et datasæt 'as.tibble()', kan vi få en oversigt over hvor mange komponenter netværket består af og hvor mange node de hver især indeholder 'count(comp)'
+gr %>% activate(nodes) %>% as_tibble() %>% count(comp)
+
+# Nu er vi klar til at lave et plot:
+
 
 # 1) først trækker vi netværket ud for den største komponent
 # 2) laver et plot  
@@ -159,7 +161,7 @@ gr_lc
 # 7) Tilføjer overskrifter og navn på labels
 # 8) Tilføjer et tema der er flot til netværk...
 
-gr_lc %>% 
+gr %>% filter(comp == 1) %>% 
   ggraph("kk") + 
   geom_edge_link0(color = "gray40", edge_width = .6) +
   geom_node_point(aes(color = sector), size = 3) +
@@ -181,11 +183,8 @@ gr_lc %>%
 #############################/
 
 
-#   1) Indlæs data-filen "data/den17-no-nordic-letters.csv"
-#   2) Funktionen show.all.tags() kan bruges til at se de tags, der er i data
-
-#   3) brug has.tags til at subsette på et eller flere tags
-        #forslag: c("Banks", "FINA", "Finance", "Investment", "Insurance")
+#   1) Indlæs data-filen "data/danish_elitenetworks2024.csv"
+#   2) Indlæg hjælpe-filen "data/
 
 #   4) undersøg sector og overvej om der skal subsettes her også med filter()
 

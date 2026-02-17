@@ -166,15 +166,6 @@ library(Matrix)
 library(RColorBrewer)
 ```
 
-Vi skal også indlæse et *script*, der indeholder funktioner skrevet specifikt til dette kursus. Det drejer sig om filen *custom_functions.R* i mappen "/functions".
-
-::: callout-note
-Et script indlæses med funktionen `source(, ...echo = FALSE)`, hvor `echo = FALSE` betyder at scriptet indlæses uden at vise indholdet.
-:::
-
-```{r, }
-source("functions/custom_functions.R", echo = FALSE)
-```
 
 ## Danish Elite Network 2017 (den17)
 
@@ -329,13 +320,17 @@ Jeg har tidligere downloadet et datasæt med alle aktive, public limited compani
 
 I kan downloade datasættet her: [Download Data](data/tobaco_and_alcohol.xlsx){.btn .btn-primary} og lægge filen i data mappen i vores Rprojekt mappe. Filen kan også hentes på Canvas.
 
-Der er også en ny funktion i `custom_functions` scriptet, `read_orbisxlsx()`, det er en genvej til at indlæse datafiler fra Orbis. For at bruge den funktion skal I download en ny udgave af `custom_functions` her [Download file](functions/custom_functions.R){.btn .btn-primary} og lægge den i `functions/` mappen i Rprojekt mappen (dvs. erstatte den anden). Filen kan også hentes på Canvas. Når filen ligger i functions mappen kan vi "source" den og anvende funktionen.
+I kan downloade og indlæse et *script*, der indeholder en funktion skrevet specifikt til dette kursus. Det drejer sig om filen *read_orbis.R*. I kan downloade den her [Download file](functions/read_orbis.R){.btn .btn-primary} og lægge den i Rprojekt mappen. Filen kan også hentes på Canvas. Når filen ligger i mappen kan vi "source" den og anvende funktionen `read_orbisxlsx()`, som er en genvej til at indlæse datafiler fra Orbis. 
 
-```{r}
-source("functions/custom_functions.R", echo = FALSE)
+::: callout-note
+Et script indlæses med funktionen `source(, ...echo = FALSE)`, hvor `echo = FALSE` betyder at scriptet indlæses uden at vise indholdet.
+:::
+
+```{r, }
+source("functions/read_orbis.R", echo = FALSE)
 ```
 
-Nu kan vi indlæse orbis-filen `tobaco_and_alcohol.xlsx` ved at indsætten stien til filen (`data/tobaco_and_alcohol.xlsx`) med `read_orbisxlsx()`:
+Nu kan vi indlæse orbis-filen `tobaco_and_alcohol.xlsx` ved at indsætten stien til filen (`data/tobaco_and_alcohol.xlsx`) i `read_orbisxlsx()`:
 
 ```{r, echo = TRUE}
 df <- read_orbisxlsx(path = "data/tobaco_and_alcohol.xlsx")
