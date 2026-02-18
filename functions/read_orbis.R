@@ -67,15 +67,40 @@ read_orbisxlsx <- function(path = "path", resultsheet = 2) {
   # get rid of duplicates
   # distinct(affiliation, id, .keep_all = TRUE)
   
+  if("role_level" %in% colnames(df1)){
+  
+    df1 <- df1 %>% 
+    mutate(role_level_rec = case_when(
+      grepl("member", role_level, ignore.case = T) ~ "member",
+      grepl("executive", role_level, ignore.case = T) ~ "executive",
+      grepl("vice (pres|chair)", role_level, ignore.case = T) ~ "vice chairman", 
+      grepl("president|chairman", role_level, ignore.case = T) ~ "chairman", 
+      .default = "other"))
+  
+  
+    df1 <- df1 %>% 
+    mutate(role_level_rec = case_when(
+      role_level_rec == "other" & 
+        (grepl("SenMan", role_type, ignore.case = T) | 
+           grepl("manager", role_level, ignore.case = T)) ~ "executive",
+      role_level_rec == "other" & 
+        grepl("chief", role_level, ignore.case = T) ~ "executive",
+      .default = role_level_rec))
+  }
+  
+  if("n_employees" %in% colnames(df1)) {
   if(is.character(df1$n_employees)) {
     df1 <- df1 %>% mutate(across(matches("n_employees"), ~ na_if(., "n.a.") %>% as.numeric(.)))
   }
+  }
+  if("revenue" %in% colnames(df1)) {
   if(is.character(df1$revenue)) {
     df1 <- df1 %>% mutate(across(matches("revenue"), ~ na_if(., "n.a.") %>% as.numeric(.)))
-  }
-  if(is.character(df1$assets)) {
+  }}
+  if("total_assets" %in% colnames(df1)) {
+  if(is.character(df1$total_assets)) {
     df1 <- df1 %>% mutate(across(matches("assets"), ~ na_if(., "n.a.") %>% as.numeric(.)))
-  }
+  }}
   
   df1 <- df1 %>% group_by(affiliation) %>% 
     mutate(across(any_of(matches("csh_|duo_|guo_|subsid_")), .fns = ~first(.x))) 
@@ -86,6 +111,6 @@ read_orbisxlsx <- function(path = "path", resultsheet = 2) {
   
   nch <- nchar(changes$orbis_var) 
   tab <- nchar(changes$orbis_var) %>% max()
-  message(c("Orbis variable names updated: \n\n", paste0(gsub("\n", " ", changes$orbis_var), strrep(" ", tab-nch),"=> ", changes$new_var, "\n"), "\n\nNew variables added: \n", "person {TRUE/FALSE}" ))
+  message(c("Orbis variable names updated: \n\n", paste0(gsub("\n", " ", changes$orbis_var), strrep(" ", tab-nch),"=> ", changes$new_var, "\n"), "\n\nNew variables added: \n", "person {TRUE/FALSE} \n", "role_level_rec {omkodning af role_level)"))
   return(df1 %>% ungroup())
 }

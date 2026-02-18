@@ -1,378 +1,276 @@
-##############################/
+###############################################################/
 #
-#  Øvelse 4: Centralitets mål
+#  Øvelse 3: Sammenhængskraft; densitet, kliker og strukturelle huller
 #
-##############################/
+###############################################################/
 
-
-# 0. SETTING UP --------------------------------------------------------------
-
-# installer nye pakker
-# install.packages("ggpubr")
-
-# Indlæs relevante pakker og funktioner
-
-library(ggplot2)
-library(ggpubr)
+# indlæs pakker
 library(tidyverse)
 library(igraph)
 library(ggraph)
+library(graphlayouts)
 library(Matrix)
-# Download nye functions filer
-download.file("https://jacoblunding.quarto.pub/virkstrat2025/functions/networkfunctions.R", "functions/networkfunctions.R")
+#install.packages("patchwork")
+library(patchwork)
+#install.packages("treesj")
 
-source("functions/networkfunctions.R")
+source("functions/clique_plot.R")
+source("functions/triangle_plot.R")
+###############################################################/
+# 1. Indlæs og udvalg/behandling af data ----
+###############################################################/
 
-#############################################################/
-# 1. Indlæs data  ----
-#############################################################/
+den <- read_csv("data/danish_elitenetworks2024.csv")
 
-den <- read_csv("data/den17-no-nordic-letters.csv")
+# Lad os først vælge et subset af datasættet. 
+# Til det har vi forskellige mulgiheder med hhv affiliation_branche_niveau1 til den$affiliation_branche_niveau5 og affiliation_tags
+den %>% distinct(affiliation, affiliation_branche_niveau1) %>% count(affiliation_branche_niveau1) %>% View()
 
-# subset data til kun at indeholde rækker hvor sector == "Corporation"
-den_corp <- 
-  den %>% filter(sector == "Corporations")
+# lad os kigge "Pengeinstitut- og finansvirksomhed, forsikring"
 
-# subsetter videre data til kun at indeholde linkere, dvs. individer med mere end 1 bestyrelsespost
-den_corp <- 
-  den_corp %>% 
-  group_by(name) %>% 
+#Kigger vi på `affiliation_tags` som vi er nød til først at splitte `str_split()` og unliste `unlist()` fordi der kan være flere tags per virksomhed. De er separeret med "; ", så det splitter vi på: 
+  
+den %>% pull(affiliation_tags) %>% str_split("; ") %>% unlist() %>% table()
+
+
+den <- den %>% mutate(finans = affiliation_branche_niveau1 == "Pengeinstitut- og finansvirksomhed, forsikring" | 
+                        grepl("Erhvervsliv_Finans|Erhvervsliv_Finans_Banker|Erhvervsliv_Finans_Forsikring|Erhvervsliv_Finans_Investering|Erhvervsliv_Finans_Pension", affiliation_tags))
+den %>% count(finans)
+
+den_finans <- den %>% filter(finans == TRUE)
+
+
+den_finans <- den_finans %>% 
+  # grupperer data efter 'name'
+  group_by(person_name) %>% 
+  # laver en ny variabel 'n_memberships' som for hvert individ (vi har jo grupperet data på individer) tæller antallet af unikke boards med n_distinct()
   mutate(n_memberships = n_distinct(affiliation)) 
+# til sidst kan vi nu filtrere data på et logisk statement, så vi kun får rækker med individer der har mere end 1 medlemskab.
 
-den_corp <- den_corp %>% filter(n_memberships >1) 
 
-#############################################################/
-# 2. Lav netværksobjektet / grafobjektet ----
-#############################################################/
- 
-biadj    <- xtabs(den_corp, formula = ~name + affiliation, sparse = T)
-adj_ind  <- biadj %*% t(biadj)
-adj_virk <- t(biadj) %*% biadj
+den_finans <- den_finans %>% filter(n_memberships > 1)
 
-# individ netværket 
-gr_ind    <- adj_ind %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE) 
-# virksomheds netværket 
-gr_virk   <- adj_virk %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE) 
 
-#################################/
-# 3. Kig på komponenter & plot ----
-# I det her eksempel går vi videre med
-# virksomhedsnetværket: gr_virk
-#################################/
 
-# Hvordan ser komponent strukturen ud
-complist <- components(gr_virk)
-complist
-complist$csize
-complist$no
+###############################################################/
+# 2. Konstruktion af grafobjekt / netværksdata ----
+###############################################################/
 
-# Lad os vælge den største komponent med largest_component funktionen fra Igraph: 
 
-largest_comp_virk <- gr_virk %>% largest_component()
+bi_adj <- xtabs(formula = ~ person_name + affiliation, data = den_finans, sparse = TRUE) #Sparse = TRUE betyder at vi beder funktionen xtabs om at gemme den nye matrice i et hukommelsesbesparende format, hvor den ikke gemmer alle 0'erne (dvs. de ikke-optrædende forbindelser)
+adj_c <- bi_adj %*%  t(bi_adj)
 
-# og lave et simplet plot af hele netværket vs den største komponent
-p1 <- gr_virk %>% 
+# Her betragter vi ikke netværket som vægtet!!
+gr    <- adj_c %>% graph_from_adjacency_matrix(mode = "undirected", weighted = NULL, diag = FALSE) %>% simplify()
+gr    <- gr %>% as_tbl_graph()
+
+################################################################################################/
+# 3. Sammenhængskraft ----
+################################################################################################/
+
+##################################################################/
+# Densitet ----
+# Densiteten i et netværk udtrykker sandsynligheden for at to tilfældige noder i netværker er forbundne. 
+# Den udregnes ved at dividere det faktiske antal forbindelser (edges) med den maksimale mulige antal forbindelser (edges).
+##################################################################/
+
+# eksempler: forskellige netværk med 40 noder  ### maksimale antal edges = (N_noder * N_noder - 1) / 2
+(40 * (40-1)) / 2
+
+# Lad os lige se hvad antallet af noder betyder for det teoretiske max !!
+teo_max <- tibble(nodes = c(2:10000)) %>% mutate(teo_max = (nodes * (nodes -1))/2)
+
+ggplot() + geom_line(data = teo_max, aes(x = nodes, y = teo_max))
+
+e1 <- make_full_graph(40, directed = FALSE)
+e1 <- e1 %>% as_tbl_graph()
+
+e1 %>% ggraph() +
+  geom_edge_link0(edge_width = 0.1, alpha = 0.4) +
+  geom_node_point(color = "steelblue1", size = 4) +
+  theme_graph()
+edge_density(e1, loops=FALSE)
+
+e2 <- make_star(40, mode = "undirected")
+e2 <- e2 %>% as_tbl_graph()
+
+e2 %>% ggraph() +
+  geom_edge_link0(edge_width = 0.1, alpha = 0.4) +
+  geom_node_point(color = "steelblue1", size = 4) +
+  theme_graph()
+edge_density(e2, loops=FALSE)
+
+ecount(e2) / ((40 * (40-1))/2)
+
+
+# Lad os nu bergne densiteten af vores virksomhedsnetværk
+edges     <- ecount(gr) 
+nodes     <- vcount(gr)
+edges_max <- (nodes * (nodes-1)) / 2
+edges / edges_max
+
+edge_density(gr, loops = FALSE)
+
+##################################################################/ 
+# Komponenter ---------------------------------------------------
+# en komponent er en sammenhængende undergraf
+##################################################################/
+
+# Hvis vi plotter virksomhedsnetværket gr kan vi se komponentstrukturen
+gr %>% 
+  ggraph() +
+  geom_edge_link0(edge_width = .2, edge_alpha = .3) +
+  geom_node_point(size=1.5) +
+  theme_graph()
+
+# Vi kan lave en variabel på node-delen af vores graf-data:
+gr <- gr %>% 
+  activate(nodes) %>% 
+  mutate(comp = group_components())
+
+# Hvis vi vil vide noget om komponentstrukturen kan vi lave et 'exportere' node-dataen og kigge på det:
+gr %>% activate(nodes) %>% as_tibble() %>% count(comp)
+# der er 15 komponenter. Den største har 40 'medlemmer'. den næst-største har 8 osv.
+
+# vi kan nu regne densiteten i komponenterne: 
+gr %>% filter(comp == 1) %>% edge_density()
+
+# Visualisering af den største komponenter
+gr %>% filter(comp==1) %>% 
+  ggraph(layout = "fr") +
+  geom_edge_link0(color = "gray70", width = 0.1) +
+  geom_node_point(size=1.5) +
+  theme_graph()
+
+####################################################################################################################/
+# Connectedness
+# Hvor mange 'par af noder' kan nå hinanden (dvs. er i samme komponent) i forhold til det teoretisk mulige antal par
+####################################################################################################################/
+sp <- distances(gr)
+sp
+sp[is.infinite(sp)] <- 0
+sp[sp > 0] <- 1
+(sum(rowSums(sp, na.rm = T)) / ((vcount(gr)*(vcount(gr)-1))))
+
+
+##################################################################/ 
+# Transitivitet ----
+# et mål for antallet af faktiske triader ud af det mulige antal triader
+# måler graden af lokal forbundethed:
+# Når A kender B og B kender C, hvor hyppigt er det så at A også kender C
+# Husk strong ties og triadic closure
+##################################################################/ 
+
+# eksempler
+# En ring graf, med ingen triader
+g1 <- make_ring(10)
+autograph(g1) + theme_graph()
+transitivity(g1) # 0 - no triads
+
+# I et tilfældigt netværk med x noder og en given densitet
+g2 <- sample_gnp(30, p = 2/30)  # p er sandsynligheden for at der er en forbindelse mellem to noder : altså densiteten
+autograph(g2) + 
+  geom_node_point(aes(filter = {count_triangles(g2) > 0}, color = {count_triangles(g2) >0})) +
+  theme_graph() + guides(color = "none")
+transitivity(g2) 
+
+# Transitiviteten i virksomhedsnetværket
+tr_g <- transitivity(gr, type = "global") 
+tr_l <- transitivity(gr, type = "local") 
+
+tr_l %>% enframe %>% tibble() %>% View()
+
+
+gr %>% filter(comp==1) %>% 
+  ggraph(layout = "fr") +
+  geom_edge_link0(color = "gray70", width = 0.1) +
+  geom_node_point(size=1.5) +
+  geom_node_point(aes(filter = centrality_degree() != 1 & local_transitivity() < .33), color = "red")+
+  geom_node_label(aes(filter = centrality_degree() != 1 & local_transitivity() < .33, label = local_transitivity() %>% round(2)), color = "red", repel = TRUE)+
+  theme_graph()
+
+
+# Visualisering af open og closed triads
+tri_plot(gr, mode = "closed")
+tri_plot(gr, mode = "open")
+
+
+# Kliker
+max_cliques(gr) 
+max_cliques(gr) %>% sapply(., length) %>% table()
+p_cli <- clique_plot(gr, n =4, mode = "both")
+p_cli$vertices + p_cli$edges
+
+
+##################################################################/ 
+# Diameter ----
+# En netværksgrafs diameter er den længste 'korteste sti' mellem to noder i netværket. Altså den korteste vej mellem netværkets yderpunkter, kan man sige. Giver kun mening for sammenhængende grafer, da den korteste vej mellem to ikke-forbunde noder er uendelig stor.
+##################################################################/ 
+comp1 <- gr %>% filter(comp == 1)
+
+
+# diameter på den største komponent i vores virksomhedsnetværk
+diameter(comp1, directed = FALSE)
+
+# hvilke to virksomheder ligger længst fra hinanden
+farthest_vertices(comp1, directed = FALSE)
+
+# hvad er vejen mellem dem
+diam <- get_diameter(comp1, directed = FALSE)
+diam <- names(diam)
+
+# Vi kan visualisere den længste sti:
+
+# 1) vi gemmer en attribut til noderne, der fortæller (TRUE/FALSE) om de ligger på stien.
+comp1 <- comp1 %>% activate(nodes) %>% 
+  mutate(diameter = name %in% diam) 
+
+
+# 2) vi gemmer en attribut til egdes, der fortæller (TRUE/FALSE) om de indgår i stien
+comp1 <- comp1 %>% activate(edges) %>% 
+  mutate(diameter = FALSE) %>% 
+  morph(to_shortest_path, from = .N()$name == first(diam), to = .N()$name ==last(diam)) %>%
+  mutate(diameter = TRUE) %>% unmorph()
+
+# 3) plot 
+comp1 %>% 
+  ggraph(layout = "fr") +
+  geom_edge_link0(aes(filter=diameter==FALSE), color = "gray60") + 
+  geom_node_point(aes(filter=diameter==FALSE), color = "black") +
+  geom_edge_link0(aes(filter=diameter==TRUE), color = "red", width = 1.5) +
+  geom_node_point(aes(filter=diameter==TRUE), color = "red", size =2) +
+  geom_node_label(aes(filter=diameter==TRUE, label = name), nudge_y = -0.3, size =2.5, repel = TRUE) + 
+  labs(title = 'Diameter in EliteDBs finance component') +
+  theme_graph() 
+
+
+############################################################/
+# Ekstra ----
+# Den korteste vej mellem to specifikke noder
+############################################################/
+
+node1 <- "Louise Caroline Mogensen 52924" # direktør i finanstilsynet
+node2 <- "Carsten Egeriis 66665"          # adm. direktør i danske bank
+
+# Vi laver en vertex attribute der er TRUE for alle noder på stien og for alle edges
+
+comp1 <- comp1 %>% activate(nodes) %>% 
+  mutate(sh_path = FALSE) %>% 
+  morph(to_shortest_path, from = .N()$name == vertex1, to = .N()$name ==vertex2) %>%
+  mutate(sh_path = TRUE) %>% unmorph()
+
+comp1 <- comp1 %>% activate(edges) %>% 
+  mutate(sh_path = FALSE) %>% 
+  morph(to_shortest_path, from = .N()$name == vertex1, to = .N()$name ==vertex2) %>%
+  mutate(sh_path = TRUE) %>% unmorph()
+
+
+comp1 %>% 
   ggraph(layout='fr') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
-  geom_node_point(color='black', alpha=0.6)  + 
-  labs(title = paste0("Netværket af virksomheder i \n'Danish Elite Network' (n=", vcount(gr_virk), ")")) +
-  theme_graph()  + theme(plot.title = element_text(family = "serif", size = 12))
-p2 <- largest_comp_virk %>% 
-  ggraph(layout='fr') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
-  geom_node_point(color='black', alpha=0.6)  + 
-  labs(title = paste0("Den største komponent (n=", vcount(largest_comp_virk),")")) +
-  theme_graph() + theme(plot.title = element_text(family = "serif", size = 12))
-
-ggarrange(plotlist = list(p1, p2))
-
-##################################################/
-# 4. Centralitetsmål  ----
-# 
-#################################################/
-
-star <- make_star(10, mode = "undirected")
-V(star)$name <- LETTERS[1:10]
-star %>% ggraph("kk") +
-  geom_edge_link0() +
-  geom_node_label(aes(label = name, size = degree(star)), show.legend = F) +
-  scale_size_continuous(range = c(3,6)) +
-  theme_graph(base_family = "serif") + labs(title = "Stjernegraf med 10 noder", caption = "Freeman, Linton C. 1979. “Centrality  in Social Networks  Conceptual  Clarification.” Social  Networks 1979(1):215–39.")
-
-##################################################/
-# 4.a Kontaktbaserede centralitetsmål  ----
-#################################################/
-
-#################################################/
-# Degree centralitet:
-##################################################/
-# Ide: en central aktør er en aktør med mange forbindelser, høj aktivitet. 
-# I praksis: Tæller hvor mange direkte forbindelser hver node har, dvs hvor mange andre noder den er forbundet til
-    # I et ikke-retningsbestemte netværk (undirected) der kun et degree mål. 
-    # I retningsbestemte netværk har hver node en:
-       # 'out degree' (udadgående forbindelser) 
-       # 'in degree' (indkommende forbindelser) 
-       # Total degree (summen af de to).
-
-deg <- degree(largest_comp_virk) 
-table(deg)
-
-# Vi tilføjer degreemålet til vores grafobjekt som vertex attribute: der er to måder at gøre det på
-
-#1)
-V(largest_comp_virk)$degree <- deg
-#2)
-largest_comp_virk <- set_vertex_attr(largest_comp_virk, name = "degree", value = deg)
-
-
-hist_deg <- deg %>% tibble() %>% 
-  ggplot() +
-  geom_histogram(aes(x=.), fill = "grey20") + #binwidth definerer, hvor mange kategorier på x-aksen en søje i histogrammet skal 'opsummere'
-  scale_y_continuous(breaks = seq(0,100, 10), name = "Antal") + scale_x_continuous(breaks = c(1, seq(5,max(deg), 5)), minor_breaks = seq(0,max(deg), 1), name ="Degree") + theme_minimal(base_family = "serif")
-
-p_deg <- largest_comp_virk %>% 
-  ggraph(layout='stress') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
-  geom_node_point(aes(color=degree), alpha=0.8)  + 
-  labs(title = paste0("Den største komponent (n=", vcount(largest_comp_virk),")"), subtitle = "degree", color = "") +
-  theme_graph() + theme(plot.title = element_text(family = "serif", size = 12), plot.subtitle = element_text(family = "serif", size = 12), legend.position = "bottom")
-
-ggarrange(plotlist = list(hist_deg, p_deg), widths = c(1.4,2))
-
-
-##################################################/
-# Eigenvector centrality: 
-##################################################/
-# Ide: som med degree, det er godt at have mange 'venner', men endnu bedre, hvis disse venner også er populære!
-# I praksis: Udregnes hurtigt med 'kompliceret' matematik, eigenvector decomposition, deraf navnet. Intuitionen er: Alle noder starter med en 'vægt' på 1, for hver node tælles summen af deres forbindelsers 'vægt', svarer i første omgang til degree, gentages i flere runder, hvorved noder der er forbundne til velforbundne node, stiger hurtigere (= er mere centrale), skaleres til at være mellem 0 og 1, hvor 0 er isolates og en højeste centralitet.
-
-eig <- eigen_centrality(largest_comp_virk, weights = NA, directed = FALSE)
-str(eig)
-eig <- eig$vector
-
-V(largest_comp_virk)$eigencentrality <- eig
-
-hist_eig <- eig %>% tibble() %>% 
-  ggplot() +
-  geom_histogram(aes(x=.), fill = "grey20") + 
-  scale_y_continuous(name = "Antal") + scale_x_continuous(breaks = seq(0,max(eig), .1), name ="Eigencentralitet") + theme_minimal(base_family = "serif")
-
-p_eig <- largest_comp_virk %>% 
-  ggraph(layout='stress') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
-  geom_node_point(aes(color=eigencentrality), alpha=0.8)  + 
-  labs(title = paste0("Den største komponent (n=", vcount(largest_comp_virk),")"), subtitle = "Eigencentrality", color = "") +
-  theme_graph() + theme(plot.title = element_text(family = "serif", size = 12), plot.subtitle = element_text(family = "serif", size = 12), legend.position = "bottom")
-
-ggarrange(plotlist = list(hist_eig, p_eig), widths = c(1.4,2))
-
-
-##################################################/
-# 4.b Stibaserede centralitetsmål  ----
-#################################################/
-
-
-##################################################/
-# Excentricitetscentralitet:
-##################################################/ 
-
-# Ide: Et netværk har yderpunkter, dvs. noder der er længst fra hinanden. De siges at ligge i periferien og deres afstand er derfor netværkets Diameter. De noder med den korteste afstand til fjerneste node, kalder vi centrum i netværket, og afstanden til periferien Radius. 
-# I praksis: for hver node udregnes dens længste korteste sti til en anden node. Den inverse eccentricitet -> 1/eccentricitet, er således et centralitetsmål, som går fra lav til høj.
-
-ecc <- 1 / eccentricity(largest_comp_virk, weights = NA)
-table(ecc)
-V(largest_comp_virk)$eccentricity <- ecc
-
-hist_ecc <- ecc %>% tibble() %>% 
-  ggplot() +
-  geom_histogram(aes(x=.), fill = "grey20") + 
-  scale_y_continuous(name = "Antal") + scale_x_continuous(breaks = seq(0,max(ecc), .01), name ="1/Eccentricity") + theme_minimal(base_family = "serif")
-
-p_ecc <- largest_comp_virk %>% 
-  ggraph(layout='stress') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
-  geom_node_point(aes(color=eccentricity), alpha=0.8)  + 
-  labs(title = paste0("Den største komponent (n=", vcount(largest_comp_virk),")"), subtitle = "1/Eccentricity", color = "") +
-  theme_graph() + theme(plot.title = element_text(family = "serif", size = 12), plot.subtitle = element_text(family = "serif", size = 12), legend.position = "bottom")
-
-ggarrange(plotlist = list(hist_ecc, p_ecc), widths = c(1.4,2))
-
-
-##################################################/
-# Closeness centralitet: 
-##################################################/
-# Ide: en central node er en der (i gennemsnit) er tæt på de andre noder. En der hurtigt kan række ud i netværket og derfor har en grad af uafhængighed.
-# I praksis: udregnes (for node A) som : antallet af noder udover A selv / summen af A's netværksafstande til alle andre noder. Svarer til den inverse gennemsnitlige afstand til de andre noder. 
-
-clo  <- closeness(largest_comp_virk, weights = NA) 
-V(largest_comp_virk)$closeness <- clo
-
-hist_clo <- clo %>% tibble() %>% 
-  ggplot() +
-  geom_histogram(aes(x=.), fill = "grey20") + 
-  scale_y_continuous(name = "Antal") + scale_x_continuous(name ="Closeness") + theme_minimal(base_family = "serif")
-
-p_clo <- largest_comp_virk %>% 
-  ggraph(layout='stress') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
-  geom_node_point(aes(color=closeness), alpha=0.8)  + 
-  labs(title = paste0("Den største komponent (n=", vcount(largest_comp_virk),")"), subtitle = "Closeness", color = "") +
-  theme_graph() + theme(plot.title = element_text(family = "serif", size = 12), plot.subtitle = element_text(family = "serif", size = 12), legend.position = "bottom")
-
-ggarrange(plotlist = list(hist_clo, p_clo), widths = c(1.4,2))
-
-
-##################################################/
-# Betweenness centralitet: 
-##################################################/
-# Ide: En central node er en der er uundværlig for at andre noder, der ikke er direkte forbundne, kan 'nå' hinanden, dvs. én der bygger bro, én gatekeeper osv.
-# I praksis: Tæller antallet af shortest paths parvist mellem alle andre noder, der går igennem en given node.
-
-bet <- betweenness(largest_comp_virk, weights = NA)
-V(largest_comp_virk)$betweenness <- bet
-
-hist_bet <- bet %>% tibble() %>% 
-  ggplot() +
-  geom_histogram(aes(x=.), fill = "grey20") + 
-  scale_y_continuous(name = "Antal") + scale_x_continuous(name ="Betweenness") + theme_minimal(base_family = "serif")
-
-p_bet <- largest_comp_virk %>% 
-  ggraph(layout='stress') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
-  geom_node_point(aes(color=betweenness), alpha=0.8)  + 
-  labs(title = paste0("Den største komponent (n=", vcount(largest_comp_virk),")"), subtitle = "Betweenness", color = "") +
-  theme_graph() + theme(plot.title = element_text(family = "serif", size = 12), plot.subtitle = element_text(family = "serif", size = 12), legend.position = "bottom")
-
-ggarrange(plotlist = list(hist_bet, p_bet), widths = c(1.4,2))
-
-largest_comp_virk
-# Et samlet dataobjekt (en 'tibble') med de udvalgte centralitetsmål 
-cent_metrics <- as_data_frame(largest_comp_virk, what = "vertices") %>% tibble()
-# Centralitetsrank 
-  # Det kan være en god ide at lave en rankvariabel for de forskellige mål, som ranker alle noder efter deres centralitet på de forskellige mål. Funktionen dense_rank( ) kombineret med desc( ) [descending] giver os et rank hvor noden med den højeste centralitet bliver nr 1 og de andre noder, 2,3,4,5 osv. jo lavere deres centralitet er.
-
-cent_metrics_rnk <- cent_metrics %>% mutate(
-  across(.cols = -name, .fns = ~dense_rank(desc(.x)), .names = "{.col}_rnk"))
-
-# korrrelation mellem forskellige former for centralitet 
-  # med en 'hjemmelavet' plotfunktion fra 'networkfunctions.R' kan vi lave et hurtigt plot, der viser korrelationen mellem de forskellige centralitetsmål.
-cent_metrics_norm <- cent_metrics %>% mutate(across(.cols = -name, .fns = ~.x / max(.x))) 
-cent_metrics_norm %>% cor_plots(., name_var = "name")
-
-# og vi kan se de parvise korrelationer.
-cent_metrics_norm  %>% select(-name) %>% cor(, method = "kendall")
-
-#Konklussion: De er allesammen korrelerede til hinanden i forskellige grad, men ikke perfekt, da de udtrykker forskellige aspekter af hvad det vil sige at være central i et netværk: 
-# Degree: 'simpel' popularitet, dvs. hvem har flest forbindelser.
-# Closeness: effektiv spreder af information, da høj closeness betyder at resten af netværket er relativt tilgængeligt for denne node. 
-# Betweennes: kontrol med information, høj betweenness betyder at en stor del af det, der 'flyder' mellem noder i netværket går gennem denne node.
-
-
-
-##################################################/
-# 5. Kerne/periferi  struktur ----
-##################################################/
-
-# Coreness eller K-core decomposition 
-  # En anden måde at tænke centralitet på, med udgangspunkt i netværkets kerne/periferi struktur
-  # ide: Første lag K=0: Alle noder; Andet lag K=1 alle noder med < 1 forbindelse slettes; næste lag K=2 alle noder der nu har <2 forbindelser slettes; K=3 alle noder der nu har <3 noder slettes osv. indtil man ikke kan slette noder uden at antallet de reterende noders forbindelser falder....
-core <- coreness(largest_comp_virk)
-table(core)
-
-# et visualierngs eksempel | bruger en funktion fra networkfunctions.R
-coreness_viz(largest_comp_virk, algorithm = 'fr')
-
-
-
-# lad os lige tilføje coreness til vores net_metrics data
-cent_metrics <- cent_metrics %>% mutate(coreness = core)
-
-
-# 6. Eksempler på visualiernger af netværk ----
-
-# Visualisering af eccentriciteten 
-
-largest_comp_virk %>% ggraph(layout='stress') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.35) +
-  geom_node_point(aes(color=eccentricity), alpha=0.75, size = 2) + 
-  theme_graph() + scale_color_viridis(direction = -1) + labs(color="1/Eccentricity") +
-  geom_node_label(aes( filter=name %in% {cent_metrics %>% filter(eccentricity %in% c(min(eccentricity), max(eccentricity))) %>% pull(name)}, label=name), alpha=0.65, size = 3, repel=T, force = 50)
-
-# Visualisering af betweenness 
-largest_comp_virk %>% ggraph(layout='stress') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.35) + 
-  geom_node_point(aes(color=betweenness, size = betweenness), alpha=0.75) + 
-  theme_graph() + scale_color_viridis(direction = -1) + labs(color="Betweenness") + 
-  geom_node_label(aes( filter=name %in% {cent_metrics_rnk %>% filter(betweenness_rnk <= 10) %>% pull(name)}, label=name), alpha=0.65, size = 3, repel=T, force = 50)
-
-
-ggsave('output/elitedb-graph-betweenness.png', width=30, height=17.5, unit='cm')
-
-# Visualisering af closeness
-largest_comp_virk %>% ggraph(layout='stress') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.35) +
-  geom_node_point(aes(color=closeness), alpha=0.75, size = 2) + 
-  theme_graph() + scale_color_viridis(direction = -1) + 
-  labs(color="Closeness") + 
-  geom_node_label(aes( filter=name %in% {cent_metrics_rnk %>% filter(closeness_rnk <= 10) %>% pull(name)}, label=name), alpha=0.65, repel=T,size=3, force = 60)
-ggsave('output/elitedb-graph-closeness.png', width=30, height=17.5, unit='cm')
-
-
-#############################################################################################/
-# 7 Centralisering: ----
-# Er centraliteten i netværket spredt ud eller koncentreret på få noder
-#############################################################################################/
-  # udregnes som "summen af differencen mellem centraliteten for den mest centrale node og de andre" divideret med "den teoretiske situation, hvor én node er central og alle andre perifære" For de fleste centralitetsmål er denne teoretiske situation stjernegrafen...
-
-deg_cent  <- centr_degree(largest_comp_virk)$centralization
-deg_cent
-clo_cent  <- centr_clo(largest_comp_virk)$centralization
-clo_cent
-betw_cent <- centr_betw(largest_comp_virk)$centralization
-betw_cent
-eigen_cent <- centr_eigen(largest_comp_virk)$centralization
-eigen_cent
-
-
-stargr <- make_star(vcount(largest_comp_virk), mode = "undirected") 
-
-lay1 <- create_layout(largest_comp_virk, layout = "fr") 
-
-p0 <- stargr %>% ggraph(layout = "star") + 
-  geom_edge_link0(edge_width = .1, edge_alpha = 0.4) + 
-  geom_node_point(aes(size = degree(stargr), color = degree(stargr))) + 
-  scale_size_continuous(range = c(.5,8)) + 
-  guides(size = "none", color = "none", alpha = "none") + 
-  labs(caption = paste0("Centralization = 1")) + 
+  geom_edge_link0(aes(filter=sh_path==FALSE), color='grey50', alpha=0.5) + 
+  geom_node_point(aes(filter=sh_path==FALSE), color='black', size=3, alpha=0.25) + 
+  geom_edge_link0(aes(filter=sh_path==TRUE), color='red', width=1.2) + 
+  geom_node_point(aes(filter=sh_path==TRUE), color='darkred', size=5, alpha=0.5) + 
+  geom_node_label(aes(filter=sh_path==TRUE, label=name), color='red', size=2, alpha = 0.8, repel = T) + 
   theme_graph()
 
-p1 <- lay1 %>% ggraph() + 
-  geom_edge_link0(edge_width = .1, edge_alpha = 0.4) + 
-  geom_node_point(aes(size = degree, color = degree, alpha = degree)) + 
-  scale_size_continuous(range = c(0.5, 6)) + 
-  guides(size = "none", color = "none", alpha = "none") + 
-  labs(caption = paste0("Degree centralization = ", round(deg_cent,2))) + 
-  theme_graph()
-
-p2 <- lay1 %>% ggraph() + 
-  geom_edge_link0(edge_width = .1, edge_alpha = 0.4) + 
-  geom_node_point(aes(size = betweenness, color = betweenness, alpha = betweenness)) +
-  scale_size_continuous(range = c(0.5, 6)) + 
-  guides(size = "none", color = "none", alpha = "none") +
-  labs(caption = paste0("Betwenness centralization = ", round(betw_cent,2))) + 
-  theme_graph()
-
-p3 <- lay1 %>% ggraph() + 
-  geom_edge_link0(edge_width = .1, edge_alpha = 0.4) + 
-  geom_node_point(aes(size =eigen_cent, color = eigencentrality, alpha = eigencentrality)) +
-  scale_size_continuous(range = c(0.5, 6)) + 
-  guides(size = "none", color = "none", alpha = "none") + 
-  labs(caption = paste0("Eigencentrality centralization = ", round(eigen_cent,2))) + 
-  theme_graph()
-
-ggarrange(plotlist = list(p0, p1, p2, p3)) %>% annotate_figure(., top = text_grob("Graph level centralization", family = "serif", size = 12, face = "bold"))
-
-
-#I kan downloade øvelsen her:
-download.file("https://jacoblunding.quarto.pub/virkstrat2025/scripts%20til%20undervisning/Session3_øvelse.R", "scripts/Session3_øvelse.R")
-download.file("https://jacoblunding.quarto.pub/virkstrat2025/scripts%20til%20undervisning/Session3_øvelse_med_svar.R", "scripts/Session3_øvelse_med_svar.R")

@@ -35,16 +35,16 @@ den <- read_csv("data/danish_elitenetworks2024.csv")
 den %>% glimpse()
 
 # Count
-den %>% count(org_sector, sort = TRUE)
-den %>% distinct(AFFILIATION, org_tags, org_tags_full, first.tag) %>% count(org_tags, org_tags_full, first.tag, sort = TRUE) %>% View()
+den %>% count(affiliation_sektor, sort = TRUE)
+den %>% distinct(affiliation, affiliation_tags) %>% count(affiliation_tags, sort = TRUE) %>% View()
 
 #######################/
 # 3. Subset data -----
 #######################/
 
 # Lad os lave to forskellige variable, som vi kan bruge til at finde landbrugsnetværket
-den <- den %>% mutate(landbrug_org  = str_detect(org_tags_full, regex("landbrug", ignore_case = TRUE)))
-den <- den %>% group_by(NAME) %>% mutate(landbrug_pers = any(landbrug_org)) %>% ungroup()
+den <- den %>% mutate(landbrug_org  = str_detect(affiliation_tags, regex("landbrug", ignore_case = TRUE)))
+den <- den %>% group_by(person_name) %>% mutate(landbrug_pers = any(landbrug_org)) %>% ungroup()
 
 
 # Filter
@@ -57,33 +57,33 @@ den_corp <- den %>%
 den_corp %>% slice_sample(n = 10)
 
 # Når nu vi kun har landbrugsforaer, kan vi kigge på hvilke brancher der optræder i data
-den_corp %>% distinct(AFFILIATION, org_cvr_branche) %>% count(org_cvr_branche, sort = TRUE)
+den_corp %>% distinct(affiliation, affiliation_branche_niveau5) %>% count(affiliation_branche_niveau5, sort = TRUE)
 
 # select() 
-den_corp <- den_corp %>% select(NAME, AFFILIATION, Gender, person_leader)
+den_corp <- den_corp %>% select(person_name, affiliation, person_køn, position_leader)
 
 # Lad os lave en variabel der indikerer at en person har en ledende post (direktør eller bestyrelsesformand) i et eller andet
 den_corp <- den_corp %>% 
-  group_by(NAME) %>% 
-  mutate(person_leader = any(person_leader == TRUE)) %>% 
+  group_by(person_name) %>% 
+  mutate(person_leader = any(position_leader == TRUE)) %>% 
   ungroup()
 # Og lad os filtrere på den, så vi kun har folk, der har en ledende post
 den_corp <- den_corp %>% filter(person_leader == TRUE)
 
-den_corp %>% count(Gender)
+den_corp %>% count(person_køn)
 
-den_corp %>% filter(is.na(Gender)|Gender == "Binominal") %>% distinct(NAME, Gender) %>% head()
+den_corp %>% filter(is.na(person_køn)|person_køn == "Binominal") %>% distinct(person_name, person_køn) %>% head()
 
 # Omkodning!!
-den_corp <- den_corp %>% mutate(Gender = case_when(NAME == "Marc-Dominique Prikazsky 57958"~"Men", 
-                                                   NAME == "H. C. Gæmelke 59543"~"Men",
-                                                   NAME == "Laury Kristoffersen 22938"~"Men",
-                                                   NAME == "Rune-Christoffer Dragsdahl 59891"~"Men",
-                                                   NAME == "Tina-Henriette Kristiansen 66185"~"Women",
-                                                   NAME == "Valérie, Claire, Aline Mazeaud 57956"~"Women",
-                                                   .default = Gender))
+den_corp <- den_corp %>% mutate(person_køn = case_when(person_name == "Marc-Dominique Prikazsky 57958"~"Men", 
+                                                       person_name == "H. C. Gæmelke 59543"~"Men",
+                                                       person_name == "Laury Kristoffersen 22938"~"Men",
+                                                       person_name == "Rune-Christoffer Dragsdahl 59891"~"Men",
+                                                       person_name == "Tina-Henriette Kristiansen 66185"~"Women",
+                                                       person_name == "Valérie, Claire, Aline Mazeaud 57956"~"Women",
+                                                  .default = person_køn))
 
-den_corp %>% count(Gender)
+den_corp %>% count(person_køn)
 
 
 
@@ -99,7 +99,7 @@ den_corp %>% count(Gender)
 
 # biadjacency matrice individer ('name') i rækker og organisationer ('affiliation') i kolonner. 
 # sparte = TRUE fordi det er et megt stort data
-den_corp_bi <- den_corp %>% xtabs(formula = ~NAME + AFFILIATION, sparse = TRUE)
+den_corp_bi <- den_corp %>% xtabs(formula = ~person_name + affiliation, sparse = TRUE)
 den_corp_bi
 
 # adjacency matrix for rækkerne (indvid x individ)
@@ -166,7 +166,7 @@ ggraph(g_bi_l, layout = "fr") +
 # individ projektionen
 ##############################/
 g_ind <- g_ind %>% activate(nodes) %>% 
-  left_join(den_corp %>% select(NAME, Gender, person_leader) %>% distinct(), by = c("name" = "NAME"))
+  left_join(den_corp %>% select(person_name, person_køn, person_leader) %>% distinct(), by = c("name" = "person_name"))
 
 g_ind <- g_ind %>% 
   activate(nodes) %>% 
@@ -208,5 +208,19 @@ ggraph(g_org_l) +
   theme_graph() 
 
 
-g_ind_l <- g_ind_l %>% activate(nodes) %>% left_join(den_corp %>% group_by(NAME) %>% summarise(memberships = paste0(AFFILIATION, collapse = " | ")), by = c("name" = "NAME"))
-g_ind_l %>% as_tibble() %>% arrange(betweenness_rank) %>% View()
+
+## Hvis nu vi gerne vil kunne se alle de poster en person har kan vi lave en ny variabel i den_corp, der indeholde alle poster: dvs. vi grupperer på person_name og opsummerer - 'summarise()' - data, så hver bliver til en række og en ny variabel 'memberships' indeholder en sammenlægning - 'paste0(..., collapse = "|")' - af det der før stod i flere rækker i affiliation. Adskilt af separatoren "|").
+memberships <- den_corp %>% 
+  group_by(person_name) %>% 
+  summarise(memberships = paste0(affiliation, collapse = " | "))
+
+# den variabel kan vi joine på vores netværksdata objekt. med leftjoin
+g_ind_l <- g_ind_l %>% 
+  activate(nodes) %>% 
+  left_join(memberships, by = c("name" = "person_name"))
+
+# Hvis vi derefter udtrækker node dataen 'activte(nodes)' som et datasæt (med 'as_tibble') kan vi sortere det efter betweenness rank og inspisere det ('View') for at se hvilke poster de mest centrale personer har.
+g_ind_l %>% 
+  activate(nodes) %>% 
+  as_tibble() %>% 
+  arrange(betweenness_rank) %>% View()

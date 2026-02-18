@@ -32,17 +32,17 @@ den <- read_csv("data/danish_elitenetworks2024.csv")
 
 I ["Intro til R og Tidyverse"](intro.html) introducerede vi en række funktioner fra tidyverse's dplyr pakke. Dem skal vi bruge nogle af her.
 
-Først ser vi lige på hvad vores dataobjekt indeholder `glimpse()`. Det består af `81,429` og `30` kolonner - eller variable:
+Først ser vi lige på hvad vores dataobjekt indeholder `glimpse()`. Det består af `81,429` og `28` kolonner - eller variable:
 
 ```{r}
 den %>% glimpse()
 ```
 
-Lad os tjekke hvad org_tags_full variablen indeholder med `count()` - og også med `distinct()`, da vores data indeholde flere rækker for hver organisation (`AFFILIATION`, som variablen med organisationsnavne hedder), da der er tale om et positionsdatasæt individ-rolle-organisation:
+Lad os tjekke hvad `affiliation_tags` variablen indeholder med `count()` - og også med `distinct()`, da vores data indeholde flere rækker for hver organisation (`affiliation`, som variablen med organisationsnavne hedder), da der er tale om et positionsdatasæt individ-rolle-organisation:
 
 ```{r}
-den %>% count(org_tags, sort = TRUE)
-den %>% distinct(AFFILIATION, org_tags) %>% count(org_tags, sort = TRUE) 
+den %>% count(affiliation_tags, sort = TRUE)
+den %>% distinct(affiliation, affiliation_tags) %>% count(affiliation_tags, sort = TRUE) 
 ```
 Lad os sige vi gerne vil kigge på netværk i landbruget:
 Til det har vi brug for at lave en variabel, der gør at vi kan identificere mødesteder, hvor ordet  "landbrug" indgår i et "tag"
@@ -50,8 +50,8 @@ Til det har vi brug for at lave en variabel, der gør at vi kan identificere mø
 Lad os lave to forskellige variable, som vi kan bruge til at finde landbrugsnetværket: én der fortæller os hvilke AFFILIATIONS, der har landbrug i tagget og én der fortæller os hvilke personer der er knyttet til (min.) en organisation/AFFILIATION, der er tagget som landbrug. Det gør vi ved at bruge `mutate()` - for at tilføje til vores data - og deri funktionen `str_detect()` og `regex()`. Med `str_detect` spørger vi om et string-pattern (her "landbrug") findes i en string variabel og med `regex()` fortæller vi funktionen at det er en regular expression, den skal lede efter og at den skal ignorere store/små bogstaver. Når vi har gjort det kan vi lave den anden variabel ved at gruppere `group_by` vores data på NAME (altså unikke individer) og igen i en `mutate()` spørge om landbrug_org er TRUE for bare én af dette individs positioner. Hvis det er sandt får dette individ værdien TRUE i alle sine rækker.
 
 ```{r}
-den <- den %>% mutate(landbrug_org  = str_detect(string = org_tags_full, pattern = regex("landbrug", ignore_case = TRUE)))
-den <- den %>% group_by(NAME) %>% mutate(landbrug_pers = any(landbrug_org)) %>% ungroup()
+den <- den %>% mutate(landbrug_org  = str_detect(string = affiliation_tags, pattern = regex("landbrug", ignore_case = TRUE)))
+den <- den %>% group_by(person_name) %>% mutate(landbrug_pers = any(landbrug_org)) %>% ungroup()
 ```
 
 
@@ -63,7 +63,7 @@ den_corp <- den %>%
 ```
 
 ```{r}
-den_corp %>% count(AFFILIATION, sort = TRUE)
+den_corp %>% count(affiliation, sort = TRUE)
 ```
 
 # Fra data til netværksobjekter
@@ -219,9 +219,22 @@ I R kode er det meget nemmere end det ser ud...
 
 ```{r, echo= TRUE}
 x <- data.frame(i = c("ind1", "ind2", "ind3", "ind4"), org1 = c(1,0,0,1), org2= c(1,1,0,0), org3 = c(0,0,1,1), row.names = "i") %>% as.matrix()
+```
+
+Individ x orgnisations matricen:
+```{r, echo= TRUE}
 x
+```
+den inverse matrice (`t(x)`):
+```{r, echo= TRUE}
 t(x)
+```
+
+```{r, echo= TRUE}
 x %*% t(x)
+```
+
+```{r, echo= TRUE}
 t(x) %*% x
 ```
 
@@ -229,16 +242,16 @@ t(x) %*% x
 
 lad os bruge det dataobjekt vi allerede har defineret, *den_corp*, som indeholder alle rækker fra *den24* som er personer med min. en position i noget med landbrug.
 
-vi kan lige se, hvordan kolonnerne `NAME` og `AFFILIATION` ser ud:
+vi kan lige se, hvordan kolonnerne `person_name` og `affiliation` ser ud:
 
 ```{r}
-den_corp %>% select(NAME, AFFILIATION) 
+den_corp %>% select(person_name, affiliation) 
 ```
 
-Det vil vi gerne lave til en biadjacency matrice med individer i rækker og affiliations i kolonnerne. Fordi det bliver en kæmpe tabel med `r den_corp %>% pull(NAME) %>% unique() %>% length()` rækker og `r den_corp %>% pull(AFFILIATION) %>% unique() %>% length()` kolonner, bruger vi funktionen `xtabs()` som gemmer data i hukommelse på en smart måde (hvis vi sætter option `spare = TRUE`), så vi slipper på at bruge computerhukommelse på alle 'nullerne' (det skal I ikke bekymre jer om)
+Det vil vi gerne lave til en biadjacency matrice med individer i rækker og affiliations i kolonnerne. Fordi det bliver en kæmpe tabel med `r den_corp %>% pull(person_name) %>% unique() %>% length()` rækker og `r den_corp %>% pull(affiliation) %>% unique() %>% length()` kolonner, bruger vi funktionen `xtabs()` som gemmer data i hukommelse på en smart måde (hvis vi sætter option `spare = TRUE`), så vi slipper på at bruge computerhukommelse på alle 'nullerne' (det skal I ikke bekymre jer om)
 
 ```{r}
-den_corp_bi <- den_corp %>% xtabs(formula = ~NAME + AFFILIATION, sparse = TRUE)
+den_corp_bi <- den_corp %>% xtabs(formula = ~person_name + affiliation, sparse = TRUE)
 ```
 
 Som I kan se har den_corp_bi nu 2267 rækker og 1310 kolonner

@@ -18,15 +18,33 @@ Eller denne, mere traditionelle, gennemgang:
 r-[tutorial](https://www.guru99.com/r-tutorial.html) (første lektion “What is R Programming Language? Introduction & Basics” kan springes
 over, det er mere en slags salgstale for hvorfor man skal bruge R.)
 
+[Download script til Session 1 her](scripts til undervisning/Session1.R){.btn .btn-primary}
+
+[Download slides fra Session 1 her](presentations/Session1.pdf){.btn .btn-primary}
+
 ---
 
-## Session 2 — [Sammenhængskraft, korteste stier, kliker](session2.qmd)
+## Session 2 — [Indsamling af netværksdata og konstruktion af netværksobjekter](session2.qmd)
+Denne øvelsesgang vil fokusere på to ting; datakilder og transformering af forskellige dataformater til en netværksdatastruktur.
+
+[Download slides fra Session 2 her](presentations/Session2.pptx){.btn .btn-primary}
+
+[Download script til Session 2 her](scripts til undervisning/Session2.R){.btn .btn-primary}
+
+[Download read_orbis funktionen her](functions/read_orbis.R){.btn .btn-primary}
+
+[Download øvelsesscript til Session 2 her](scripts til undervisning/Session2_øvelse.R){.btn .btn-primary}
+
+---
+
+## Session 3 — [Sammenhængskraft, korteste stier, kliker](session3.qmd)
 I denne session arbejder vi især med begreberne densitet, stilængde, diameter og komponenter vs isolerede noder. 
 
----
+[Download script til Session 3 her](scripts til undervisning/Session3.R){.btn .btn-primary}
 
-## Session 3 — [Indsamling af netværksdata og konstruktion af netværksobjekter](session3.qmd)
-Denne øvelsesgang vil fokusere på to ting; datakilder og transformering af forskellige dataformater til en netværksdatastruktur.
+[Download clique_plot funktionen her](functions/clique_plot.R){.btn .btn-primary}
+
+[Download triangle_plot funktionen her](functions/triangle_plot.R){.btn .btn-primary}
 
 ---
 
@@ -34,10 +52,15 @@ Denne øvelsesgang vil fokusere på to ting; datakilder og transformering af for
 I denne øvelsesgang gennemgår vi, hvordan man måler noders overordnet centralitet i form af degree, closeness og betweenness samt graden af centralisering i et netværk. 
 Endelig ser vi også på, hvordan man kan visualisere centrale aktører i et netværk. I får, som altid, mulighed for at arbejde med at analysere netværksmålene på jeres egne data.
 
+[Download script til Session 4 her](scripts til undervisning/Session4.R){.btn .btn-primary}
+
+
 ---
 
 ## Session 5 — [Analyse af strategiske netværksrolle](session5.qmd)
 I denne session har vi fokus på Burts constraint som et mål for brobygning vs indlejrethed i redundente forbindelser  
+
+[Download script til Session 5 her](scripts til undervisning/Session5.R){.btn .btn-primary}
 
 ---
 
@@ -47,6 +70,8 @@ communities i R samt at benytte mål som clustering coefficient. Vi vil ligelede
 gennemgå, hvordan man plotter et netværk på forskellige communities og hvordan man
 kan undersøge karakteristika for forskellige communities.
 
+[Download script til Session 6 her](scripts til undervisning/Session6.R){.btn .btn-primary}
+
 ---
 
 ## Session 7 — [Visualisering af netværk](session7.qmd)
@@ -55,5 +80,9 @@ hjælp af ggraph-pakken i R. I vil lære, hvordan man anvender forskellige layou
 farvepaletter og labels for at gøre netværksvisualiseringerne mere informative. Vi vil
 gennemgå, hvordan man kan bruge forskellige typer af skalaer for at fremhæve
 bestemte aspekter af netværket.
+
+[Download script til Session 7 her](scripts til undervisning/Session7.R){.btn .btn-primary}
+
+
 
 ---

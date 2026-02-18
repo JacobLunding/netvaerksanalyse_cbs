@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Sammenhængskraft, Densitet, kliker og strukturelle huller – Virksomhedsstrategi i et netværksperspektiv</title>
+<title>Indsamling af netværksdata og konstruktion af netværksobjekter – Virksomhedsstrategi i et netværksperspektiv</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -188,15 +188,18 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#transportsektoren-i-det-danske-elitenetværk" id="toc-transportsektoren-i-det-danske-elitenetværk" class="nav-link active" data-scroll-target="#transportsektoren-i-det-danske-elitenetværk">Transportsektoren i det danske elitenetværk</a>
+  <li><a href="#vigtige-spørgsmål-ift-netværksdata" id="toc-vigtige-spørgsmål-ift-netværksdata" class="nav-link active" data-scroll-target="#vigtige-spørgsmål-ift-netværksdata">Vigtige spørgsmål ift netværksdata</a></li>
+  <li><a href="#kilder-til-netværksdata" id="toc-kilder-til-netværksdata" class="nav-link" data-scroll-target="#kilder-til-netværksdata">Kilder til Netværksdata:</a>
   <ul class="collapse">
-  <li><a href="#data-det-danske-elitenetværk" id="toc-data-det-danske-elitenetværk" class="nav-link" data-scroll-target="#data-det-danske-elitenetværk">Data: Det danske elitenetværk</a></li>
-  <li><a href="#subset-tags" id="toc-subset-tags" class="nav-link" data-scroll-target="#subset-tags">Subset: Tags</a></li>
-  <li><a href="#grafobjekt" id="toc-grafobjekt" class="nav-link" data-scroll-target="#grafobjekt">Grafobjekt</a></li>
+  <li><a href="#danish-elite-network-2024-den24" id="toc-danish-elite-network-2024-den24" class="nav-link" data-scroll-target="#danish-elite-network-2024-den24">Danish Elite Network 2024 (den24)</a></li>
+  <li><a href="#orbis" id="toc-orbis" class="nav-link" data-scroll-target="#orbis">Orbis</a>
+  <ul class="collapse">
+  <li><a href="#at-bygge-et-søgefilter-på-orbis" id="toc-at-bygge-et-søgefilter-på-orbis" class="nav-link" data-scroll-target="#at-bygge-et-søgefilter-på-orbis">At ‘bygge’ et søgefilter på Orbis</a></li>
+  <li><a href="#tilføj-bestyrelsesoplysninger-til-vores-data" id="toc-tilføj-bestyrelsesoplysninger-til-vores-data" class="nav-link" data-scroll-target="#tilføj-bestyrelsesoplysninger-til-vores-data">Tilføj bestyrelsesoplysninger til vores data</a></li>
+  <li><a href="#eksporter-data-til-xlsx" id="toc-eksporter-data-til-xlsx" class="nav-link" data-scroll-target="#eksporter-data-til-xlsx">Eksporter data til xlsx</a></li>
+  <li><a href="#eksempel-med-alkohol-og-tobak-fra-orbis" id="toc-eksempel-med-alkohol-og-tobak-fra-orbis" class="nav-link" data-scroll-target="#eksempel-med-alkohol-og-tobak-fra-orbis">Eksempel med alkohol og tobak fra Orbis</a></li>
   </ul></li>
-  <li><a href="#sammenhængskraft---cohesion" id="toc-sammenhængskraft---cohesion" class="nav-link" data-scroll-target="#sammenhængskraft---cohesion">Sammenhængskraft - <em>Cohesion</em></a>
-  <ul class="collapse">
-  <li><a href="#densitet-edge_density" id="toc-densitet-edge_density" class="nav-link" data-scroll-target="#densitet-edge_density">Densitet: <code>edge_density()</code></a></li>
+  <li><a href="#cvr" id="toc-cvr" class="nav-link" data-scroll-target="#cvr">CVR</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -206,7 +209,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Sammenhængskraft, Densitet, kliker og strukturelle huller</h1>
+<h1 class="title">Indsamling af netværksdata og konstruktion af netværksobjekter</h1>
 </div>
 
 
@@ -223,229 +226,804 @@ window.Quarto = {
 </header>
 
 
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.4     ✔ readr     2.1.5
-✔ forcats   1.0.0     ✔ stringr   1.5.1
-✔ ggplot2   3.5.2     ✔ tibble    3.2.1
-✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-✔ purrr     1.0.4     
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
-ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<section id="vigtige-spørgsmål-ift-netværksdata" class="level1">
+<h1>Vigtige spørgsmål ift netværksdata</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'Matrix'
-
-The following objects are masked from 'package:tidyr':
-
-    expand, pack, unpack</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'igraph'
-
-The following objects are masked from 'package:lubridate':
-
-    %--%, union
-
-The following objects are masked from 'package:dplyr':
-
-    as_data_frame, groups, union
-
-The following objects are masked from 'package:purrr':
-
-    compose, simplify
-
-The following object is masked from 'package:tidyr':
-
-    crossing
-
-The following object is masked from 'package:tibble':
-
-    as_data_frame
-
-The following objects are masked from 'package:stats':
-
-    decompose, spectrum
-
-The following object is masked from 'package:base':
-
-    union</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<section id="transportsektoren-i-det-danske-elitenetværk" class="level1">
-<h1>Transportsektoren i det danske elitenetværk</h1>
-<section id="data-det-danske-elitenetværk" class="level2">
-<h2 class="anchored" data-anchor-id="data-det-danske-elitenetværk">Data: Det danske elitenetværk</h2>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>den <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/den17-no-nordic-letters.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>Vha funktionen <code>show.all.tags()</code> fra <code>custom_functions.R</code> i functionsmappen, kan vi studere og udvælge specifikke tags, vi synes skal med for at indfange et bestemt område: <a href="functions/custom_functions.R" class="btn btn-primary">Download costumfunctions.R her</a></p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions/custom_functions.R"</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">show.all.tags</span>(den), <span class="dv">25</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                               Positions affiliations
-A-kasse                              193           14
-Academics                            927           71
-Actors                                65            7
-Administration                       789           66
-Africa                                13            1
-Alternative                           45            8
-Animals                              397           50
-Architecture                        1419          130
-Art                                  753          100
-Artists                              245           30
-Asia                                   5            1
-Award                                 40            6
-Baltic countries                      11            2
-Banks                                899           69
-BILH                                 190           45
-Blood donation                        72            5
-Board of representatives             846           15
-Boarding school                       27            2
-Borgerloen                            11            1
-Brazil                                 5            1
-Business                            1665          114
-Business and Financial Affairs        86           12
-Business association                3627          343
-BYGG                                 282           43
-Cancer                                96            9</code></pre>
+<div class="callout-title-container flex-fill">
+Note
 </div>
 </div>
+<div class="callout-body-container callout-body">
+<p>Som med al anden indsamling af samfundsvidenskabelig data er det også med netværksanalyse meget vigtig at man forholder sig til en række metodologiske og videnskabsteoretiske spørgsmål, allerede i den fase, hvor man overvejer hvilken data man vil indsamle(/bruge) og hvordan man vil indsamle(/bruge) det!</p>
+</div>
+</div>
+<p>I social netværksanalyse behandler vi data <em>relationelt</em>, dvs. vi har nogle enheder (mennesker, virksomheder, ‘ideer/begreber’, hjemmesider), som vi antager indgår i nogle relationer, som vi gerne vil strudere på en systematisk måde. Det betyder at vi på et visuelt plan hele tiden arbejder med punkter (vertices eller noder) der er forbundet (eller ikke forbundet) af streger (edges):</p>
+<div class="grid">
+<div class="g-col-6">
+<p><img src="images/Screenshot from 2025-02-17 11-43-34.png" class="img-fluid" style="width:50.0%"></p>
+</div>
+<div class="g-col-6">
+<p><img src="images/Screenshot from 2025-02-17 11-52-41.png" class="img-fluid" style="width:50.0%"></p>
+</div>
+</div>
+<p>Det rejser nogle vigtige spørgsmål:</p>
+<ol type="1">
+<li><p>Hvad er en relation?</p>
+<ul>
+<li>Er det medlemskaber (som i figuren til højre, de to blå punkter er begge medlem af det røde punkt), er det venskaber/kendskaber (som i figuren til venstre de tre blå punkter kender hinanden). Er relationen samtidig? dvs. Er de to blå punkter fx. medlem af den samme klub nu(!) eller er det nok (for vores analyse) at de begge har været med på et tidspunkt, men ikke nødvendigvis samtidig? En forbindelse kan også udtrykke udveklingsrelationer. Er det fx to virksomheder der sender penge eller varer til hinanden? Eller kampagnedonationer til politikere/partier? Relationer kan også være mere abstrakte, fx. relationer mellem ideer og begreber, fx semantiske relationer eller referencer - “forfatter B” trækker på “forfatter A”s ideer osv. På mange måder mulighederne uendelige. Det vigtigste er at man er eksplicit og tydelig omkring hvad man mener man kigger på. Det har nemlig stor betydning for om man faktisk viser det man tror man viser i sine analyser. Det er også afgørende om tænker at relationen har en <strong>retning</strong>, som i eksemlet med forfatter B, der trækker på forfatter As ideer. Der kan man sige at relationen fra B til A (eller den anden vej for den sags skyld; er det det at B <em>trækker</em> på A, der er afgørende eller er det det at ideen <em>flyder</em> fra A til B der er afgørende?). Eller er relationen gensidig, når A og B er vener. Har relationerne forskellig <strong>vægt</strong>? Kender A og B fx hinanden <em>mere</em> eller <em>bedre</em> end B kender C osv.?</li>
+</ul></li>
+<li><p>Hvad er et punkt?</p>
+<ul>
+<li>I skal også forholde jer til hvad enheden i analyserne er? Hvad er udgør et punkt? Og hvilke punkter skal med? Hvis vi kiggede på venskaber i en klasse, så er punkterne måske klassens elever. Men hvad hvis elev A og B ikke nævner hinanden som venner, men begge nævner X fra parallelklassen? Skal X så med? Skal hele parallelklassen med? Eller hele skolen? Og måske også naboskolen? Det er et helt afgørende spørgsmål i netværksanalyse: Hvor starter og slutter netværket?</li>
+</ul></li>
+<li><p>Hvilken slags netværk er det vi kigger på?</p>
+<ul>
+<li>Som vi tidligere har talt om kan vi have både netværk mellem en enkelt type af aktører og netværk mellem flere typer af ‘aktører’. Ofte har vi måske indsamlet et netværk med to distinkte typer (et bipartite netværk), fx bestyrelsespersoner og deres virksomheder, eller forfattere og deres begreber osv. I en analytisk sammenhæng kunne vi måske være interesseret i at rette blikket mod (de formidlede) relationer mellem én netværkets enheder. Det kræver en så kaldt projektion af netværket.</li>
+</ul></li>
+</ol>
+<p><img src="images/session2.png" class="img-fluid"></p>
+<p>En vigtig del af en netværksanalyse er at forholde sig til spørgsmål som disse. Hvilken mekanisme er vi interesseret i at studere. Er vi optaget af en epidemologisk kortlægning af risikoen for spredning af coronavirus? Ja men, så vi nødt til at tænke relationen som en eller anden grad af fysisk kontakt. Er vi interesseret i indflydelse på beslutninger, så er relationen måske medlemskab i organer, hvor der træffes beslutninger. Er vi interesseret i popularitet og anerkendelse, så er relationen vi skal lede efter måske oplevede venskaber. Vil vi studere muligheder for innovation i virksomheder, så skal vi måske forstå relationerne som et flow af vidensdeling mellem individer eller teams.</p>
+<p>Selvom netværksanalyse på papiret ‘bare’ er punkter og streger er det altså utrolig vigtigt at forholde sig til hvad punkterne og stregerne repræsenterer.</p>
 </section>
-<section id="subset-tags" class="level2">
-<h2 class="anchored" data-anchor-id="subset-tags">Subset: Tags</h2>
-<p>Lad os i det følgende kigge på mødesteder, e.g.&nbsp;bestyrelser, råd, nævn m.v., i det danske elitenetværk (2017), der tematisk kan siges at udgøre transportområdet. Det gør vi vha. <code>has.tags()</code> funktionen i <code>custom_functions.R</code></p>
+<section id="kilder-til-netværksdata" class="level1">
+<h1>Kilder til Netværksdata:</h1>
+<p>Lod os kigge nærmere på hvilke typer af data I kan bruge i jeres eksamensopgaver. Der er grundlæggende tre muligheder:</p>
+<ul>
+<li>I kan bruge Danish Elite Network 2024 (Ellersgaard og Larsen m.fl), og finde et spændende subset af dette, I kan analysere</li>
+<li>I kan bruge CBS’ adgang til Orbis og definere og downloade et datasæt herfra.</li>
+<li>I kan bruge andre tilgængelige kilder eller indsamle jeres egen data (the sky is the limit!).</li>
+</ul>
+<p>I det følgende skal vi se nærmere på de forskellige mulighedre:</p>
+<p>men først indlæser vi lige de R-pakker vi får brug for (som altså skal installeres først, hvis de ikke allerede er det).</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>transport <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"BILH"</span>,<span class="st">"Cars"</span>, <span class="st">"Public transport"</span>, <span class="st">"TRAN"</span>, <span class="st">"Transport"</span>, <span class="st">"Traffic"</span>, <span class="st">"Infrastructure"</span>, <span class="st">"VL"</span>, <span class="st">"Roads"</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>den_sub   <span class="ot">&lt;-</span> <span class="fu">has.tags</span>(den, <span class="at">tags =</span> transport, <span class="at">result =</span> <span class="st">"den"</span>, <span class="at">mode =</span> <span class="st">"or"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tidyverse")</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("igraph")</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("ggraph")</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("ggpubr")</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("readxl")</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("writexl")</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("RColorBrewer")</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidygraph)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="danish-elite-network-2024-den24" class="level2">
+<h2 class="anchored" data-anchor-id="danish-elite-network-2024-den24">Danish Elite Network 2024 (den24)</h2>
+<p>I mappen <code>"/data"</code> i R projketet finder i filen <code>danish_elitenetworks2024.csv</code>. Den kan også downloades her, hvis I ikke allerede har den:</p>
+<p><a href="data/danish_elitenetworks2024.csv" class="btn btn-primary">Download den24</a></p>
+<p>Indlæs data med <code>read_csv</code></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>den <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/danish_elitenetworks2024.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>den24 er et <em>affiliation</em> datasæt, som indeholder bestyrelsesposter og og andre medlemskaber i (stort set) alle (relevante) virksomheder, organisationer, fonde, insitutioner, råd, nævn, kommissioner osv. Dvs alt lige fra Kattens Vaern over A.P. Moeller - Maersk og Novo Nordisk til regeringens sikkerhedsudvalg osv. Hver række i datasættet repræsenterer en position, dvs. en person med en rolle i organisation:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                 Matched positions
-BILH                           190
-Cars                           126
-Public transport                97
-TRAN                           236
-Transport                      578
-Traffic                         17
-Infrastructure                 298
-VL                            3803
-Roads                           39
-
- </code></pre>
+<pre><code># A tibble: 6 × 28
+  person_name     person_orig_navn person_cvr_enhedsnum…¹ person_køn person_land
+  &lt;chr&gt;           &lt;chr&gt;                             &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      
+1 Thomas Peter C… Thomas Peter Ca…             4004114722 Men        DK         
+2 Anna Emilie vo… Anna Emilie von…             4000746209 Women      DK         
+3 Boris Christop… Boris Christoph…             4004138259 Men        DK         
+4 Erik Christian… Erik Christian …             4003961226 Men        DK         
+5 Morten Lund Je… Morten Lund Jen…             4009483110 Men        DK         
+6 Bjarne Lund Jø… Bjarne Lund Jør…             4000172334 Men        DK         
+# ℹ abbreviated name: ¹​person_cvr_enhedsnummer
+# ℹ 23 more variables: person_postnumber &lt;dbl&gt;, person_postdistrikt &lt;chr&gt;,
+#   position_rolle &lt;chr&gt;, position_leader &lt;lgl&gt;, position_start &lt;date&gt;,
+#   affiliation &lt;chr&gt;, affiliation_orig_name &lt;chr&gt;,
+#   affiliation_cvrnummer &lt;dbl&gt;, affiliation_parent &lt;chr&gt;,
+#   affiliation_beskrivelse &lt;chr&gt;, affiliation_sektor &lt;chr&gt;,
+#   affiliation_cvr_branche &lt;chr&gt;, affiliation_branchekode &lt;chr&gt;, …</code></pre>
 </div>
 </div>
+<p>Vi kan bruge <code>glimpse()</code> til lige at se hvad data ellers indeholder:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>den_sub <span class="ot">&lt;-</span> den_sub <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(name) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">n_afil =</span> <span class="fu">n_distinct</span>(affiliation))</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>den_sub <span class="ot">&lt;-</span> den_sub <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n_afil <span class="sc">&gt;</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">glimpse</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 81,429
+Columns: 28
+$ person_name                 &lt;chr&gt; "Thomas Peter Carlsen 46174", "Anna Emilie…
+$ person_orig_navn            &lt;chr&gt; "Thomas Peter Carlsen", "Anna Emilie von L…
+$ person_cvr_enhedsnummer     &lt;dbl&gt; 4004114722, 4000746209, 4004138259, 400396…
+$ person_køn                  &lt;chr&gt; "Men", "Women", "Men", "Men", "Men", "Men"…
+$ person_land                 &lt;chr&gt; "DK", "DK", "DK", "DK", "DK", "DK", "DK", …
+$ person_postnumber           &lt;dbl&gt; 8541, 1124, 2100, 2980, 5700, 6950, 6880, …
+$ person_postdistrikt         &lt;chr&gt; "Skødstrup", "København K", "København Ø",…
+$ position_rolle              &lt;chr&gt; "Bestyrelsesmedlem", "Bestyrelsesmedlem", …
+$ position_leader             &lt;lgl&gt; FALSE, FALSE, TRUE, TRUE, TRUE, FALSE, FAL…
+$ position_start              &lt;date&gt; 2012-05-11, 2022-05-20, 2022-05-20, 2022-…
+$ affiliation                 &lt;chr&gt; "'ROSENHOLMFONDEN' 21165190", "'ROSENHOLMF…
+$ affiliation_orig_name       &lt;chr&gt; "'ROSENHOLMFONDEN'", "'ROSENHOLMFONDEN'", …
+$ affiliation_cvrnummer       &lt;dbl&gt; 21165190, 21165190, 21165190, 21165190, 19…
+$ affiliation_parent          &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ affiliation_beskrivelse     &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ affiliation_sektor          &lt;chr&gt; "Kultur: Teater, Museer", "Kultur: Teater,…
+$ affiliation_cvr_branche     &lt;chr&gt; "Historiske monumenter og bygninger og lig…
+$ affiliation_branchekode     &lt;chr&gt; "91.03.00", "91.03.00", "91.03.00", "91.03…
+$ affiliation_branche_niveau1 &lt;chr&gt; "Kultur, forlystelser og sport", "Kultur, …
+$ affiliation_branche_niveau2 &lt;chr&gt; "Biblioteker, arkiver, museer og anden kul…
+$ affiliation_branche_niveau3 &lt;chr&gt; "Biblioteker, arkiver, museer og anden kul…
+$ affiliation_branche_niveau4 &lt;chr&gt; "Historiske monumenter og bygninger og lig…
+$ affiliation_branche_niveau5 &lt;chr&gt; "Historiske monumenter og bygninger og lig…
+$ affiliation_tags            &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ affiliation_founding_date   &lt;date&gt; 1998-07-09, 1998-07-09, 1998-07-09, 1998-…
+$ affiliation_land            &lt;chr&gt; "DK", "DK", "DK", "DK", "DK", "DK", "DK", …
+$ affiliation_postnummer      &lt;dbl&gt; 8543, 8543, 8543, 8543, 5700, 6950, 6950, …
+$ affiliation_postdistrikt    &lt;chr&gt; "Hornslet", "Hornslet", "Hornslet", "Horns…</code></pre>
 </div>
+</div>
+<p>‘Organisationerne’ i datasættet er indelt i branchekoder <code>affiliation_branchekode</code>(fra cvr) som findes på forskellige aggregerings niveauer (<code>affiliation_branche_niveau1-5</code>) og desuden i række <code>tags</code> som kategoriserer organisationerne i forskellige emner og underemner. Der er desuden en variabel <code>affiliation_sektor</code> som inddeler data fra cvr i forskellige området, fx. virksomheder, kultur osv.</p>
+<p>Lad os lige se hvor mange unikke virksomheder, der findes under hver branche og hver tag. Det gør vi ved at bruge <code>distinct(affiliation, .keep_all = TRUE)</code> som gør at den kun tager én række pr virksomhed, men (pga. .keep_all = TRUE) beholder de resterende variable i data.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(affiliation, <span class="at">.keep_all =</span> T) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation_sektor, <span class="at">sort =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 15 × 2
+   affiliation_sektor                            n
+   &lt;chr&gt;                                     &lt;int&gt;
+ 1 Virksomhed                                 3862
+ 2 Velgørende foreninger og fonde             1788
+ 3 &lt;NA&gt;                                       1423
+ 4 Fagforeninger og faglige sammenslutninger  1008
+ 5 Erhvervs- og arbejdsgiverorganisationer     909
+ 6 Øvrige foreninger                           503
+ 7 Velfærd og omsorgsinstitutioner             406
+ 8 Kultur: Teater, Museer                      370
+ 9 Religion                                    329
+10 Sportsklubber                               200
+11 Undervisning                                188
+12 Medier og forlag                            145
+13 Universiteter og forskning                  121
+14 Politiske partier                            48
+15 Forsvar, ret og politi                       16</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(affiliation, <span class="at">.keep_all =</span> T) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation_branche_niveau1, <span class="at">sort =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 21 × 2
+   affiliation_branche_niveau1                                                 n
+   &lt;chr&gt;                                                                   &lt;int&gt;
+ 1 Andre serviceydelser                                                     2688
+ 2 Sundhedsvæsen og sociale foranstaltninger                                2129
+ 3 &lt;NA&gt;                                                                     1537
+ 4 Liberale, videnskabelige og tekniske tjenesteydelser                     1055
+ 5 Kultur, forlystelser og sport                                             828
+ 6 Pengeinstitut- og finansvirksomhed, forsikring                            530
+ 7 Landbrug, jagt, skovbrug og fiskeri                                       437
+ 8 Engroshandel og detailhandel; reparation af motorkøretøjer og motorcyk…   378
+ 9 Fast ejendom                                                              343
+10 Fremstillingsvirksomhed                                                   307
+# ℹ 11 more rows</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(affiliation, <span class="at">.keep_all =</span> T) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation_branche_niveau2, <span class="at">sort =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 81 × 2
+   affiliation_branche_niveau2                                           n
+   &lt;chr&gt;                                                             &lt;int&gt;
+ 1 Organisationer og foreninger                                       2681
+ 2 Sociale foranstaltninger uden institutionsophold                   1920
+ 3 &lt;NA&gt;                                                               1537
+ 4 Hovedsæders virksomhed; virksomhedsrådgivning                       577
+ 5 Pengeinstitut- og finansieringsvirksomhed undtagen forsikring og    463
+ 6 Plante- og husdyravl, jagt og serviceydelser i forbindelse hermed   410
+ 7 Fast ejendom                                                        343
+ 8 Sport, forlystelser og fritidsaktiviteter                           342
+ 9 Kreative aktiviteter, kunst og forlystelser                         304
+10 Engroshandel undtagen med motorkøretøjer og motorcykler             244
+# ℹ 71 more rows</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(affiliation, <span class="at">.keep_all =</span> T) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation_branche_niveau3, <span class="at">sort =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 224 × 2
+   affiliation_branche_niveau3                                                 n
+   &lt;chr&gt;                                                                   &lt;int&gt;
+ 1 Andre sociale foranstaltninger uden institutionsophold                   1902
+ 2 &lt;NA&gt;                                                                     1537
+ 3 Erhvervs- og arbejdsgiverorganisationer samt faglige sammenslutninger    1389
+ 4 Andre organisationer og foreninger                                        789
+ 5 Fagforeninger                                                             503
+ 6 Kreative aktiviteter, kunst og forlystelser                               304
+ 7 Virksomhedsrådgivning                                                     299
+ 8 Udlejning af og virksomhed i forbindelse med egen eller leaset fast ej…   295
+ 9 Hovedsæders virksomhed                                                    278
+10 Sport                                                                     261
+# ℹ 214 more rows</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(affiliation, <span class="at">.keep_all =</span> T) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation_branche_niveau4, <span class="at">sort =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 404 × 2
+   affiliation_branche_niveau4                                                 n
+   &lt;chr&gt;                                                                   &lt;int&gt;
+ 1 Andre sociale foranstaltninger uden institutionsophold i.a.n.            1819
+ 2 &lt;NA&gt;                                                                     1537
+ 3 Erhvervs- og arbejdsgiverorganisationer                                   894
+ 4 Fagforeninger                                                             503
+ 5 Faglige sammenslutninger                                                  495
+ 6 Andre organisationer og foreninger i.a.n.                                 415
+ 7 Religiøse institutioner og foreninger                                     329
+ 8 Udlejning af og virksomhed i forbindelse med egen eller leaset fast ej…   295
+ 9 Hovedsæders virksomhed                                                    278
+10 Holdingselskabers virksomhed                                              216
+# ℹ 394 more rows</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(affiliation, <span class="at">.keep_all =</span> T) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation_branche_niveau5, <span class="at">sort =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 480 × 2
+   affiliation_branche_niveau5                                                 n
+   &lt;chr&gt;                                                                   &lt;int&gt;
+ 1 Foreninger, legater og fonde med sygdomsbekæmpende, sociale og velgøre…  1787
+ 2 &lt;NA&gt;                                                                     1537
+ 3 Erhvervs- og arbejdsgiverorganisationer                                   894
+ 4 Fagforeninger                                                             503
+ 5 Faglige sammenslutninger                                                  495
+ 6 Andre organisationer og foreninger i.a.n.                                 415
+ 7 Religiøse institutioner og foreninger                                     329
+ 8 Ikke-finansielle hovedsæders virksomhed                                   275
+ 9 Ikke-finansielle holdingselskaber                                         195
+10 Dyrkning af korn (undtagen ris), bælgfrugter og olieholdige frø           187
+# ℹ 470 more rows</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(affiliation, <span class="at">.keep_all =</span> T) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation_tags, <span class="at">sort =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,000 × 2
+   affiliation_tags                                                            n
+   &lt;chr&gt;                                                                   &lt;int&gt;
+ 1 &lt;NA&gt;                                                                     8813
+ 2 Mødested_Netværk_VL-grupper                                               114
+ 3 Ideologi_Videnskab_Naturvidenskab; Ideologi_Videnskab_Teknologi; Ideol…    58
+ 4 Ideologi_Videnskab_Samfundsvidenskab; Ideologi_Videnskab_Universiteter…    54
+ 5 Ideologi_Videnskab_Humaniora; Ideologi_Videnskab_Universiteter; Mødest…    49
+ 6 Ideologi_Videnskab_Naturvidenskab; Ideologi_Videnskab_Universiteter; M…    49
+ 7 Erhvervsliv_Fonde                                                          40
+ 8 Stat_Politik_Interesseorganisationer                                       38
+ 9 Stat_Politik_Interesseorganisationer_Fagbevægelse                          31
+10 Stat_Politik_Interesseorganisationer_Civilsamfund                          27
+# ℹ 990 more rows</code></pre>
+</div>
+</div>
+<p>Disse branchekoder og emne-tags kan bruges til at udvælge subset af data til forskellige analyser. Det vender vi tilbage til løbende.</p>
 </section>
-<section id="grafobjekt" class="level2">
-<h2 class="anchored" data-anchor-id="grafobjekt">Grafobjekt</h2>
-<p>Vi laver en sparse incidence eller bipartite adjacency matrix. Dvs en matrice med individer (<code>name</code>) i rækker og virksomheder m.v. (<code>affiliation</code>) i kolonner:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>bi_adj <span class="ot">&lt;-</span> <span class="fu">xtabs</span>(<span class="at">formula =</span> <span class="sc">~</span> name <span class="sc">+</span> affiliation, <span class="at">data =</span> den_sub, <span class="at">sparse =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="orbis" class="level2">
+<h2 class="anchored" data-anchor-id="orbis">Orbis</h2>
+<p>En anden kilde til (netværks-)data om virksomheder er <em>Orbis</em>. Orbis er en database der indeholder information om virksomheder fra hele verden - omkring 400.000.000 selskaber. Databasen trækker data fra mere end 170 forskellige kilder som standardiseres og linkes på en måde der muliggør sammenlinging. På virksomhedsniveau indeholder orbis blandt meget andet geografisk data, juridisk data, finansiel data, ejerskabsdata mv. om den enkelte virksomhed. Fra et netværksperspektiv er databasen interessant fordi den desuden indeholder (aktuel og historisk) data om virksomhedernes bestyrelse og direktion (m.v.). I det følgende skal vi se hvordan man trækker et bestyrelses-(netværks-)datasæt fra orbis.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<p>Og laver vha matrix multiplikation <span class="math inline">\(individ \times individ\)</span> matricen:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>adj <span class="ot">&lt;-</span>  bi_adj <span class="sc">%*%</span> <span class="fu">t</span>(bi_adj)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout-title-container flex-fill">
+Note
 </div>
-<p>Jeg vil gerne vide hvilke værdier vores matrice indeholder. Så jeg kan overveje om den er vægtet eller ej. Da det er en sparse matrice vi har lavet kan vi dog ikke lave en simple <code>table()</code>. <code>str()</code> fortæller os hvad dataobjektet indeholder.</p>
+</div>
+<div class="callout-body-container callout-body">
+<p>Som med al anden data (særligt data man ikke selv har frembragt), skal man med Orbis være opmærksom på en række</p>
+<p>Skim evt. <a href="https://www.oecd.org/content/dam/oecd/en/publications/reports/2020/05/coverage-and-representativeness-of-orbis-data_9628c322/c7bdaa03-en.pdf">denne</a> rapport fra OECD om Orbis’ dækningsgrad. Eller tag et kig på <a href="https://doi.org/10.1111/glob.12183">(Heemskerk et al.&nbsp;2018)</a> om bl.a. ‘completeness’ og problemer med ‘entity resolution’ - optræder det samme firma eller den samme person flere gange med forskllige versioner af det navn. Det er ikke problemer I behøver at løse, men noget det er værd at bemærke, når man præsenterer den data man analyserer!</p>
+</div>
+</div>
+<p>Orbis kan tilgås via jeres login til CBS’s bibliotek: <a href="https://www.cbs.dk/bibliotek/soeg-i-biblioteket/online-ressourcer/orbis"><strong>Orbis via cbs</strong></a></p>
+<section id="at-bygge-et-søgefilter-på-orbis" class="level3">
+<h3 class="anchored" data-anchor-id="at-bygge-et-søgefilter-på-orbis">At ‘bygge’ et søgefilter på Orbis</h3>
+<p>Det første man skal tænke over er hvilke filtre, der er nødvendige for at hente det subset af virksomheder man er interesseret i. Der er selvfølgelig et hav af muligheder.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/orbis.png" class="img-fluid figure-img" data-fig.pos="H" width="600"></p>
+<figcaption>Orbis forside</figcaption>
+</figure>
+</div>
+<ol type="1">
+<li>Under <em>Company</em>, kan man under fx vælge <em>Standardized legal forms</em> vælge kun ‘Private limited companies’ eller også ‘Public limited companies’. Man kan også under <em>Number of employees</em> vælge kun at kigge på virksomheder af en hvis størrelse.</li>
+<li>Under <em>Location</em> kan man sætte forskellige geografiske filtre, både lande, regioner m.v., men også forskellige klassifikationer.</li>
+<li>Under <em>Activities and industry</em> kan man under <em>Industri classifications</em> vælge mellem forskellige branche-klassifikationer og herunder udvælge en (eller flere) bestemt(e) branche(r). Man kan desuden under <em>Entity type</em> afgrænse virksomhedstype yderligere. En anden mulighed er at man definerer ‘fritekst’ søgning under <em>Activity text search</em>, hvor man under ‘scope’ vælger hvilke datafelter, der skal søges i og under ‘Free text’ skriver hvad der skal søges efter. <img src="images/fritekst orbis.png" class="img-fluid" alt="Fritekstsøgning"></li>
+</ol>
+<p>Når man har ‘bygget’ sit filter kan man se hvad de forskellige filtre gør og hvad de til sammen giver af resultat. Næste skridt er <em>View results</em> <img src="images/search.png" class="img-fluid" alt="Fritekstsøgning"></p>
+</section>
+<section id="tilføj-bestyrelsesoplysninger-til-vores-data" class="level3">
+<h3 class="anchored" data-anchor-id="tilføj-bestyrelsesoplysninger-til-vores-data">Tilføj bestyrelsesoplysninger til vores data</h3>
+<p>Her kan vi se alle de virksomheder, der lever op til vores søgekriterier. Det vi gerne vil nu er at tilføje bestyrelsesdata. Klik på <em>Add/remove columns</em> øverst til højre. <img src="images/add_cols.png" class="img-fluid" alt="Fritekstsøgning"> Scroller man lidt ned i venstre kolonne og klikker på feltet <em>Directors and managers</em>, får man i den midsterste kolonne en række valgmuligheder: <img src="images/add_data.png" class="img-fluid" alt="Tilføj Directors and managers"> Vælg som minimum 1) Full name, 2) UCI, 3) Job title, 4) Current or previous.</p>
+<p>Under <em>Other personal information</em> og <em>Other role information</em> i venstre kolonne kan man tilføje yderligere information om personen og dennes rolle. På personniveau fx. køn og nationalitet mv. På rolleniveau kan det være nyttigt at tilføje ‘Type of role’ og ‘Board, committee or department’ og evt. ‘Level of responsibility’, da det kan give mulighed for at fokusere kun på bestyrelse og direktion.</p>
+<p>Hvis man klikker på det lille filter-ikon under fx ‘Full name’ i den venstre kolonne får man mulighed for at filtrere på rollerne. Det kan være nyttigt her at forholde sig til om man både vil have nuværende og tidligere roller med. Har man tilføjet variablen <em>Current or previous</em>, kan man altid filtrere senere, men hvis man ikke gør det her skal man være opmærksom på at data kommer til at indeholde mange rækker (!)</p>
+<p>Det er også muligt at tilføje yderligere virksomhedsdata.</p>
+<p>Når de variable man gerne vil have med er valg, trykker man <em>Apply</em> og så er vi klar til at eksportere data.</p>
+</section>
+<section id="eksporter-data-til-xlsx" class="level3">
+<h3 class="anchored" data-anchor-id="eksporter-data-til-xlsx">Eksporter data til xlsx</h3>
+<p>Klik på “Excel”.. I den eksport-menu, der kommer op er det vigtigt, at man under <em>Options for excel</em> vælger ‘Repeat single item data’ inden man trykker Export.</p>
+<div class="grid">
+<div class="g-col-6">
+<p><img src="images/save.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+<div class="g-col-6">
+<p><img src="images/export.png" class="img-fluid" style="width:80.0%"></p>
+</div>
+</div>
+<p>Når Orbis har klargjort data, kan man downloade filen til sin computer.</p>
+</section>
+<section id="eksempel-med-alkohol-og-tobak-fra-orbis" class="level3">
+<h3 class="anchored" data-anchor-id="eksempel-med-alkohol-og-tobak-fra-orbis">Eksempel med alkohol og tobak fra Orbis</h3>
+<p>Jeg har tidligere downloadet et datasæt med alle aktive, public limited companies med branchekoderne Alkohol og tobak (‘Manufacture of beverages’ NACE#11(-soft drinks 11.0.7) &amp; ‘Manufacture of tobacco products’ NACE#12)</p>
+<p>I kan downloade datasættet her: <a href="data/tobaco_and_alcohol.xlsx" class="btn btn-primary">Download Data</a> og lægge filen i data mappen i vores Rprojekt mappe. Filen kan også hentes på Canvas.</p>
+<p>I kan downloade og indlæse et <em>script</em>, der indeholder en funktion skrevet specifikt til dette kursus. Det drejer sig om filen <em>read_orbis.R</em>. I kan downloade den her <a href="functions/read_orbis.R" class="btn btn-primary">Download file</a> og lægge den i Rprojekt mappen. Filen kan også hentes på Canvas. Når filen ligger i mappen kan vi “source” den og anvende funktionen <code>read_orbisxlsx()</code>, som er en genvej til at indlæse datafiler fra Orbis.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Et script indlæses med funktionen <code>source(, ...echo = FALSE)</code>, hvor <code>echo = FALSE</code> betyder at scriptet indlæses uden at vise indholdet.</p>
+</div>
+</div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(adj)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions/read_orbis.R"</span>, <span class="at">echo =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Nu kan vi indlæse orbis-filen <code>tobaco_and_alcohol.xlsx</code> ved at indsætten stien til filen (<code>data/tobaco_and_alcohol.xlsx</code>) i <code>read_orbisxlsx()</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_orbisxlsx</span>(<span class="at">path =</span> <span class="st">"data/tobaco_and_alcohol.xlsx"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Orbis variable names updated: 
+
+DMFull name                                       =&gt; name
+DMUCI (Unique Contact Identifier)                 =&gt; person_id
+Company name Latin alphabet                       =&gt; affiliation
+Country ISO code                                  =&gt; affiliation_country
+DMJob title (in English)                          =&gt; role
+DMBoard, committee or department                  =&gt; board_type
+DMType of role                                    =&gt; role_type
+DMLevel of responsibility                         =&gt; role_level
+DMAppointment date                                =&gt; appointment
+DMResignation date                                =&gt; resignation
+DMCurrent or previous                             =&gt; role_status
+NACE Rev. 2, core code (4 digits)                 =&gt; sector
+Operating revenue (Turnover) th USD Last avail. yr=&gt; revenue
+Number of employees Last avail. yr                =&gt; n_employees
+CSH - Orbis ID number                             =&gt; csh_orbis_id
+CSH - Name                                        =&gt; csh_name
+CSH - Country ISO code                            =&gt; csh_country
+GUO - Name                                        =&gt; guo_name
+GUO - Country ISO code                            =&gt; guo_country
+DUO - Name                                        =&gt; duo_name
+DUO - Country ISO code                            =&gt; duo_country
+
+
+New variables added: 
+person {TRUE/FALSE} 
+role_level_rec {omkodning af role_level)</code></pre>
+</div>
+</div>
+<p>read_orbisxlsx funktionen oversætter bl.a. variabelnavne fra orbis til noget mere meningsfuld og læseligt. Vigtigt: <code>Current or previous</code> variablen hedder nu <code>role_status</code>. Der er også en ny variabel, <code>person</code>, som ud fra identifikationsnummeret ‘gætter’ om personen faktisk er en person og en variabel, <code>role_level_rec</code>, som er en omkodning af <code>role_level</code>.</p>
+<p>Lad os til at begynde med reducere vores data (<code>filter()</code>) til kun aktive/current poster og poster der faktisk er personer:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(person <span class="sc">==</span> <span class="cn">TRUE</span> <span class="sc">&amp;</span> role_status <span class="sc">==</span> <span class="st">"Current"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>En udfordring ved bestyrelsesdata fra Orbis er at det er uklart/varierende hvor mange individer, der er registreret for hver virksomhed:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(name, affiliation) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(affiliation) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(name)) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>(n) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
-  ..@ i       : int [1:1552] 0 18 23 1 121 2 40 58 85 96 ...
-  ..@ p       : int [1:203] 0 3 5 14 21 27 31 41 47 55 ...
-  ..@ Dim     : int [1:2] 202 202
-  ..@ Dimnames:List of 2
-  .. ..$ name: chr [1:202] "Agner Holmbjerg" "Allan Junge" "Allan Linneberg-Agerholm" "Anders Egehus" ...
-  .. ..$ name: chr [1:202] "Agner Holmbjerg" "Allan Junge" "Allan Linneberg-Agerholm" "Anders Egehus" ...
-  ..@ x       : num [1:1552] 2 2 2 2 1 2 1 1 1 1 ...
-  ..@ factors : list()</code></pre>
+<pre><code> affiliation              n           
+ Length:5938        Min.   :   1.000  
+ Class :character   1st Qu.:   1.000  
+ Mode  :character   Median :   2.000  
+                    Mean   :   4.303  
+                    3rd Qu.:   4.000  
+                    Max.   :1140.000  </code></pre>
 </div>
 </div>
-<p><code>@x</code> indeholder matrices værdier (ud over 0): Så kan vi tælle:</p>
+<p>Gennemsnittet har 4 ‘directors’, der er en del en mandsbestyrelser og én virksomhed har <code>1140</code> (!) ‘directors’. Det skyldes at alle mulige lavere direktører er registreret. Vi kan prøve at løse noget af det med variablen <code>role_level_rec</code>, som <code>read_orbisxlsx</code> funktione har lavet. Den prøfer indfange meningen af en rolle fra <code>role_level</code>-variablen (som i Orbis hed <code>DMLevel of responsibility</code>) og fra <code>role_type</code> (som i Orbis hed <code>DMType of role</code>)</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(adj<span class="sc">@</span>x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> <span class="fu">count</span>(role_level, <span class="at">sort =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>
-   1    2    3    4    5    7 
-1078  444   23    5    1    1 </code></pre>
+<pre><code># A tibble: 491 × 2
+   role_level                                             n
+   &lt;chr&gt;                                              &lt;int&gt;
+ 1 Member                                             10438
+ 2 Highest executive                                   2530
+ 3 President / Chairman                                2246
+ 4 Representative                                      2158
+ 5 Unspecified executive                                991
+ 6 Manager                                              879
+ 7 Executive                                            685
+ 8 Employee                                             634
+ 9 Vice President / Vice Chairman                       589
+10 Chief Financial Officer (CFO); Financial executive   566
+# ℹ 481 more rows</code></pre>
 </div>
-</div>
-<p>Der er altså (444 + 23 + 5 + 1 + 1 = 474) / 2 individer, der mødes mere end et sted. Så der er en mulighed for at lade edges være vægtede. I dette eksempel vælger jeg at se bort fra vægten (dvs vi <em>undlader</em> at skrive <code>weighted = TRUE</code>).</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>gr    <span class="ot">&lt;-</span> adj <span class="sc">%&gt;%</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>gr</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> <span class="fu">count</span>(role_type, <span class="at">sort =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH f49c1a0 UN-- 202 675 -- 
-+ attr: name (v/c)
-+ edges from f49c1a0 (vertex names):
- [1] Agner Holmbjerg         --Bo Tarp                   
- [2] Agner Holmbjerg         --Carl Johan Hansen         
- [3] Allan Junge             --Lars Goth                 
- [4] Allan Linneberg-Agerholm--Dan Nissen                
- [5] Allan Linneberg-Agerholm--Hans Christian Munck 10772
- [6] Allan Linneberg-Agerholm--Jens Dalsgaard Loegstrup  
- [7] Allan Linneberg-Agerholm--Jesper Eigen Moeller      
- [8] Allan Linneberg-Agerholm--Joergen Groth Dirksen     
-+ ... omitted several edges</code></pre>
+<pre><code># A tibble: 196 × 2
+   role_type      n
+   &lt;chr&gt;      &lt;int&gt;
+ 1 BoD         9526
+ 2 SenMan      6862
+ 3 OthDep      3002
+ 4 FinAcc      1311
+ 5 SupB        1294
+ 6 AudC         932
+ 7 BoD,SenMan   904
+ 8 Sales        776
+ 9 Oper         623
+10 ExeC         621
+# ℹ 186 more rows</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> <span class="fu">count</span>(role_level_rec, <span class="at">sort =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  role_level_rec     n
+  &lt;chr&gt;          &lt;int&gt;
+1 executive      14444
+2 member         11350
+3 other           2714
+4 chairman        2269
+5 vice chairman    589</code></pre>
 </div>
 </div>
+<p>Nu kan vi så subsette data, så vi kun har de ‘niveauer’ vi skal bruge. Dvs. alt undtagen ‘other’</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>() <span class="sc">+</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_width =</span> <span class="fl">0.3</span>, <span class="at">edge_alpha =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>() <span class="sc">+</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="ot">&lt;-</span> df_current <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(role_level_rec <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"member"</span>,<span class="st">"chairman"</span>, <span class="st">"vice chairman"</span>,<span class="st">"executive"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Hvor meget hjalp det? Lad os lige se hvor mange medlemmer de forskellige affilations nu har:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(name, affiliation) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(affiliation) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(name)) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>(n) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> affiliation              n          
+ Length:5927        Min.   :  1.000  
+ Class :character   1st Qu.:  1.000  
+ Mode  :character   Median :  2.000  
+                    Mean   :  3.921  
+                    3rd Qu.:  4.000  
+                    Max.   :834.000  </code></pre>
+</div>
+</div>
+<p>Der er stadig et meget højt max på <code>834</code>.</p>
+<p>Vi kan starte med lige at se på hvor mange ‘board members’ hver virksomhed har: Som I kan se er der nogle meget store ‘boards’. Det er et af problemerne med Orbis, nemlig at det er uklart hvad der er registreret per virksomhed.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(name, affiliation) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5,927 × 2
+   affiliation                          n
+   &lt;chr&gt;                            &lt;int&gt;
+ 1 CONSTELLATION BRANDS, INC.         834
+ 2 BROWN FORMAN CORP                  300
+ 3 PHILIP MORRIS INTERNATIONAL INC.   187
+ 4 MOLSON COORS BEVERAGE COMPANY      172
+ 5 TREASURY WINE ESTATES LIMITED      110
+ 6 JAPAN TOBACCO INC                   75
+ 7 ALTRIA GROUP, INC.                  67
+ 8 TURNING POINT BRANDS, INC.          66
+ 9 TANZANIA BREWERIES LIMITED          53
+10 SECHABA BREWERY HOLDINGS LIMITED    52
+# ℹ 5,917 more rows</code></pre>
+</div>
+</div>
+<p>Vi kan lave en ny variabel i vores datasæt, der for hvert individ tæller hvor mange virksomeder, de er knyttet til (altså hvor mange medlemskaber:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="ot">&lt;-</span> df_current <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(name) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">n_memberships =</span> <span class="fu">n_distinct</span>(affiliation)) <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>()</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span>  <span class="fu">count</span>(n_memberships)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 2
+  n_memberships     n
+          &lt;int&gt; &lt;int&gt;
+1             1 24333
+2             2  2623
+3             3   860
+4             4   368
+5             5   265
+6             6    66
+7             7    71
+8             8    48
+9             9    18</code></pre>
+</div>
+</div>
+<p>Lad os slette personer, <code>n = 24333</code>, der ‘kun’ sidder i en enkelt virksomhed, da de alligevel ikke laver nogen forbindelser på tværs af virksomheder i vores netværk. Vi sletter så at sige folk i vores affiliation data, der ikke er ‘linkere’ (<code>filter()</code>) og samtidig sørger vi for at hvert individ kun optræder én gang per virksomhed (<code>distinct()</code>) - det kan jo være at nogen har mere end en rolle i samme bestyrelse (datasnavs?).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="ot">&lt;-</span> df_current <span class="sc">%&gt;%</span> </span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n_memberships <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(name, affiliation, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Hvor meget hjalp det så?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>df_current <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(name, affiliation) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,048 × 2
+   affiliation                                                         n
+   &lt;chr&gt;                                                           &lt;int&gt;
+ 1 PHILIP MORRIS INTERNATIONAL INC.                                   41
+ 2 ZAMBIAN BREWERIES PLC                                              38
+ 3 PAPASTRATOS CIGARETTES MANUFACTURING COMPANY SINGLE MEMBER S.A.    37
+ 4 TANZANIA BREWERIES LIMITED                                         37
+ 5 ANHEUSER-BUSCH INBEV SA/NV                                         35
+ 6 SECHABA BREWERY HOLDINGS LIMITED                                   30
+ 7 KIRIN HOLDINGS COMPANY LIMITED                                     24
+ 8 MERCIAN CORPORATION                                                24
+ 9 MOLSON COORS BEVERAGE COMPANY                                      24
+10 BRITISH AMERICAN TOBACCO PLC                                       23
+# ℹ 1,038 more rows</code></pre>
+</div>
+</div>
+<p>Nu har den største bestyrelse 41 medlemmer. Meget bedre!</p>
+<section id="fra-data-til-netværk." class="level5">
+<h5 class="anchored" data-anchor-id="fra-data-til-netværk.">Fra data til netværk.</h5>
+<p>Husk fra sidst <a href="session1.html">Session 1 (uge 6): Introduktion til netværksanalyse i R</a>, hvordan vi kommer fra et affiliation datasæt som vi har her, med rækker der forbinder “individer” til “organisationer”. Her er et skematisk overblik.</p>
+<p><img src="images/Notebook 2 - page 1.png" class="img-fluid"> R-kode til at lave ‘biadjacency matricen’ med individer i rækker og affiliations i kolonner (husk sparse!)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>bi_adj <span class="ot">&lt;-</span> <span class="fu">xtabs</span>(<span class="at">data =</span> df_current, <span class="at">formula =</span> <span class="sc">~</span>name <span class="sc">+</span> affiliation, <span class="at">sparse =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>I dette eksempel vil vi gerne se hvordan virksomheder der fremstiller tobak og alkohol er forbundet gennem overlappende bestyrelser. Derfor vil gerne ‘udregne’ <span class="math inline">\(affiliation \times affiliation\)</span> matricen ved at gange en transponeret udgave af vores biadjacency matrice med sig selv (<span class="math inline">\(B^T \times B\)</span>)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>adj_c     <span class="ot">&lt;-</span> <span class="fu">t</span>(bi_adj) <span class="sc">%*%</span> bi_adj</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Som altid skal vi lige lave vores adjacency matrice om til et grafobjekt med <code>igraph</code>-funktionen <code>graph_from_adjacency_matrix()</code>. Her har vi et “undirected”, “weighted” netværk, hvor vi ser bort fra diagonalen:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>gr <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(adj_c, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>, <span class="at">weighted =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Fordi vi også gerne vil kunne bruge tidyverse måden at kode på på vores netværksdata, laver graf- eller netværksdataobjektet (graf og netværk bruges i litteraturen synonymt) <code>gr</code> om til et tidygraph format (med <code>as_tbl_graph()</code>)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>gr <span class="ot">&lt;-</span> <span class="fu">as_tbl_graph</span>(gr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Lad os se hvad gr indeholder:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>gr</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tbl_graph: 1048 nodes and 1135 edges
+#
+# An undirected simple graph with 346 components
+#
+# Node Data: 1,048 × 1 (active)
+   name                                          
+   &lt;chr&gt;                                         
+ 1 1919 WINES&amp;SPIRITS PLATFORM TECHNOLOGY CO.,LTD
+ 2 A. LE COQ AS                                  
+ 3 AALTO BODEGAS Y VINEDOS SA                    
+ 4 AARTI BREWERIES LIMITED                       
+ 5 AB MV GROUP PRODUCTION                        
+ 6 ABADIA RETUERTA SA                            
+ 7 ABEGOARIA WINES, S.A.                         
+ 8 ABI SAB GROUP HOLDING LIMITED                 
+ 9 ABIHAR PAN PRODUCTS LIMITED                   
+10 ABINBEV EFES UKRAINE PRIVATE JSC AT           
+# ℹ 1,038 more rows
+#
+# Edge Data: 1,135 × 3
+   from    to weight
+  &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;
+1     1   274      1
+2     2    35      3
+3     2   687      2
+# ℹ 1,132 more rows</code></pre>
+</div>
+</div>
+<p>Som I kan se er der to datasæt ‘inden i’ <code>gr</code>: - et data med noder, som lige nu har en variabel, nemlig <code>name</code> - et data med edges, som lige nu har tre variable, nemlig <code>from</code> og <code>to</code> som er indeks numrene på de noder der er forbundne og <code>weight</code> som er forbindelsens vægt (den variabel er der fordi vi har ladet netværket være vægtet). I et uvægtet netværk ville edge data kun indeholde <code>from</code> og <code>to</code></p>
+<p>Lad os som det første kigge på et helt minimalistisk plot af vores netværk:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>() <span class="sc">+</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>() <span class="sc">+</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>() <span class="sc">+</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Using "stress" as default layout</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="session2_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="session2_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+<p>Som I kan se består netværket af flere ‘klynger’. Det kaldes i netværksanalysesprog for komponenter. Det kommer vi tilbage til i løbet af kurset, men en netværkskomponent er et sammenhængende sæt af vertices. Lad os i første omgang prøve at bruge vores branchekode-variabel til at se om vi kan finde noget logik i hvordan komponenterne ser ud. Er der komponenter, hvor der er bestyrelsesoverlap (dvs. edges) mellem virksomheder der fremstiller hhv. alkohol og tobak. Det kræver at vi får lagt vores branchekode ind i grafobjektet som en vertex attribute.</p>
 </section>
-</section>
-<section id="sammenhængskraft---cohesion" class="level1">
-<h1>Sammenhængskraft - <em>Cohesion</em></h1>
-<p>I det følgende skal vi se på forskellige måder at at studere et netværks ‘sammenhængskraft’ eller forbundethed. Hvor sammenfiltret er det?</p>
-<section id="densitet-edge_density" class="level2">
-<h2 class="anchored" data-anchor-id="densitet-edge_density">Densitet: <code>edge_density()</code></h2>
-<p>Det mest simple og intuitive mål for ‘sammenfiltrethed’ er at udtrykke det faktiske antal af forbindelser i et netværk som en andel af de teoretisk mulige.</p>
-<p>Lad os sige vi har et netværk med <span class="math inline">\(n=25\)</span> individer. Hvis alle har en forbindelse til alle vil der være: <span class="math display">\[n \times (n-1)\]</span> forbindelser, hvis forbindelserne er retningsbestemte, så <span class="math inline">\(A \rightarrow B \nRightarrow A \leftarrow B\)</span>, dvs. forbindelsen A-B medfører ikke nødvendigvis forbindelsen B-A.</p>
-<p>og <span class="math display">\[(n \times (n-1)) \over 2\]</span> forbindelser, hvis forbindelserne er symmetriske per definition, <span class="math inline">\(A - B = B-A\)</span>.</p>
-<p>Det kalder vi det teoretiske max og densiteten er således: <span class="math display">\[
-{E \over n \times (n-1)} \quad \text{eller} \quad {2E \over n \times (n-1)}, \quad \text{hvor er det faktiske antal forbindelser}
-\]</span></p>
+<section id="tilføj-vertice-attributes" class="level5">
+<h5 class="anchored" data-anchor-id="tilføj-vertice-attributes">Tilføj vertice attributes</h5>
+<p>Fordi vores netværksdata objekt er et tidygraph objekt kan vi relativt ‘let’ tilføje variable til data. For at tilgå de forskellige dele af netværksobjektet bruges funktionen <code>activate()</code> fra <code>tidygraph</code>.</p>
+<p>I vores oprindelige data har vi jo variablen <code>sector</code> den vil vi gerne tilføje til node-delen af netværksobjektet. Derfor skal vi aktivere node-delen: <code>activate(nodes)</code>. Dernæst skal vi bruge <code>left_join()</code> som ‘joiner’ et datasæt på et andet. Vi skal ‘kun’ bruge <code>sector</code> og <code>affiliation</code> (for at kunne matche navnene) så vi bruger <code>select()</code>. Desuden skal vi lige sørge for at der kun er en række per affiliation / sector kombination, så den ved hvad der skal joines. Sidst men ikke mindst skal vi fortælle left_join hvilke variable der skal matches. Her <code>name</code> og <code>affiliation</code></p>
 <div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>gr <span class="ot">&lt;-</span> gr <span class="sc">%&gt;%</span> </span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span> </span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(df_current <span class="sc">%&gt;%</span> <span class="fu">select</span>(affiliation, sector) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(), </span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"name"</span> <span class="ot">=</span> <span class="st">"affiliation"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Hvis vi kigger på gr igen</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>gr</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tbl_graph: 1048 nodes and 1135 edges
+#
+# An undirected simple graph with 346 components
+#
+# Node Data: 1,048 × 2 (active)
+   name                                           sector
+   &lt;chr&gt;                                          &lt;chr&gt; 
+ 1 1919 WINES&amp;SPIRITS PLATFORM TECHNOLOGY CO.,LTD 1101  
+ 2 A. LE COQ AS                                   1105  
+ 3 AALTO BODEGAS Y VINEDOS SA                     1102  
+ 4 AARTI BREWERIES LIMITED                        1102  
+ 5 AB MV GROUP PRODUCTION                         1101  
+ 6 ABADIA RETUERTA SA                             1102  
+ 7 ABEGOARIA WINES, S.A.                          1102  
+ 8 ABI SAB GROUP HOLDING LIMITED                  1105  
+ 9 ABIHAR PAN PRODUCTS LIMITED                    1200  
+10 ABINBEV EFES UKRAINE PRIVATE JSC AT            1105  
+# ℹ 1,038 more rows
+#
+# Edge Data: 1,135 × 3
+   from    to weight
+  &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;
+1     1   274      1
+2     2    35      3
+3     2   687      2
+# ℹ 1,132 more rows</code></pre>
+</div>
+</div>
+<p>kan vi se at der er kommet en ny variabel på node-data delen med branchekoder.</p>
+</section>
+<section id="omkodning-af-branche-variablen" class="level4">
+<h4 class="anchored" data-anchor-id="omkodning-af-branche-variablen">Omkodning af branche variablen</h4>
+<p>Jeg ved at alle tobaks-underbrancherne starter med 12 og alle alkohol ditto starter med 11, så jeg først en ny variabel hvor jeg kun tager de første to ciffre af branchekoden (<code>substr()</code> tager en substring fra start = ? til stop = ?). Hvorefter jeg omkoder sector variablen med <code>case_when()</code>. I begge tilfælde skal jeg igen huske at aktivere node-delen (<code>activate(nodes)</code>) og bruge <code>mutate()</code></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>gr <span class="ot">&lt;-</span> gr <span class="sc">%&gt;%</span>  </span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span> </span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sector_2digits =</span> <span class="fu">substr</span>(sector, <span class="at">start =</span> <span class="dv">1</span>, <span class="at">stop =</span> <span class="dv">2</span>))</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>gr <span class="ot">&lt;-</span> gr <span class="sc">%&gt;%</span>  </span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span> </span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sector =</span> <span class="fu">case_when</span>(</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>    sector_2digits <span class="sc">==</span> <span class="st">"12"</span><span class="sc">~</span><span class="st">"Tobak"</span>,</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>    sector_2digits <span class="sc">==</span> <span class="st">"11"</span><span class="sc">~</span><span class="st">"Alkohol"</span>,</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.default =</span> <span class="st">"Ukendt"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>For at lave en simpel tabel (<code>count()</code>) over en variabel i node-data skal vi lige aktivere den og trække den ud som et almindeligt dataformat (med <code>as_tibble()</code>):</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> </span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span> </span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(sector, <span class="at">sort =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  sector      n
+  &lt;chr&gt;   &lt;int&gt;
+1 Alkohol   930
+2 Tobak     117
+3 Ukendt      1</code></pre>
+</div>
+</div>
+</section>
+<section id="visualisering-med-ggraph" class="level4">
+<h4 class="anchored" data-anchor-id="visualisering-med-ggraph">Visualisering med ggraph:</h4>
+<p>Lad os nu lave vores visualisering igen, hvor vi farvelægger noderne efter branche. Vi kommer senere til detaljer i plot funktionerne. Kort fortalt om visualisering:</p>
+<ol type="1">
+<li>funktionen <code>ggraph()</code> opretter et tilsyneladende tomt plot (tilsyneladende fordi den faktisk udregner et layout for vertices i vores data)</li>
+<li>funktionen <code>geom_edge_link0()</code> plotter vores edges som en ‘streg’/et link. Der er også andre muligheder fx. <code>geom_edge_arc()</code> der plotter dem som en bue.</li>
+<li>funktionen <code>geom_node_point()</code> der plotter vores noder som en ‘cirkel’/point.</li>
+</ol>
+<ul>
+<li>inden for hver af disse <code>geom'er</code> kan vi sætte en masse options. Blandt andet kan vi definere nogle <code>aesthetics</code>. lad os bruge sector til at sætte farven på vores punkter (<code>mapping = aes(color = sector)</code>). Det betyder at vi lader farven på punkter følge værdierne på en bestemt variabel.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>() <span class="sc">+</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>() <span class="sc">+</span></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">color =</span> sector)) <span class="sc">+</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Using "stress" as default layout</code></pre>
+</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="session2_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="session2_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+<p>Med undtagelse af primært den største komponent ser komponenterne ud til at være ret branche homogene. Der sker noget andet i den største komponent, så lad os fokusere vores visualisering på den største komponent i netværket.</p>
+<p>tidygraph har en funktion der hedder <code>group_components()</code></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">transitivity</span>(<span class="fu">largest_component</span>(gr))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) først laver vi en variabel der indikerer hvilke komponenter de forskellige noder tilhører</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>gr <span class="ot">&lt;-</span> gr <span class="sc">%&gt;%</span> </span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span> </span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">comp =</span> <span class="fu">group_components</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) laver et plot hvor vi først filtrer på comp == 1, som er den største.</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">filter</span>(comp <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>() <span class="sc">+</span> </span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) tilføjer edges, som vi giver en fast farve og størrelse:</span></span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">color =</span> <span class="st">"gray40"</span>, <span class="at">edge_width =</span> .<span class="dv">6</span>) <span class="sc">+</span></span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 4) tilføjer vertices, farvelagt efter sector og med en fast størrelse:</span></span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> sector), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 5) Tilføjer labels for udvalgte vertices:</span></span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_node_label</span>(<span class="fu">aes</span>(<span class="at">filter =</span> <span class="fu">grepl</span>(<span class="st">"british american tobacco plc|carlsberg a/S|PHILIP MORRIS INTERNATIONAL INC|HEINEKEN N</span><span class="sc">\\</span><span class="st">.|diageo p"</span>, name, <span class="at">ignore.case =</span> T), <span class="at">label =</span> name, <span class="at">color =</span> sector), <span class="at">size =</span> <span class="dv">3</span>, <span class="at">repel =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 6) Ændrer farver og labels.</span></span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"salmon2"</span>, <span class="st">"steelblue"</span>, <span class="st">"grey"</span>), </span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Alkohol"</span>, <span class="st">"Tobak"</span>, <span class="st">"Ukendt"</span>)) <span class="sc">+</span></span>
+<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 7) Tilføjer overskrifter og navn på labels</span></span>
+<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"'Corporate interlocks' i alkohol- og tobaksbrancherne"</span>, </span>
+<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"den største komponent"</span>,</span>
+<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Branche"</span>) <span class="sc">+</span></span>
+<span id="cb60-17"><a href="#cb60-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 8) Tilføjer et tema der er flot til netværk...</span></span>
+<span id="cb60-18"><a href="#cb60-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Using "stress" as default layout</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session2_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="cvr" class="level2">
+<h2 class="anchored" data-anchor-id="cvr">CVR</h2>
+<p>En tredje kilde til bestyrelsesnetværk er <strong>Det centrale virksomhedsregister i Danmark</strong> (<a href="https://datacvr.virk.dk/" class="uri">https://datacvr.virk.dk/</a>). Her kan man lave afgrænsede søgninger på danske virksomheder ud fra bl.a. geografi: Kommune eller region, virksomhedsstatus (aktive, ophørt, under konkurs etc.), virksomhedsform (aktieselskab, anpartsselskab etc.), startdato og branche.</p>
+<p><img src="images/CVR.png" class="img-fluid"></p>
+<p>I dette eksempel har jeg valgt “Region = Grønland”, “Virksomhedsstatus = Aktive”, “Virksomhedsform = Aktieselskab”. Det giver os 199 virksomheder. Hvis man scroller ned kan man eksportere data som en xlsx fil.</p>
+<p>download filen her</p>
+<p><a href="data/CVRudtræk_AS_Grønland_2025-02-17.xlsx" class="btn btn-primary">Download Data</a></p>
+<p>Hvis I lægger filen i datamappen under Rprojekt-mappen, kan den indlæses med <code>read_xlsx()</code> her</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>gronland_as <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">"data/CVRudtræk_AS_Grønland_2025-02-17.xlsx"</span>)</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(gronland_as)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.6948424</code></pre>
+<pre><code># A tibble: 6 × 12
+  `CVR-nummer/REG-nummer` Startdato  Ophørsdato Navn       Adresse Postnr. By   
+  &lt;chr&gt;                   &lt;chr&gt;      &lt;lgl&gt;      &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
+1 12486162                2008-06-01 NA         GREENLAND… Vatika… 3920    Qaqo…
+2 12706952                2013-12-23 NA         SIKUKI NU… Issort… 3905    Nuus…
+3 12036329                2002-07-01 NA         IMARTUNEQ… C/O Po… 3900    Nuuk 
+4 40976191                2019-10-15 NA         Nuuk Wate… Imaneq… 3900    Nuuk 
+5 45203573                2024-11-12 NA         Maniitsoq… C/O Ka… 3912    Mani…
+6 12579853                2009-12-01 NA         ILLIT FOR… Eqalug… 3905    Nuus…
+# ℹ 5 more variables: Virksomhedsform &lt;chr&gt;, Hovedbranche &lt;chr&gt;,
+#   Telefonnr &lt;chr&gt;, Email &lt;chr&gt;, Reklamebeskyttet &lt;chr&gt;</code></pre>
 </div>
 </div>
-<p><a href="functions/networkfunctions.R" class="btn btn-primary">Download nye funktioner her</a></p>
+<p>Det kræver lidt mere arbejde at komme frem til et bestyrelsesnetværk her fra. Det er nemlig kun virksomhedsdata vi får ud her. Næste skridt er at gå ind på hver virksomhed på cvr og finde bestyrelsesmedlemmerne:</p>
+<ol type="1">
+<li><p>Søg på CVR nummer (eller virksomhedsnavn) i søgefeltet:</p></li>
+<li><p>Klik på “Tegningsregel, personkreds og revisor”</p></li>
+</ol>
+<p><img src="images/CVR_virksøg.png" class="img-fluid"></p>
+<ol start="3" type="1">
+<li>Kopier bestyrelsen til et excel-ark:</li>
+</ol>
+<p><img src="images/xlsx.png" class="img-fluid"> Og så fortsætter man ellers bare med alle 199 virksomheder, til man har et komplet excel ark med alle bestyrelsesmedlemmer for alle virksomheder.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Det tager noget tid!! (Man kan evt. spørge øvelseslæreren om det evt. er muligt at trække data på en anden måde via fx Elitedatabasen eller direkte fra CVR!)</p>
+</div>
+</div>
 
 
 </section>
