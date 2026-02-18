@@ -4,6 +4,12 @@ title: "Kursusmateriale"
 
 Her er et overblik over de forskellige elementer vi skal igennem i løbet af kursets i alt 7 øvelsessessioner.
 
+## datassæt
+
+[Download Danish Elitenetwork 2024 her](data/danish_elitenetworks2024.csv){.btn .btn-primary}
+
+[Download tobaco & alcohol data her](data/tobaco_and_alcohol.xlsx){.btn .btn-primary}
+
 ---
 
 ## Session 1 — [Intro til netværksanalyse i R](session1.qmd)
