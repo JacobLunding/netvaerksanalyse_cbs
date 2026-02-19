@@ -188,16 +188,28 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#den-finansielle-sektor-i-det-danske-elitenetværk" id="toc-den-finansielle-sektor-i-det-danske-elitenetværk" class="nav-link active" data-scroll-target="#den-finansielle-sektor-i-det-danske-elitenetværk">Den finansielle sektor i det danske elitenetværk</a>
+  <li><a href="#bank-sektoren-i-det-danske-elitenetværk" id="toc-bank-sektoren-i-det-danske-elitenetværk" class="nav-link active" data-scroll-target="#bank-sektoren-i-det-danske-elitenetværk">Bank sektoren i det danske elitenetværk</a>
   <ul class="collapse">
   <li><a href="#data-det-danske-elitenetværk" id="toc-data-det-danske-elitenetværk" class="nav-link" data-scroll-target="#data-det-danske-elitenetværk">Data: Det danske elitenetværk</a></li>
   <li><a href="#subset-tags-og-branchekoder" id="toc-subset-tags-og-branchekoder" class="nav-link" data-scroll-target="#subset-tags-og-branchekoder">Subset: Tags og branchekoder</a></li>
-  <li><a href="#grafobjekt" id="toc-grafobjekt" class="nav-link" data-scroll-target="#grafobjekt">Grafobjekt</a></li>
+  <li><a href="#fra-medlemsdata-til-netværksdata" id="toc-fra-medlemsdata-til-netværksdata" class="nav-link" data-scroll-target="#fra-medlemsdata-til-netværksdata">Fra medlemsdata til netværksdata</a>
+  <ul class="collapse">
+  <li><a href="#adjacency-matricer" id="toc-adjacency-matricer" class="nav-link" data-scroll-target="#adjacency-matricer">Adjacency-matricer</a></li>
+  <li><a href="#netværks--eller-grafobjekt" id="toc-netværks--eller-grafobjekt" class="nav-link" data-scroll-target="#netværks--eller-grafobjekt">Netværks- eller grafobjekt</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#sammenhængskraft---cohesion" id="toc-sammenhængskraft---cohesion" class="nav-link" data-scroll-target="#sammenhængskraft---cohesion">Sammenhængskraft - <em>Cohesion</em></a>
   <ul class="collapse">
   <li><a href="#densitet-edge_density" id="toc-densitet-edge_density" class="nav-link" data-scroll-target="#densitet-edge_density">Densitet: <code>edge_density()</code></a></li>
   </ul></li>
+  <li><a href="#komponenter" id="toc-komponenter" class="nav-link" data-scroll-target="#komponenter">Komponenter</a>
+  <ul class="collapse">
+  <li><a href="#visualisering-af-den-største-komponenter" id="toc-visualisering-af-den-største-komponenter" class="nav-link" data-scroll-target="#visualisering-af-den-største-komponenter">Visualisering af den største komponenter</a></li>
+  </ul></li>
+  <li><a href="#transitivitet--" id="toc-transitivitet--" class="nav-link" data-scroll-target="#transitivitet--">Transitivitet —-</a></li>
+  <li><a href="#stilængder-gennemsnitlig-afstand-og-diameter--" id="toc-stilængder-gennemsnitlig-afstand-og-diameter--" class="nav-link" data-scroll-target="#stilængder-gennemsnitlig-afstand-og-diameter--">Stilængder gennemsnitlig afstand og diameter —-</a></li>
+  <li><a href="#ekstra-den-korteste-vej-mellem-to-specifikke-noder" id="toc-ekstra-den-korteste-vej-mellem-to-specifikke-noder" class="nav-link" data-scroll-target="#ekstra-den-korteste-vej-mellem-to-specifikke-noder">Ekstra : Den korteste vej mellem to specifikke noder</a></li>
+  <li><a href="#øvelse" id="toc-øvelse" class="nav-link" data-scroll-target="#øvelse">Øvelse</a></li>
   </ul>
 </nav>
     </div>
@@ -224,7 +236,6 @@ window.Quarto = {
 
 
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.4     ✔ readr     2.1.5
@@ -235,435 +246,305 @@ window.Quarto = {
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
-ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidygraph)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+
 Attaching package: 'tidygraph'
+
 
 The following object is masked from 'package:stats':
 
-    filter</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
+    filter
+
+
+
 Attaching package: 'igraph'
+
 
 The following object is masked from 'package:tidygraph':
 
     groups
 
+
 The following objects are masked from 'package:lubridate':
 
     %--%, union
+
 
 The following objects are masked from 'package:dplyr':
 
     as_data_frame, groups, union
 
+
 The following objects are masked from 'package:purrr':
 
     compose, simplify
+
 
 The following object is masked from 'package:tidyr':
 
     crossing
 
+
 The following object is masked from 'package:tibble':
 
     as_data_frame
+
 
 The following objects are masked from 'package:stats':
 
     decompose, spectrum
 
+
 The following object is masked from 'package:base':
 
-    union</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
+    union
+
+
+
 Attaching package: 'Matrix'
+
 
 The following objects are masked from 'package:tidyr':
 
     expand, pack, unpack</code></pre>
 </div>
 </div>
-<section id="den-finansielle-sektor-i-det-danske-elitenetværk" class="level1">
-<h1>Den finansielle sektor i det danske elitenetværk</h1>
+<section id="bank-sektoren-i-det-danske-elitenetværk" class="level1">
+<h1>Bank sektoren i det danske elitenetværk</h1>
+<p>For at køre dette script skal du downloade</p>
+<p>scriptet: <a href="scripts til undervisning/Session3.R" class="btn btn-primary">Scriptet - Session3.R</a></p>
+<p>datasættet: <a href="data/danish_elitenetworks2024.csv" class="btn btn-primary">Datasættet - danish_elitenetworks2024.csv</a> som du skal lægge i undermappen /data i din r-projekt-mappe</p>
+<p>og funktioner: <a href="&quot;functions/triangle_plot.R&quot;" class="btn btn-primary">funktionen - triangle_plot.R</a></p>
+<p><a href="&quot;functions/clique_plot.R&quot;" class="btn btn-primary">funktionen - clique_plot.R</a> som begge lægges i undermappen /functions i r-projekt-mappen</p>
+<p>Når de to funktioner ligger der kan de sources</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions/clique_plot.R"</span>, <span class="at">echo =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions/triangle_plot.R"</span>, <span class="at">echo =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <section id="data-det-danske-elitenetværk" class="level2">
 <h2 class="anchored" data-anchor-id="data-det-danske-elitenetværk">Data: Det danske elitenetværk</h2>
+<p>Vi starter med at indlæse datasættet:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>den <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/danish_elitenetworks2024.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>den <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/danish_elitenetworks2024.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="subset-tags-og-branchekoder" class="level2">
 <h2 class="anchored" data-anchor-id="subset-tags-og-branchekoder">Subset: Tags og branchekoder</h2>
-<p>Lad os forsøge at finde et relevant subset af affiliatoins, vi kan kalde den finansielle sektor:</p>
-<p>På det mest aggregerede branchekode niveau finder vi:</p>
+<p>Lad os forsøge at finde et relevant subset af affiliatoins, vi kan kalde bank sektoren:</p>
+<p>På det mest detaljerede branchekode-niveau (niveau5) finder vi:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(affiliation, affiliation_branche_niveau1) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation_branche_niveau1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(affiliation, affiliation_branche_niveau5) <span class="sc">%&gt;%</span> <span class="fu">count</span>(affiliation_branche_niveau5)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 21 × 2
-   affiliation_branche_niveau1                                                 n
+<pre><code># A tibble: 484 × 2
+   affiliation_branche_niveau5                                                 n
    &lt;chr&gt;                                                                   &lt;int&gt;
- 1 Administrative tjenesteydelser og hjælpetjenester                         156
- 2 Andre serviceydelser                                                     2689
- 3 Bygge- og anlægsvirksomhed                                                 88
- 4 El-, gas- og fjernvarmeforsyning                                           34
- 5 Engroshandel og detailhandel; reparation af motorkøretøjer og motorcyk…   385
- 6 Fast ejendom                                                              348
- 7 Fremstillingsvirksomhed                                                   309
- 8 Information og kommunikation                                              221
- 9 Kultur, forlystelser og sport                                             831
-10 Landbrug, jagt, skovbrug og fiskeri                                       437
-# ℹ 11 more rows</code></pre>
+ 1 Administration af fast ejendom på kontraktbasis                            15
+ 2 Administration af og bidrag til erhvervsfremme                             30
+ 3 Administration af sundhedsvæsen, undervisning, kultur og sociale forho…    24
+ 4 Agenturhandel med landbrugsråvarer, levende dyr, tekstilmaterialer og …     1
+ 5 Agenturhandel med maskiner, teknisk udstyr, skibe og flyvemaskiner          2
+ 6 Agenturhandel med møbler, husholdningsartikler og isenkram                  1
+ 7 Agenturhandel med specialiseret varesortiment i.a.n.                        3
+ 8 Agenturhandel med tekstiler, beklædning, pelsværk, fodtøj og lædervarer     2
+ 9 Aktiviteter, der udøves efter produktion af film, video- og tv-program…     2
+10 Aldersintegrerede institutioner                                            31
+# ℹ 474 more rows</code></pre>
 </div>
 </div>
-<p>545 virksomheder med branchekoden “Pengeinstitut- og finansvirksomhed, forsikring”</p>
+<p>24 virksomheder med branchekoden “Banker, sparekasser og andelskasser”</p>
 <p>Kigger vi på <code>affiliation_tags</code> som vi er nød til først at splitte <code>str_split()</code> og unliste <code>unlist()</code> fordi der kan være flere tags per virksomhed. De er separeret med “;”, så det splitter vi på:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">pull</span>(affiliation_tags) <span class="sc">%&gt;%</span> <span class="fu">str_split</span>(<span class="st">"; "</span>) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>() <span class="sc">%&gt;%</span> <span class="fu">table</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">pull</span>(affiliation_tags) <span class="sc">%&gt;%</span> <span class="fu">str_split</span>(<span class="st">"; "</span>) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>() <span class="sc">%&gt;%</span> <span class="fu">table</span>() <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">25</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>.
-                                                         Erhvervsliv 
-                                                                 782 
-                                                  Erhvervsliv_Finans 
-                                                                 367 
-                                           Erhvervsliv_Finans_Banker 
-                                                                 306 
-                                            Erhvervsliv_Finans_Bolig 
-                                                                  19 
-                                       Erhvervsliv_Finans_Forsikring 
-                                                                 453 
-                                      Erhvervsliv_Finans_Investering 
-                                                                 587 
-                                          Erhvervsliv_Finans_Pension 
-                                                                 368 
-                                                   Erhvervsliv_Fonde 
-                                                                1706 
-                                       Erhvervsliv_Handel og service 
-                                                                1029 
-                  Erhvervsliv_Handel og service_Konsulent &amp; Revision 
-                                                                 548 
-                                                Erhvervsliv_Industri 
-                                                                1357 
-                                        Erhvervsliv_Industri_Byggeri 
-                                                                 764 
-                                         Erhvervsliv_Industri_Energi 
-                                                                1006 
-                              Erhvervsliv_Industri_Medicinalindustri 
-                                                                 425 
-                                           Erhvervsliv_Industri_Tech 
-                                                                 561 
-                                      Erhvervsliv_Industri_Transport 
-                                                                 648 
-                                                Erhvervsliv_Landbrug 
-                                                                2598 
-                                        Erhvervsliv_Landbrug_Fiskeri 
-                                                                 336 
-                                       Erhvervsliv_Landbrug_Skovbrug 
-                                                                 170 
-                                           Events eller begivenheder 
-                                                                1439 
-                                                            Ideologi 
-                                                                  25 
-                                                     Ideologi_Kultur 
-                                                                 755 
-                                          Ideologi_Kultur_Arkitektur 
-                                                                  78 
-                                         Ideologi_Kultur_Billedkunst 
-                                                                 117 
-                                              Ideologi_Kultur_Design 
-                                                                  91 
-                                       Ideologi_Kultur_Film &amp; Teater 
-                                                                 230 
-                                          Ideologi_Kultur_Litteratur 
-                                                                 169 
-                                               Ideologi_Kultur_Musik 
-                                                                 138 
-                                                     Ideologi_Medier 
-                                                                 354 
-                                                   Ideologi_Religion 
-                                                                 203 
-                                                      Ideologi_Sport 
-                                                                 196 
-                                                  Ideologi_Videnskab 
-                                                                 572 
-                                        Ideologi_Videnskab_Humaniora 
-                                                                1014 
-                               Ideologi_Videnskab_Humaniora_Historie 
-                                                                  94 
-                                   Ideologi_Videnskab_Naturvidenskab 
-                                                                1837 
-                                Ideologi_Videnskab_Samfundsvidenskab 
-                                                                1636 
-                        Ideologi_Videnskab_Samfundsvidenskab_Økonomi 
-                                                                 805 
-                                        Ideologi_Videnskab_Teknologi 
-                                                                1336 
-                                    Ideologi_Videnskab_Universiteter 
-                                                                4108 
-                                                             Militær 
-                                                                 482 
-                                                      Militær_Politi 
-                                                                  37 
-                                             Militær_Væbnede styrker 
-                                                                 111 
-                                                            Mødested 
-                                                                 314 
-                                                    Mødested_Adelige 
-                                                                 836 
-                                                Mødested_Akademikere 
-                                                                 604 
-                                                 Mødested_Begivenhed 
-                                                                 651 
-                                             Mødested_Dansk Industri 
-                                                                1027 
-                                                      Mødested_Ejere 
-                                                                  33 
-                                                    Mødested_Familie 
-                                                                  17 
-                                                 Mødested_Ingeniører 
-                                                                  47 
-                                               Mødested_Iværksættere 
-                                                                  77 
-                                                    Mødested_Ledelse 
-                                                                 385 
-                                                     Mødested_Nation 
-                                                                  36 
-                                                    Mødested_Netværk 
-                                                                5220 
-                                         Mødested_Netværk_VL-grupper 
-                                                                3580 
-                                          Mødested_Offentlige ledere 
-                                                                   8 
-                                               Mødested_Pensionister 
-                                                                  62 
-                                             Mødested_Standsforening 
-                                                                  51 
-                                        Mødested_Statsadministration 
-                                                                  45 
-                  Mødested_Statsadministration_Centraladministration 
-                                                                2087 
-       Mødested_Statsadministration_Centraladministration_Kommission 
-                                                                 461 
-      Mødested_Statsadministration_Centraladministration_Råd og Nævn 
-                                                                3513 
-                    Mødested_Statsadministration_Lokaladministration 
-                                                                  53 
-                                                 Mødested_Studerende 
-                                                                 106 
-                                                                Stat 
-                                                                  48 
-                                                           Stat_Jura 
-                                                                 367 
-                                                  Stat_Jura_Domstole 
-                                                                 549 
-                                                 Stat_Jura_Retsvæsen 
-                                                                 298 
-                                                        Stat_Politik 
-                                                                  97 
-                                              Stat_Politik_Folketing 
-                                                                 305 
-                                Stat_Politik_Interesseorganisationer 
-                                                                2413 
-     Stat_Politik_Interesseorganisationer_Arbejdsgiverorganisationer 
-                                                                 472 
-                   Stat_Politik_Interesseorganisationer_Civilsamfund 
-                                                                1251 
-         Stat_Politik_Interesseorganisationer_Erhvervsorganisationer 
-                                                                4538 
-                   Stat_Politik_Interesseorganisationer_Fagbevægelse 
-                                                                1585 
-                     Stat_Politik_Interesseorganisationer_Fritidsliv 
-                                                                 235 
-          Stat_Politik_Interesseorganisationer_Patientorganisationer 
-                                                                 492 
-                     Stat_Politik_Interesseorganisationer_Tænketanke 
-                                                                 984 
-                    Stat_Politik_Interesseorganisationer_Velgørenhed 
-                                                                 600 
-                                                  Stat_Politik_Parti 
-                                                                 336 
-                                     Stat_Politik_Parti_Konservative 
-                                                                  88 
-                                         Stat_Politik_Parti_Radikale 
-                                                                 100 
-                                Stat_Politik_Parti_Socialdemokratiet 
-                                                                 207 
-                                          Stat_Politik_Parti_Venstre 
-                                                                  32 
-                      Stat_Statsadministration_Centraladministration 
-                                                                2533 
-        Stat_Statsadministration_Centraladministration_Beskæftigelse 
-                                                                 455 
-Stat_Statsadministration_Centraladministration_Børne- og ungeområdet 
-                                                                 122 
-           Stat_Statsadministration_Centraladministration_By &amp; Bolig 
-                                                                 455 
-      Stat_Statsadministration_Centraladministration_Erhvervsområdet 
-                                                                1206 
-             Stat_Statsadministration_Centraladministration_Kongehus 
-                                                                1001 
-        Stat_Statsadministration_Centraladministration_Kulturområdet 
-                                                                 917 
-        Stat_Statsadministration_Centraladministration_Socialområdet 
-                                                                 506 
-                              Stat_Statsadministration_Infrastruktur 
-                                                                 238 
-                       Stat_Statsadministration_Infrastruktur_Energi 
-                                                                 578 
-                        Stat_Statsadministration_Infrastruktur_Miljø 
-                                                                 633 
-                    Stat_Statsadministration_Infrastruktur_Transport 
-                                                                 367 
-                        Stat_Statsadministration_Lokaladministration 
-                                                                  33 
-               Stat_Statsadministration_Lokaladministration_Kolonier 
-                                                                   9 
-              Stat_Statsadministration_Lokaladministration_Kommunalt 
-                                                                 324 
-              Stat_Statsadministration_Lokaladministration_Regionalt 
-                                                                 110 
-                          Stat_Statsadministration_Udenrigstjenesten 
-                                                                 241 
-             Stat_Statsadministration_Udenrigstjenesten_Ulandsstøtte 
-                                                                  46 
-                                                        Stat_Sundhed 
-                                                                 980 
-                                              Stat_Sundhed_Lægestand 
-                                                                  46 
-                                              Stat_Sundhed_Psykiatri 
-                                                                  42 
-                                                     Stat_Uddannelse 
-                                                                 317 
-                                       Stat_Uddannelse_Erhvervsskole 
-                                                                 260 
-                                          Stat_Uddannelse_Folkeskole 
-                                                                 108 
-                                           Stat_Uddannelse_Gymnasier 
-                                                                  92 
-                                            Stat_Uddannelse_Højskole 
-                                                                  71 
-                             Stat_Uddannelse_Videregående uddannelse 
-                                                                4096 </code></pre>
+                                       Erhvervsliv 
+                                               782 
+                                Erhvervsliv_Finans 
+                                               367 
+                         Erhvervsliv_Finans_Banker 
+                                               306 
+                          Erhvervsliv_Finans_Bolig 
+                                                19 
+                     Erhvervsliv_Finans_Forsikring 
+                                               453 
+                    Erhvervsliv_Finans_Investering 
+                                               587 
+                        Erhvervsliv_Finans_Pension 
+                                               368 
+                                 Erhvervsliv_Fonde 
+                                              1706 
+                     Erhvervsliv_Handel og service 
+                                              1029 
+Erhvervsliv_Handel og service_Konsulent &amp; Revision 
+                                               548 
+                              Erhvervsliv_Industri 
+                                              1357 
+                      Erhvervsliv_Industri_Byggeri 
+                                               764 
+                       Erhvervsliv_Industri_Energi 
+                                              1006 
+            Erhvervsliv_Industri_Medicinalindustri 
+                                               425 
+                         Erhvervsliv_Industri_Tech 
+                                               561 
+                    Erhvervsliv_Industri_Transport 
+                                               648 
+                              Erhvervsliv_Landbrug 
+                                              2598 
+                      Erhvervsliv_Landbrug_Fiskeri 
+                                               336 
+                     Erhvervsliv_Landbrug_Skovbrug 
+                                               170 
+                         Events eller begivenheder 
+                                              1439 
+                                          Ideologi 
+                                                25 
+                                   Ideologi_Kultur 
+                                               755 
+                        Ideologi_Kultur_Arkitektur 
+                                                78 
+                       Ideologi_Kultur_Billedkunst 
+                                               117 
+                            Ideologi_Kultur_Design 
+                                                91 </code></pre>
 </div>
 </div>
-<p>Her kan vi se at tags’ne: “Erhvervsliv_Finans” (uden nævnere angivelse), “Erhvervsliv_Finans_Banker”, “Erhvervsliv_Finans_Forsikring”, “Erhvervsliv_Finans_Investering”, “Erhvervsliv_Finans_Pension” er relevante…</p>
-<p>Med de to oplysninger kan vi lave en variabel der fortæller os om en affiliation er relevant:</p>
+<p>Her kan vi se at der er et tag for “Erhvervsliv_Finans_Banker”</p>
+<p>Med de to oplysninger kan vi lave en variabel der fortæller os om en affiliation er en bank:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>den <span class="ot">&lt;-</span> den <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">finans =</span> affiliation_branche_niveau1 <span class="sc">==</span> <span class="st">"Pengeinstitut- og finansvirksomhed, forsikring"</span> <span class="sc">|</span> </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">grepl</span>(<span class="st">"Erhvervsliv_Finans|Erhvervsliv_Finans_Banker|Erhvervsliv_Finans_Forsikring|Erhvervsliv_Finans_Investering|Erhvervsliv_Finans_Pension"</span>, affiliation_tags))</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">count</span>(finans)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>den <span class="ot">&lt;-</span> den <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">er_bank =</span> affiliation_branche_niveau5 <span class="sc">==</span> <span class="st">"Banker, sparekasser og andelskasser"</span> <span class="sc">|</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">grepl</span>(<span class="st">"Erhvervsliv_Finans_Banker"</span>, affiliation_tags, <span class="at">ignore.case =</span> T))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">count</span>(er_bank)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 2
-  finans     n
-  &lt;lgl&gt;  &lt;int&gt;
-1 FALSE  52466
-2 TRUE    5188
-3 NA     23775</code></pre>
+  er_bank     n
+  &lt;lgl&gt;   &lt;int&gt;
+1 FALSE   56419
+2 TRUE      583
+3 NA      24427</code></pre>
 </div>
 </div>
 <p>###Filtrering</p>
+<p>Her subsettes <code>den</code>, så vi kun har de poster der er i en bank virksomhed/organisation….</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>den_sub <span class="ot">&lt;-</span> den <span class="sc">%&gt;%</span> <span class="fu">filter</span>(finans <span class="sc">==</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>den_bank <span class="ot">&lt;-</span> den <span class="sc">%&gt;%</span> <span class="fu">filter</span>(er_bank <span class="sc">==</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>En anden mulighed er at inkludere de andre (ikke bank) steder hvor folk med en bank-position sidder.</p>
+<p>Det gør vi ved at trække (<code>pull()</code>) variablen <code>person_name</code> ud af data, dvs. tage de navne der er i den_bank og tage de unikke værdier</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>den_sub <span class="ot">&lt;-</span> den_sub <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(person_name) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">n_afil =</span> <span class="fu">n_distinct</span>(affiliation))</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>den_sub <span class="ot">&lt;-</span> den_sub <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n_afil <span class="sc">&gt;</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>bank_persons <span class="ot">&lt;-</span> den_bank <span class="sc">%&gt;%</span> <span class="fu">pull</span>(person_name) <span class="sc">%&gt;%</span> <span class="fu">unique</span>()</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>bank_persons <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Chresten Dengsøe 14501"        "Claus Jørgensen 49430"        
+ [3] "Vagn Wulf Holm 53455"          "Tina Øster Larsen 49431"      
+ [5] "Niels Olsen 49429"             "Rune Petring Hasselager 49432"
+ [7] "Lars Andersen 76485"           "Jan Walther Andersen 15072"   
+ [9] "Jesper Pedersen 15065"         "Helle Lizette Risgaard 15063" </code></pre>
+</div>
+</div>
+<p>ved at vende tilbage til det fulde data <code>den</code> og i stedet filtrere på alle de rækker der har en person fra bankdatasættet, får vi et større data med alle deres andre poster i. Dvs. hvis formanden for bestyrelsen i Danske Bank også sidder i Kattens Værn får vi den post med, selvom det ikke er en bank. Det giver mulighed for at der kan være forbindelser mellem bank-folk, som skabes andre steder end i bankbestyrelser.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>den_bank <span class="ot">&lt;-</span> den <span class="sc">%&gt;%</span> <span class="fu">filter</span>(person_name <span class="sc">%in%</span> bank_persons)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>For at kunne ‘smide’ alle de personer, der kun har én post (og derved ikke skaber forbindelse i netværket), laver vi en variabel, der tæller antallet af medlemsskaber per person. Og filtrer, så vi kun har personer med mere end en post.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>den_bank <span class="ot">&lt;-</span> den_bank <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(person_name) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">n_memberships =</span> <span class="fu">n_distinct</span>(affiliation))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>den_bank <span class="ot">&lt;-</span> den_bank <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n_memberships <span class="sc">&gt;</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="grafobjekt" class="level2">
-<h2 class="anchored" data-anchor-id="grafobjekt">Grafobjekt</h2>
-<p>Vi laver en sparse incidence eller bipartite adjacency matrix. Dvs en matrice med individer (<code>name</code>) i rækker og virksomheder m.v. (<code>affiliation</code>) i kolonner:</p>
+<section id="fra-medlemsdata-til-netværksdata" class="level2">
+<h2 class="anchored" data-anchor-id="fra-medlemsdata-til-netværksdata">Fra medlemsdata til netværksdata</h2>
+<section id="adjacency-matricer" class="level3">
+<h3 class="anchored" data-anchor-id="adjacency-matricer">Adjacency-matricer</h3>
+<p>Vi laver en sparse incidence eller bipartite adjacency matrix. Dvs en matrice med individer (<code>name</code>) i rækker og virksomheder m.v. (<code>affiliation</code>) i kolonner. Til det formål bruger vi <code>xtabs()</code> Sparse = TRUE betyder at vi beder funktionen xtabs om at gemme den nye matrice i et hukommelsesbesparende format, hvor den ikke gemmer alle 0’erne (dvs. de ikke-optrædende forbindelser)</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>bi_adj <span class="ot">&lt;-</span> <span class="fu">xtabs</span>(<span class="at">formula =</span> <span class="sc">~</span> person_name <span class="sc">+</span> affiliation, <span class="at">data =</span> den_sub, <span class="at">sparse =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>bi_adj <span class="ot">&lt;-</span> <span class="fu">xtabs</span>(<span class="at">formula =</span> <span class="sc">~</span> person_name <span class="sc">+</span> affiliation, <span class="at">data =</span> den_bank, <span class="at">sparse =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Og laver vha matrix multiplikation <span class="math inline">\(individ \times individ\)</span> matricen:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>adj <span class="ot">&lt;-</span>  bi_adj <span class="sc">%*%</span> <span class="fu">t</span>(bi_adj)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>adj <span class="ot">&lt;-</span>  bi_adj <span class="sc">%*%</span> <span class="fu">t</span>(bi_adj)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Jeg vil gerne vide hvilke værdier vores matrice indeholder. Så jeg kan overveje om den er vægtet eller ej. Da det er en sparse matrice vi har lavet kan vi dog ikke lave en simple <code>table()</code>. <code>str()</code> fortæller os hvad dataobjektet indeholder.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(adj)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(adj)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
-  ..@ i       : int [1:9166] 0 233 278 433 549 562 602 634 1 64 ...
-  ..@ p       : int [1:643] 0 8 14 44 68 86 107 134 138 145 ...
-  ..@ Dim     : int [1:2] 642 642
+  ..@ i       : int [1:8889] 0 10 14 16 49 52 54 61 69 80 ...
+  ..@ p       : int [1:312] 0 24 51 72 78 81 125 195 231 237 ...
+  ..@ Dim     : int [1:2] 311 311
   ..@ Dimnames:List of 2
-  .. ..$ person_name: chr [1:642] "Alan Daniel Berger 75816" "Alex Ostersen 19728" "Alexandra Bastkær Winther 17243" "Allan Aaskov 66668" ...
-  .. ..$ person_name: chr [1:642] "Alan Daniel Berger 75816" "Alex Ostersen 19728" "Alexandra Bastkær Winther 17243" "Allan Aaskov 66668" ...
-  ..@ x       : num [1:9166] 6 6 6 6 6 6 6 6 2 2 ...
+  .. ..$ person_name: chr [1:311] "Alex Ahrendtsen 58670" "Allan Aaskov 66668" "Allan Polack 14161" "Anders Hestbech 14538" ...
+  .. ..$ person_name: chr [1:311] "Alex Ahrendtsen 58670" "Allan Aaskov 66668" "Allan Polack 14161" "Anders Hestbech 14538" ...
+  ..@ x       : num [1:8889] 5 1 1 1 1 1 1 1 1 1 ...
   ..@ factors : list()</code></pre>
 </div>
 </div>
 <p><code>@x</code> indeholder matrices værdier (ud over 0): Så kan vi tælle:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(adj<span class="sc">@</span>x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(adj<span class="sc">@</span>x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-   1    2    3    4    5    6    7    8    9   10   12   13   17   20   64   65 
-6288 2256  305  107   48   96   13   14   12    1    3    2    4    1    6    9 
-  66 
-   1 </code></pre>
+   1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16 
+7818  691  172   82   43   26   10   11    6    3    7    4    3    3    4    2 
+  17   20   34 
+   2    1    1 </code></pre>
 </div>
 </div>
+<p>Vi kan se at der er lidt over to hundrede forbindelser som optræder 2 eller flere gange. Dvs. folk som kender hinanden fra mere flere bestyrelser. Det betyder at vi kunne vægte netværket, men det gør vi ikke. Derfor bruger vi <code>simplify()</code> som sletter <code>multiple edges</code></p>
+</section>
+<section id="netværks--eller-grafobjekt" class="level3">
+<h3 class="anchored" data-anchor-id="netværks--eller-grafobjekt">Netværks- eller grafobjekt</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>gr    <span class="ot">&lt;-</span> adj <span class="sc">%&gt;%</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>gr    <span class="ot">&lt;-</span> gr <span class="sc">%&gt;%</span> <span class="fu">as_tbl_graph</span>()</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>gr</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>gr    <span class="ot">&lt;-</span> adj <span class="sc">%&gt;%</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>gr    <span class="ot">&lt;-</span> gr <span class="sc">%&gt;%</span> <span class="fu">as_tbl_graph</span>()</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>gr</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tbl_graph: 642 nodes and 4262 edges
+<pre><code># A tbl_graph: 311 nodes and 4289 edges
 #
-# An undirected simple graph with 14 components
+# An undirected simple graph with 3 components
 #
-# Node Data: 642 × 1 (active)
-   name                           
-   &lt;chr&gt;                          
- 1 Alan Daniel Berger 75816       
- 2 Alex Ostersen 19728            
- 3 Alexandra Bastkær Winther 17243
- 4 Allan Aaskov 66668             
- 5 Allan Kragh Thaysen 17244      
- 6 Allan Luplau 66680             
- 7 Allan Polack 14161             
- 8 Anders Byriel 18049            
- 9 Anders Christian Dam 19805     
-10 Anders Christian Obel 76341    
-# ℹ 632 more rows
+# Node Data: 311 × 1 (active)
+   name                         
+   &lt;chr&gt;                        
+ 1 Alex Ahrendtsen 58670        
+ 2 Allan Aaskov 66668           
+ 3 Allan Polack 14161           
+ 4 Anders Hestbech 14538        
+ 5 Anders Holkmann Olsen 15836  
+ 6 Anders Jensen 14468          
+ 7 Andreas Munch Møller 51721   
+ 8 Ane Arnth Jensen 54733       
+ 9 Anette Holstein Nielsen 21504
+10 Anja C. Jensen 58972         
+# ℹ 301 more rows
 #
-# Edge Data: 4,262 × 2
+# Edge Data: 4,289 × 2
    from    to
   &lt;int&gt; &lt;int&gt;
-1     1   234
-2     1   279
-3     1   434
-# ℹ 4,259 more rows</code></pre>
+1     1    11
+2     1    15
+3     1    17
+# ℹ 4,286 more rows</code></pre>
 </div>
 </div>
+<p>Hvordan ser netværket så ud</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>() <span class="sc">+</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_width =</span> <span class="fl">0.3</span>, <span class="at">edge_alpha =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>() <span class="sc">+</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>() <span class="sc">+</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_width =</span> <span class="fl">0.3</span>, <span class="at">edge_alpha =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>() <span class="sc">+</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Using "stress" as default layout</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="session3_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="session3_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+</section>
 </section>
 </section>
 <section id="sammenhængskraft---cohesion" class="level1">
@@ -681,14 +562,505 @@ Stat_Statsadministration_Centraladministration_Børne- og ungeområdet
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="session3_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="session3_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-
-
+<p>Lad os starte med at se hvordan et netværk med fuld densitet ser ud ved at bruge en funktion fra Igraph, der laver et ‘fuldt’ netværk med 40 noder, hvor alle noder er forbundne.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>e1 <span class="ot">&lt;-</span> <span class="fu">make_full_graph</span>(<span class="at">n =</span> <span class="dv">40</span>, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>e1 <span class="ot">&lt;-</span> e1 <span class="sc">%&gt;%</span> <span class="fu">as_tbl_graph</span>()</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>e1 <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>() <span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_width =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">color =</span> <span class="st">"steelblue1"</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Using "stress" as default layout</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Når man har et graf- eller netværksobjekt kan densiteten beregnes med <code>edge_density()</code> funktionen fra Igraph.</p>
+<p>I det fulde netværk, <code>e1</code>, skulle værdien meget gerne være 1. (Altså 100%, fordi alle ud af de teoretisk mulige forbindelser findes)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edge_density</span>(e1, <span class="at">loops=</span><span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+</div>
+<p>Et andet ‘ekstremt’ eksempel er en stjerne-graf, hvor én node er forbundet til alle, mens de andre kun er forbundet til den (og altså ikke til hinanden)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>e2 <span class="ot">&lt;-</span> <span class="fu">make_star</span>(<span class="dv">40</span>, <span class="at">mode =</span> <span class="st">"undirected"</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>e2 <span class="ot">&lt;-</span> e2 <span class="sc">%&gt;%</span> <span class="fu">as_tbl_graph</span>()</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>e2 <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>() <span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_width =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">color =</span> <span class="st">"steelblue1"</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Using "tree" as default layout</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Her er det kun 39 forbindelser (altså en forbindelser til de 39 andre) ud af de (40*(40-1))/2 mulige</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edge_density</span>(e2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.05</code></pre>
+</div>
+</div>
+<p>Lad os vende tilbage til det faktiske eksempel med bankfolkene og beregne densiteten af deres netværk</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>edges     <span class="ot">&lt;-</span> <span class="fu">ecount</span>(gr) </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>nodes     <span class="ot">&lt;-</span> <span class="fu">vcount</span>(gr)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>edges_max <span class="ot">&lt;-</span> (nodes <span class="sc">*</span> (nodes<span class="dv">-1</span>)) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>edges <span class="sc">/</span> edges_max</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.08897417</code></pre>
+</div>
+</div>
+<p>som jo meget gerne skulle være det samme som med funktionen!!</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edge_density</span>(gr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.08897417</code></pre>
+</div>
+</div>
 </section>
+</section>
+<section id="komponenter" class="level1">
+<h1>Komponenter</h1>
+<p>En netværks-komponent er en sammenhængende undergraf. Dvs en del af hele netværket, hvor alle kan nå alle (i x antal led).</p>
+<p>Hvis vi plotter netværket, <code>gr</code>, kan vi se komponentstrukturen</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> </span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>() <span class="sc">+</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">edge_width =</span> .<span class="dv">2</span>, <span class="at">edge_alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">size=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Using "stress" as default layout</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Fordi, <code>gr</code>, er et tidygraph objekt kan ‘relativt let’ tilføje en variabel på node-delen af vores data, der fortæller hvilken komponent de forskellige noder tilhører. Til det formål skal vi lige aktivere node-delen (<code>activate(noder)</code>) hvorefter vi i mutate kan lave en variabel, jeg kalder comp, hvor <code>group_components()</code> funktionen giver hver node et nummer alt efter hvilken komponent de tilhører.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>gr <span class="ot">&lt;-</span> gr <span class="sc">%&gt;%</span> </span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">comp =</span> <span class="fu">group_components</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Hvis vi vil vide noget om komponentstrukturen kan vi lave ‘exportere’ node-dataen som <code>tibble</code> (tidydataformat) og kigge på det:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> <span class="fu">count</span>(comp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+   comp     n
+  &lt;int&gt; &lt;int&gt;
+1     1   307
+2     2     3
+3     3     1</code></pre>
+</div>
+</div>
+<p>der er 3 komponenter. Den største har 307 ‘medlemmer’. den næst-største har 3 osv.</p>
+<p>vi kan nu regne densiteten i komponenterne:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edge_density</span>(gr <span class="sc">%&gt;%</span> <span class="fu">filter</span>(comp <span class="sc">==</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.09126908</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edge_density</span>(gr <span class="sc">%&gt;%</span> <span class="fu">filter</span>(comp <span class="sc">==</span> <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6666667</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edge_density</span>(gr <span class="sc">%&gt;%</span> <span class="fu">filter</span>(comp <span class="sc">==</span> <span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] NaN</code></pre>
+</div>
+</div>
+<section id="visualisering-af-den-største-komponenter" class="level2">
+<h2 class="anchored" data-anchor-id="visualisering-af-den-største-komponenter">Visualisering af den største komponenter</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">filter</span>(comp<span class="sc">==</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>(<span class="at">layout =</span> <span class="st">"fr"</span>) <span class="sc">+</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">color =</span> <span class="st">"gray70"</span>, <span class="at">width =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">size=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="transitivitet--" class="level1">
+<h1>Transitivitet —-</h1>
+<p>I kursets forelæsninger har I diskuteret Granovetters teori om styrken af svage forbindelser og Burts tanker om strukturelle huller. Begge dele taler ind i spørgsmålet om hvor ‘sammenklumpet’ et netværk er og om triadic closure vs.&nbsp;ikke closure betyder.</p>
+<p>Med begrebet transitivitet måler måler vi det faktiske antal af lukkede trekanter i forhold til det mulige antal.</p>
+<p>Vi kan lige se på to eksempler:</p>
+<ol type="1">
+<li>En ring graf, med ingen triader</li>
+</ol>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>g1 <span class="ot">&lt;-</span> <span class="fu">make_ring</span>(<span class="dv">10</span>)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autograph</span>(g1) <span class="sc">+</span> <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Her er transitiviteten 0</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">transitivity</span>(g1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Et tilfældigt netværk med x noder og en given densitet (p er sandsynligheden for at der er en forbindelse mellem to noder : altså densiteten)</li>
+</ol>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>g2 <span class="ot">&lt;-</span> <span class="fu">sample_gnp</span>(<span class="dv">30</span>, <span class="at">p =</span> <span class="dv">10</span><span class="sc">/</span><span class="dv">100</span>) </span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autograph</span>(g2) <span class="sc">+</span> </span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">filter =</span> {<span class="fu">count_triangles</span>(g2) <span class="sc">&gt;</span> <span class="dv">0</span>}, <span class="at">color =</span> {<span class="fu">count_triangles</span>(g2) <span class="sc">&gt;</span><span class="dv">0</span>})) <span class="sc">+</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>() <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">color =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Alle noder der indgår i en lukket trekant er røde Her er transitiviteten:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">transitivity</span>(g2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1034483</code></pre>
+</div>
+</div>
+<p>Vi har indtil nu kigget på transitivitet som et mål for hele netværkets grad af lukning. Høj global transitivitet fortæller os der er mange ‘strong ties’ som skaber closure (og dermed tæthed i netværket). En lav transitivitet peger omvendt på at der er såkaldte ‘weak ties’ så trekanter ikke ‘lukkes’. Det skaber mulighed for at ‘bridge’ strukturelle huller.</p>
+<p>Man kan også beregne en lokal transitivitet, som fortæller os hvor mange af de mulige lukkede triader et given node kan indgå som faktisk er lukkede: A kender B og C - kender B og C så hinanden? Hvis ja er triaden lukket ellers ikke.</p>
+<p>Lad os vende tilbage til banknetværket og kigge på det:</p>
+<p>Banknetværkets globale transitivitet er:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>tr_g <span class="ot">&lt;-</span> <span class="fu">transitivity</span>(gr, <span class="at">type =</span> <span class="st">"global"</span>)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>tr_g</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.8679886</code></pre>
+</div>
+</div>
+<p>Det er altså ret så lukket og tæt samlet set.</p>
+<p>hvis vi ændrer type til ‘local’ får vi den lokale transitivitet:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>tr_l <span class="ot">&lt;-</span> <span class="fu">transitivity</span>(gr, <span class="at">type =</span> <span class="st">"local"</span>) </span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tr_l, <span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        Alex Ahrendtsen 58670            Allan Aaskov 66668 
+                    1.0000000                     0.6523077 
+           Allan Polack 14161         Anders Hestbech 14538 
+                    0.6052632                     1.0000000 
+  Anders Holkmann Olsen 15836           Anders Jensen 14468 
+                    1.0000000                     0.4296788 
+   Andreas Munch Møller 51721        Ane Arnth Jensen 54733 
+                    1.0000000                     0.4352941 
+Anette Holstein Nielsen 21504          Anja C. Jensen 58972 
+                    1.0000000                     0.5652174 
+            Anja Philip 54857    Anker Laden-Andersen 21210 
+                    0.6674877                     0.7777778 
+       Anna Bolette Bro 20166    Anna Kromann Aagaard 48889 
+                    1.0000000                     1.0000000 
+     Anne H. Steffensen 76538    Anne Louise Eberhard 15879 
+                    0.6048387                     0.3555556 
+            Anne Paulin 58668         Anne-Marie Krog 14678 
+                    0.6758621                     1.0000000 
+     Annemette Fuglsang 49729           Annika Olsson 53835 
+                    1.0000000                     0.0000000 </code></pre>
+</div>
+</div>
+<p>For at forstå hvad det betyder kan vi lave et lille hjælpe data, hvor vi for hver node 1) tæller hvor mange forbindelser de har (degree - det vender vi tilbage til næste gang), 2) regner ud hvor mange lukkede trekanter de således teoretisk kan indgå i, og 3) hvor mange trekanter de faktisk indgår i</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="fu">degree</span>(gr)</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>possible_triangles <span class="ot">&lt;-</span> <span class="fu">choose</span>(k, <span class="dv">2</span>)</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>actual_triangles   <span class="ot">&lt;-</span> <span class="fu">count_triangles</span>(gr)</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">degree =</span> k, </span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">possible =</span> possible_triangles,</span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">actual =</span> actual_triangles, </span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">transitivitet =</span> tr_l) <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                              degree possible actual transitivitet
+Alex Ahrendtsen 58670             23      253    253     1.0000000
+Allan Aaskov 66668                26      325    212     0.6523077
+Allan Polack 14161                20      190    115     0.6052632
+Anders Hestbech 14538              5       10     10     1.0000000
+Anders Holkmann Olsen 15836        2        1      1     1.0000000
+Anders Jensen 14468               43      903    388     0.4296788
+Andreas Munch Møller 51721        69     2346   2346     1.0000000
+Ane Arnth Jensen 54733            35      595    259     0.4352941
+Anette Holstein Nielsen 21504      5       10     10     1.0000000
+Anja C. Jensen 58972              24      276    156     0.5652174
+Anja Philip 54857                 29      406    271     0.6674877
+Anker Laden-Andersen 21210         9       36     28     0.7777778
+Anna Bolette Bro 20166             6       15     15     1.0000000
+Anna Kromann Aagaard 48889        69     2346   2346     1.0000000
+Anne H. Steffensen 76538          32      496    300     0.6048387
+Anne Louise Eberhard 15879        10       45     16     0.3555556
+Anne Paulin 58668                 30      435    294     0.6758621
+Anne-Marie Krog 14678              7       21     21     1.0000000
+Annemette Fuglsang 49729          69     2346   2346     1.0000000
+Annika Olsson 53835                2        1      0     0.0000000</code></pre>
+</div>
+</div>
+<p>Vi kan også lige lave en visualisering, hvor vi tager den største komponent og fremhæver de noder der har en lav lokal transitivitet. Dvs indgår i åbne trekanter. Det kommer til at spille en rolle, når vi senere i kurset dykker mere ned i Burts teorier om constraint..</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>gr <span class="sc">%&gt;%</span> <span class="fu">filter</span>(comp<span class="sc">==</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>(<span class="at">layout =</span> <span class="st">"fr"</span>) <span class="sc">+</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="at">color =</span> <span class="st">"gray70"</span>, <span class="at">width =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">size=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">filter =</span> <span class="fu">centrality_degree</span>() <span class="sc">!=</span> <span class="dv">1</span> <span class="sc">&amp;</span> <span class="fu">local_transitivity</span>() <span class="sc">&lt;</span> .<span class="dv">3</span>), <span class="at">color =</span> <span class="st">"red"</span>)<span class="sc">+</span></span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_label</span>(<span class="fu">aes</span>(<span class="at">filter =</span> <span class="fu">centrality_degree</span>() <span class="sc">!=</span> <span class="dv">1</span> <span class="sc">&amp;</span> <span class="fu">local_transitivity</span>() <span class="sc">&lt;</span> .<span class="dv">3</span>, <span class="at">label =</span> <span class="fu">local_transitivity</span>() <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">2</span>)), <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">repel =</span> <span class="cn">TRUE</span>)<span class="sc">+</span></span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="stilængder-gennemsnitlig-afstand-og-diameter--" class="level1">
+<h1>Stilængder gennemsnitlig afstand og diameter —-</h1>
+<p>Når vi taler om afstande i netværk taler vi om stilængder. Afstanden mellem et par er noder er således defineret ved den korteste sti (shortest path) der findes mellem to noder. Hvis A fx. kan nå D ad to veje: 1) A - C - F - Q - D og 2) A - B - H - D, er 2 den korteste vej og afstanden er tre fordi der er tre steps mellem A og D.</p>
+<p>Når vi kender den korteste vej mellem alle par af noder (det kan Igraph beregne) kan vi måle forskellige ting, der kan være beskrivende for netværkets overordnede struktur (eller topologi).</p>
+<p>Disse mål giver kun mening for en sammenhængende kompontent, så først skal vi lige subsette vores netværk, så vi kun regner på den største komponent. Vi laver et nyt graf- eller netværksobjekt kun med den største komponent. Fordi gr er et tidygraph objekt kan vi bruge tidyverse-funktioner som fx. filter()</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>comp1 <span class="ot">&lt;-</span> gr <span class="sc">%&gt;%</span> <span class="fu">filter</span>(comp <span class="sc">==</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>igraph funktionen <code>distances</code> giver os en matrice, der viser hvor lang den korteste vej mellem samtlige par af noder er:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>dist <span class="ot">&lt;-</span> <span class="fu">distances</span>(comp1) </span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>dist[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                              Alex Ahrendtsen 58670 Allan Aaskov 66668
+Alex Ahrendtsen 58670                             0                  3
+Allan Aaskov 66668                                3                  0
+Allan Polack 14161                                2                  2
+Anders Hestbech 14538                             4                  3
+Anders Holkmann Olsen 15836                       4                  3
+Anders Jensen 14468                               3                  1
+Andreas Munch Møller 51721                        3                  3
+Ane Arnth Jensen 54733                            2                  1
+Anette Holstein Nielsen 21504                     4                  3
+Anja C. Jensen 58972                              2                  2
+                              Allan Polack 14161 Anders Hestbech 14538
+Alex Ahrendtsen 58670                          2                     4
+Allan Aaskov 66668                             2                     3
+Allan Polack 14161                             0                     4
+Anders Hestbech 14538                          4                     0
+Anders Holkmann Olsen 15836                    4                     5
+Anders Jensen 14468                            2                     3
+Andreas Munch Møller 51721                     3                     4
+Ane Arnth Jensen 54733                         2                     4
+Anette Holstein Nielsen 21504                  4                     1
+Anja C. Jensen 58972                           3                     3
+                              Anders Holkmann Olsen 15836 Anders Jensen 14468
+Alex Ahrendtsen 58670                                   4                   3
+Allan Aaskov 66668                                      3                   1
+Allan Polack 14161                                      4                   2
+Anders Hestbech 14538                                   5                   3
+Anders Holkmann Olsen 15836                             0                   3
+Anders Jensen 14468                                     3                   0
+Andreas Munch Møller 51721                              4                   2
+Ane Arnth Jensen 54733                                  2                   1
+Anette Holstein Nielsen 21504                           5                   3
+Anja C. Jensen 58972                                    4                   2
+                              Andreas Munch Møller 51721 Ane Arnth Jensen 54733
+Alex Ahrendtsen 58670                                  3                      2
+Allan Aaskov 66668                                     3                      1
+Allan Polack 14161                                     3                      2
+Anders Hestbech 14538                                  4                      4
+Anders Holkmann Olsen 15836                            4                      2
+Anders Jensen 14468                                    2                      1
+Andreas Munch Møller 51721                             0                      2
+Ane Arnth Jensen 54733                                 2                      0
+Anette Holstein Nielsen 21504                          4                      4
+Anja C. Jensen 58972                                   2                      2
+                              Anette Holstein Nielsen 21504
+Alex Ahrendtsen 58670                                     4
+Allan Aaskov 66668                                        3
+Allan Polack 14161                                        4
+Anders Hestbech 14538                                     1
+Anders Holkmann Olsen 15836                               5
+Anders Jensen 14468                                       3
+Andreas Munch Møller 51721                                4
+Ane Arnth Jensen 54733                                    4
+Anette Holstein Nielsen 21504                             0
+Anja C. Jensen 58972                                      3
+                              Anja C. Jensen 58972
+Alex Ahrendtsen 58670                            2
+Allan Aaskov 66668                               2
+Allan Polack 14161                               3
+Anders Hestbech 14538                            3
+Anders Holkmann Olsen 15836                      4
+Anders Jensen 14468                              2
+Andreas Munch Møller 51721                       2
+Ane Arnth Jensen 54733                           2
+Anette Holstein Nielsen 21504                    3
+Anja C. Jensen 58972                             0</code></pre>
+</div>
+</div>
+<p>Et et-tal betyder at de er direkte forbundne, et to-tal at de skal igennem en anden node (en vens ven), et tre-tal at den koreste vej går gennem to andre noder osv.</p>
+<p>Når vi kender alle afstande kan vi beregne den gennemsnitlige afstand, eller vi kan beregne den direkte med igraph funktionen <code>mean_distance()</code></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean_distance</span>(comp1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.767772</code></pre>
+</div>
+</div>
+<p>Hvilket fortæller os at alle par af noder ‘i gennemsnit’ kan nå hinanden i lidt under 3 led.</p>
+<p>Den længste ‘korteste sti’ i netværket kalder vi netværkets diameter. Det fortæller os noget om hvor langt to noder kan være fra hinanden i en sammenhængende komponent.</p>
+<p>diameter på den største komponent i vores banknetværk</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diameter</span>(comp1, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6</code></pre>
+</div>
+</div>
+<p>er 6. Tætheden i netværket er altså relativt stor, da to bankfolk aldrig er mere end 6 led fra hinanden.</p>
+<p>hvilke to personer er så længst fra hinanden</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">farthest_vertices</span>(comp1, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$vertices
++ 2/307 vertices, named, from b8870c2:
+[1] Anders Hestbech 14538 Poul Dahlgaard 70290 
+
+$distance
+[1] 6</code></pre>
+</div>
+</div>
+<p>Anders Hestbech, som er bestyrelsesformand i DANSKE ANDELSKASSERS BANK A/S (Bestyrelse) og Poul Dahlgaard, som er med i Arbejdsgruppen om ledelsesbekendtgørelsen for Pengeinstitutter</p>
+<p>Den vej Anders skal ‘gå’ for at møde Poul er:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>diam <span class="ot">&lt;-</span> <span class="fu">get_diameter</span>(comp1, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>diam</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>+ 7/307 vertices, named, from b8870c2:
+[1] Anders Hestbech 14538     Jan Pedersen 18274       
+[3] Charlotte Skovgaard 18276 Inge Berneke 63780       
+[5] Kim Haggren 49144         Kirstine Thorsen 58934   
+[7] Poul Dahlgaard 70290     </code></pre>
+</div>
+</div>
+<p>Vi kan visualisere den længste sti:</p>
+<p>til de formål skal vi bruge navnene fra <code>diam</code> objektet</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>diam <span class="ot">&lt;-</span> <span class="fu">names</span>(diam)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Visualisering kræver at vi 1) gemmer en variabel i node-data-delen, der fortæller (TRUE/FALSE) om de ligger på stien:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>comp1 <span class="ot">&lt;-</span> comp1 <span class="sc">%&gt;%</span> <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span> </span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diameter =</span> name <span class="sc">%in%</span> diam) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>og 2) at vi gemmer en variabel til egdes, der fortæller (TRUE/FALSE) om de indgår i stien: vi aktiverer først edge-dataen <code>activate(edges)</code> og laver en variabel hvor alle edges har værdien FALSE, i læste skridt bruger vi morph() (<code>morph()</code> er en tidygraf funktion der laver en midlertidig opdeling af grafen). Her giver vi den funktionen <code>to_shortest_path</code> og beder den om kun at tage de edges, der går fra det første (<code>first()</code>) navn i <code>diam</code> (Anders) til det sidste (<code>last()</code>). Det udsnit af edges giver så værdien TRUE og unmorpher grafen igen.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>comp1 <span class="ot">&lt;-</span> comp1 <span class="sc">%&gt;%</span> <span class="fu">activate</span>(edges) <span class="sc">%&gt;%</span> </span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diameter =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">morph</span>(to_shortest_path, <span class="at">from =</span> <span class="fu">.N</span>()<span class="sc">$</span>name <span class="sc">==</span> <span class="fu">first</span>(diam), <span class="at">to =</span> <span class="fu">.N</span>()<span class="sc">$</span>name <span class="sc">==</span> <span class="fu">last</span>(diam)) <span class="sc">%&gt;%</span> </span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diameter =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">unmorph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Med de to variable kan vi plotte den største komponent igen og fremhæve stien mellem de to noder der har den største afstand i data:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>comp1 <span class="sc">%&gt;%</span> </span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>() <span class="sc">+</span></span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="fu">aes</span>(<span class="at">filter=</span>diameter<span class="sc">==</span><span class="cn">FALSE</span>), <span class="at">color =</span> <span class="st">"gray60"</span>) <span class="sc">+</span> </span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">filter=</span>diameter<span class="sc">==</span><span class="cn">FALSE</span>), <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="fu">aes</span>(<span class="at">filter=</span>diameter<span class="sc">==</span><span class="cn">TRUE</span>), <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">width =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">filter=</span>diameter<span class="sc">==</span><span class="cn">TRUE</span>), <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_label</span>(<span class="fu">aes</span>(<span class="at">filter=</span>diameter<span class="sc">==</span><span class="cn">TRUE</span>, <span class="at">label =</span> name), <span class="at">nudge_y =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">size =</span><span class="fl">2.5</span>, <span class="at">repel =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> </span>
+<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Diameter in EliteDBs finance component'</span>) <span class="sc">+</span></span>
+<span id="cb76-9"><a href="#cb76-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>() </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Using "stress" as default layout</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="ekstra-den-korteste-vej-mellem-to-specifikke-noder" class="level1">
+<h1>Ekstra : Den korteste vej mellem to specifikke noder</h1>
+<p>Lad os sige vi gerne vil finde vise den korteste vej mellem to bestemt noder</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>node1 <span class="ot">&lt;-</span> <span class="st">"Ulrik Rammeskow Bang-Pedersen 51259"</span> <span class="co"># som sidder i finansiel stabilitet</span></span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>node2 <span class="ot">&lt;-</span> <span class="st">"Carsten Egeriis 66665"</span>          <span class="co"># adm. direktør i danske bank</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>comp1 <span class="ot">&lt;-</span> comp1 <span class="sc">%&gt;%</span> <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sh_path =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">morph</span>(to_shortest_path, <span class="at">from =</span> <span class="fu">.N</span>()<span class="sc">$</span>name <span class="sc">==</span> node1, <span class="at">to =</span> <span class="fu">.N</span>()<span class="sc">$</span>name <span class="sc">==</span> node2) <span class="sc">%&gt;%</span></span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sh_path =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">unmorph</span>()</span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>comp1 <span class="ot">&lt;-</span> comp1 <span class="sc">%&gt;%</span> <span class="fu">activate</span>(edges) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sh_path =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">morph</span>(to_shortest_path, <span class="at">from =</span> <span class="fu">.N</span>()<span class="sc">$</span>name <span class="sc">==</span> node1, <span class="at">to =</span> <span class="fu">.N</span>()<span class="sc">$</span>name <span class="sc">==</span> node2) <span class="sc">%&gt;%</span></span>
+<span id="cb79-9"><a href="#cb79-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sh_path =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">unmorph</span>()</span>
+<span id="cb79-10"><a href="#cb79-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-11"><a href="#cb79-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-12"><a href="#cb79-12" aria-hidden="true" tabindex="-1"></a>comp1 <span class="sc">%&gt;%</span> </span>
+<span id="cb79-13"><a href="#cb79-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>(<span class="at">layout=</span><span class="st">'fr'</span>) <span class="sc">+</span> </span>
+<span id="cb79-14"><a href="#cb79-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="fu">aes</span>(<span class="at">filter=</span>sh_path<span class="sc">==</span><span class="cn">FALSE</span>), <span class="at">color=</span><span class="st">'grey50'</span>, <span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span> </span>
+<span id="cb79-15"><a href="#cb79-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">filter=</span>sh_path<span class="sc">==</span><span class="cn">FALSE</span>), <span class="at">color=</span><span class="st">'black'</span>, <span class="at">size=</span><span class="dv">3</span>, <span class="at">alpha=</span><span class="fl">0.25</span>) <span class="sc">+</span> </span>
+<span id="cb79-16"><a href="#cb79-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="fu">aes</span>(<span class="at">filter=</span>sh_path<span class="sc">==</span><span class="cn">TRUE</span>), <span class="at">color=</span><span class="st">'red'</span>, <span class="at">width=</span><span class="fl">1.2</span>) <span class="sc">+</span> </span>
+<span id="cb79-17"><a href="#cb79-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">filter=</span>sh_path<span class="sc">==</span><span class="cn">TRUE</span>), <span class="at">color=</span><span class="st">'darkred'</span>, <span class="at">size=</span><span class="dv">5</span>, <span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span> </span>
+<span id="cb79-18"><a href="#cb79-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_label</span>(<span class="fu">aes</span>(<span class="at">filter=</span>sh_path<span class="sc">==</span><span class="cn">TRUE</span>, <span class="at">label=</span>name), <span class="at">color=</span><span class="st">'red'</span>, <span class="at">size=</span><span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">repel =</span> T) <span class="sc">+</span> </span>
+<span id="cb79-19"><a href="#cb79-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session3_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="øvelse" class="level1">
+<h1>Øvelse</h1>
+<p>Her kan I downloade et script med øvelser til dagens session <a href="scripts til undervisning/Session3_øvelse.R" class="btn btn-primary">Scriptet - Session3_øvelser.R</a></p>
+<p>og et datasæt til øvelse: <a href="data/pharma.csv" class="btn btn-primary">Datasættet - pharma.csv</a> som du skal lægge i undermappen /data i din r-projekt-mappe</p>
+<p>Du kan også downloade øvelsen med svar (men prøv først selv :) ) <a href="scripts til undervisninSession3_øvelse med svar.R" class="btn btn-primary">Scriptet - Session3_øvelser_med_svar.R</a></p>
+
+
 </section>
 
 </main> <!-- /main -->

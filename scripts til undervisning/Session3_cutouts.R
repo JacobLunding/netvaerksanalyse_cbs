@@ -106,3 +106,56 @@ d1 <- d %>% filter(name != "Edges") %>% droplevels.data.frame()
 ggplot(d1) + geom_line(aes(x = t, y = value)) + 
   geom_point(data = d1 %>% group_by(name) %>% dplyr::summarise(MAX = max(value, na.rm = T)) %>% ungroup(), aes(x = 0, y = MAX), colour = "white", alpha = 0) + geom_point(data = d1 %>% group_by(name) %>%dplyr::summarise(MIN = min(value, na.rm = T)) %>% ungroup(), aes(x = 0, y = MIN), colour = "white", alpha = 0) +
   facet_grid(rows = vars(name), cols = vars(type), scale = "free_y", switch = "y") + theme_bw()
+
+
+
+
+
+
+
+#############SIFI eksample
+
+
+
+SIFI25 <- c("Danske Bank A/S", "Nykredit Realkredit A/S", "Jyske Bank A/S", "Nordea Kredit", "Realkreditaktieselskab", "Sydbank A/S", "DLR Kredit A/S", "Saxo Bank A/S", "A/S Arbejdernes Landsbank", "Føroya Banki", "P/F Betri Banki", "Grønlandsbanken")
+SIFI17 <- c("Danske Bank A/S", "Nykredit Realkredit A/S", "Nordea Kredit Realkredit A/S", "Jyske Bank A/S", "Sydbank A/S", " DLR Kredit A/S", "P/F BankNordik", "Betri Banki P/F", "Norðoya Sparikassi", "Grønlandsbanken")
+SIFI12 <- c("Danske Bank", "Nykredit", "Nordea Bank Danmark", "Jyske Bank", "BRFkredit", "Sydbank")
+
+
+
+
+den24 <- den24 %>% mutate(SIFI = grepl("danske bank|nykredit|(?!<nord)jy(?:d)?ske bank|nordea kredit|sydbank|dlr|saxo bank|arbejdernes landsbank|føroya bank|betri bank|grønlandsbank", affiliation, ignore.case = T, perl = T) & !grepl("repr(a|ae|æ)sentantskab|advisory board|supervisory", affiliation, ignore.case = T))
+
+den17 <- read_csv("data/den17-no-nordic-letters.csv")
+den17 <- den17 %>% mutate(SIFI = grepl("danske bank|nykredit|nordea kredit|(?!<nord)jy(?:d)?ske bank|sydbank|dlr|banknordik|betri banki|oya sparkassi|grønlandsbank", affiliation, ignore.case = T, perl = T) & !grepl("repr(a|ae|æ)sentantskab|advisory board|udvalg", affiliation, ignore.case = T))
+load("data/den.rda")
+den12 <- den %>% mutate(SIFI = grepl("danske bank|nykredit|nordea bank|jy(?:d)?ske bank|brfkredit|sydbank", AFFILIATION, ignore.case = T, perl = T) & !grepl("repr(a|ae|æ)sentantskab|advisory board|udvalg|nordjyske", AFFILIATION, ignore.case = T))
+den12 <- den12 %>% mutate(name = as.character(NAME), affiliation = as.character(AFFILIATION))
+
+den24 %>% filter(SIFI) %>% count(affiliation)
+den17 %>% filter(SIFI) %>% count(affiliation)
+den12 %>% filter(SIFI) %>% count(AFFILIATION)
+sifi_pers24 <- den24 %>% filter(SIFI) %>% pull(person_name) %>% unique()
+sifi_pers17 <- den17 %>% filter(SIFI) %>% pull(name) %>% unique()
+sifi_pers12 <- den12 %>% filter(SIFI) %>% pull(NAME) %>% droplevels() %>% unique() %>% as.character()
+
+den24_sifi <- den24 %>% filter(person_name %in% sifi_pers24)
+den17_sifi <- den17 %>% filter(name %in% sifi_pers17)
+den12_sifi <- den12 %>% filter(NAME %in% sifi_pers12)
+
+net24_sifi <- den24_sifi %>% xtabs(., formula = ~person_name + affiliation, sparse = T)
+net17_sifi <- den17_sifi %>% xtabs(., formula = ~name + affiliation, sparse = T) 
+net12_sifi <- den12_sifi %>% xtabs(., formula = ~name + affiliation, sparse = T) 
+
+sifi24_ind <- t(net24_sifi) %*% net24_sifi
+sifi17_ind <- t(net17_sifi) %*% net17_sifi
+sifi12_ind <- t(net12_sifi) %*% net12_sifi
+
+net_sifi24_ind <- sifi24_ind %>% graph_from_adjacency_matrix(., mode = "undirected", diag = FALSE) %>% simplify()
+net_sifi17_ind <- sifi17_ind %>% graph_from_adjacency_matrix(., mode = "undirected", diag = FALSE) %>% simplify()
+net_sifi12_ind <- sifi12_ind %>% graph_from_adjacency_matrix(., mode = "undirected", diag = FALSE) %>% simplify()
+
+ggraph(net_sifi24_ind) +
+  geom_edge_link0() +
+  geom_node_point() +
+  theme_graph()

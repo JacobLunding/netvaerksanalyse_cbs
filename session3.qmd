@@ -2,7 +2,7 @@
 title: "Sammenhængskraft, Densitet, kliker og strukturelle huller"
 ---
 
-```{r}
+```{r, echo = F}
 library(tidyverse)
 library(tidygraph)
 library(igraph)
@@ -10,9 +10,33 @@ library(ggraph)
 library(Matrix)
 ```
 
-# Den finansielle sektor i det danske elitenetværk
+# Bank sektoren i det danske elitenetværk
+
+For at køre dette script skal du downloade
+
+scriptet:
+[Scriptet - Session3.R](scripts%20til%20undervisning/Session3.R){.btn .btn-primary}
+
+datasættet:
+[Datasættet - danish_elitenetworks2024.csv](data/danish_elitenetworks2024.csv){.btn .btn-primary}
+som du skal lægge i undermappen /data i din r-projekt-mappe
+
+og funktioner:
+[funktionen - triangle_plot.R]("functions/triangle_plot.R"){.btn .btn-primary}
+
+[funktionen - clique_plot.R]("functions/clique_plot.R"){.btn .btn-primary}
+som begge lægges i undermappen /functions i r-projekt-mappen
+
+
+Når de to funktioner ligger der kan de sources
+```{r}
+source("functions/clique_plot.R", echo = FALSE)
+source("functions/triangle_plot.R", echo = FALSE)
+```
 
 ## Data: Det danske elitenetværk
+
+Vi starter med at indlæse datasættet:
 
 ```{r, warning=FALSE, message = FALSE}
 den <- read_csv("data/danish_elitenetworks2024.csv")
@@ -20,49 +44,69 @@ den <- read_csv("data/danish_elitenetworks2024.csv")
 
 ## Subset: Tags og branchekoder
 
-Lad os forsøge at finde et relevant subset af affiliatoins, vi kan kalde den finansielle sektor:
+Lad os forsøge at finde et relevant subset af affiliatoins, vi kan kalde bank sektoren:
 
-På det mest aggregerede branchekode niveau finder vi: 
+På det mest detaljerede branchekode-niveau (niveau5) finder vi: 
 ```{r}
-den %>% distinct(affiliation, affiliation_branche_niveau1) %>% count(affiliation_branche_niveau1)
+den %>% distinct(affiliation, affiliation_branche_niveau5) %>% count(affiliation_branche_niveau5)
 ```
-545 virksomheder med branchekoden "Pengeinstitut- og finansvirksomhed, forsikring"
+24 virksomheder med branchekoden "Banker, sparekasser og andelskasser"
 
 Kigger vi på `affiliation_tags` som vi er nød til først at splitte `str_split()` og unliste `unlist()` fordi der kan være flere tags per virksomhed. De er separeret med "; ", så det splitter vi på: 
 
 ```{r}
-den %>% pull(affiliation_tags) %>% str_split("; ") %>% unlist() %>% table()
+den %>% pull(affiliation_tags) %>% str_split("; ") %>% unlist() %>% table() %>% head(25)
 ```
 
-Her kan vi se at tags'ne: "Erhvervsliv_Finans" (uden nævnere angivelse), "Erhvervsliv_Finans_Banker", "Erhvervsliv_Finans_Forsikring", "Erhvervsliv_Finans_Investering", "Erhvervsliv_Finans_Pension" er relevante...
+Her kan vi se at der er et tag for "Erhvervsliv_Finans_Banker"
 
 
-Med de to oplysninger kan vi lave en variabel der fortæller os om en affiliation er relevant:
+Med de to oplysninger kan vi lave en variabel der fortæller os om en affiliation er en bank:
 
 ```{r}
-den <- den %>% mutate(finans = affiliation_branche_niveau1 == "Pengeinstitut- og finansvirksomhed, forsikring" | 
-                        grepl("Erhvervsliv_Finans|Erhvervsliv_Finans_Banker|Erhvervsliv_Finans_Forsikring|Erhvervsliv_Finans_Investering|Erhvervsliv_Finans_Pension", affiliation_tags))
-den %>% count(finans)
+den <- den %>% mutate(er_bank = affiliation_branche_niveau5 == "Banker, sparekasser og andelskasser" | 
+                        grepl("Erhvervsliv_Finans_Banker", affiliation_tags, ignore.case = T))
+den %>% count(er_bank)
 
 ```
 
 ###Filtrering
 
+Her subsettes `den`, så vi kun har de poster der er i en bank virksomhed/organisation....
 ```{r}
-den_sub <- den %>% filter(finans == TRUE)
+den_bank <- den %>% filter(er_bank == TRUE)
 ```
 
+En anden mulighed er at inkludere de andre (ikke bank) steder hvor folk med en bank-position sidder.
+
+Det gør vi ved at trække (`pull()`) variablen `person_name` ud af data, dvs. tage de navne der er i den_bank og tage de unikke værdier
 ```{r}
-den_sub <- den_sub %>% group_by(person_name) %>% mutate(n_afil = n_distinct(affiliation))
-den_sub <- den_sub %>% filter(n_afil > 1)
+bank_persons <- den_bank %>% pull(person_name) %>% unique()
+bank_persons %>% head(10)
 ```
 
-## Grafobjekt
-
-Vi laver en sparse incidence eller bipartite adjacency matrix. Dvs en matrice med individer (`name`) i rækker og virksomheder m.v. (`affiliation`) i kolonner:
+ved at vende tilbage til det fulde data `den` og i stedet filtrere på alle de rækker der har en person fra bankdatasættet, får vi et større data med alle deres andre poster i. Dvs. hvis formanden for bestyrelsen i Danske Bank også sidder i Kattens Værn får vi den post med, selvom det ikke er en bank. Det giver mulighed for at der kan være forbindelser mellem bank-folk, som skabes andre steder end i bankbestyrelser.
 
 ```{r}
-bi_adj <- xtabs(formula = ~ person_name + affiliation, data = den_sub, sparse = TRUE)
+den_bank <- den %>% filter(person_name %in% bank_persons)
+```
+
+For at kunne 'smide' alle de personer, der kun har én post (og derved ikke skaber forbindelse i netværket), laver vi en variabel, der tæller antallet af medlemsskaber per person. Og filtrer, så vi kun har personer med mere end en post.
+
+```{r}
+den_bank <- den_bank %>% group_by(person_name) %>% mutate(n_memberships = n_distinct(affiliation))
+den_bank <- den_bank %>% filter(n_memberships > 1)
+```
+
+## Fra medlemsdata til netværksdata
+
+### Adjacency-matricer
+
+Vi laver en sparse incidence eller bipartite adjacency matrix. Dvs en matrice med individer (`name`) i rækker og virksomheder m.v. (`affiliation`) i kolonner. Til det formål bruger vi `xtabs()`
+Sparse = TRUE betyder at vi beder funktionen xtabs om at gemme den nye matrice i et hukommelsesbesparende format, hvor den ikke gemmer alle 0'erne (dvs. de ikke-optrædende forbindelser)
+
+```{r}
+bi_adj <- xtabs(formula = ~ person_name + affiliation, data = den_bank, sparse = TRUE)
 ```
 
 Og laver vha matrix multiplikation $individ \times individ$ matricen:
@@ -74,7 +118,7 @@ adj <-  bi_adj %*% t(bi_adj)
 Jeg vil gerne vide hvilke værdier vores matrice indeholder. Så jeg kan overveje om den er vægtet eller ej. Da det er en sparse matrice vi har lavet kan vi dog ikke lave en simple `table()`. `str()` fortæller os hvad dataobjektet indeholder.
 
 ```{r}
-str(adj)
+glimpse(adj)
 ```
 
 `@x` indeholder matrices værdier (ud over 0): Så kan vi tælle:
@@ -83,6 +127,9 @@ str(adj)
 table(adj@x)
 ```
 
+Vi kan se at der er lidt over to hundrede forbindelser som optræder 2 eller flere gange. Dvs. folk som kender hinanden fra mere flere bestyrelser. Det betyder at vi kunne vægte netværket, men det gør vi ikke. Derfor bruger vi `simplify()` som sletter `multiple edges`
+
+### Netværks- eller grafobjekt
 
 ```{r}
 gr    <- adj %>% graph_from_adjacency_matrix(mode = "undirected", diag = FALSE) %>% simplify()
@@ -90,6 +137,7 @@ gr    <- gr %>% as_tbl_graph()
 gr
 ```
 
+Hvordan ser netværket så ud
 ```{r}
 gr %>% ggraph() +
   geom_edge_link0(edge_width = 0.3, edge_alpha = .5) +
@@ -123,3 +171,332 @@ ggplot(teo_max) +
   theme_bw(base_family = "serif") 
 
 ```
+
+Lad os starte med at se hvordan et netværk med fuld densitet ser ud ved at bruge en funktion fra Igraph, der laver et 'fuldt' netværk med 40 noder, hvor alle noder er forbundne.
+
+```{r}
+e1 <- make_full_graph(n = 40, directed = FALSE)
+e1 <- e1 %>% as_tbl_graph()
+e1 %>% ggraph() +
+  geom_edge_link0(edge_width = 0.1, alpha = 0.2) +
+  geom_node_point(color = "steelblue1", size = 4) +
+  theme_graph()
+```
+
+Når man har et graf- eller netværksobjekt kan densiteten beregnes med `edge_density()` funktionen fra Igraph.
+
+I det fulde netværk, `e1`, skulle værdien meget gerne være 1. (Altså 100%, fordi alle ud af de teoretisk mulige forbindelser findes)
+
+```{r}
+edge_density(e1, loops=FALSE)
+```
+
+Et andet 'ekstremt' eksempel er en stjerne-graf, hvor én node er forbundet til alle, mens de andre kun er forbundet til den (og altså ikke til hinanden)
+
+
+```{r}
+e2 <- make_star(40, mode = "undirected")
+e2 <- e2 %>% as_tbl_graph()
+
+e2 %>% ggraph() +
+  geom_edge_link0(edge_width = 0.1, alpha = 0.4) +
+  geom_node_point(color = "steelblue1", size = 4) +
+  theme_graph()
+```
+
+Her er det kun 39 forbindelser (altså en forbindelser til de 39 andre) ud af de (40*(40-1))/2 mulige
+
+```{r}
+edge_density(e2)
+```
+
+
+Lad os vende tilbage til det faktiske eksempel med bankfolkene og beregne densiteten af deres netværk
+
+```{r}
+edges     <- ecount(gr) 
+nodes     <- vcount(gr)
+edges_max <- (nodes * (nodes-1)) / 2
+edges / edges_max
+```
+
+som jo meget gerne skulle være det samme som med funktionen!!
+
+```{r}
+edge_density(gr)
+```
+
+# Komponenter
+
+En netværks-komponent er en sammenhængende undergraf. Dvs en del af hele netværket, hvor alle kan nå alle (i x antal led).
+
+
+Hvis vi plotter netværket, `gr`, kan vi se komponentstrukturen
+```{r}
+gr %>% 
+  ggraph() +
+  geom_edge_link0(edge_width = .2, edge_alpha = .3) +
+  geom_node_point(size=1.5) +
+  theme_graph()
+```
+
+
+Fordi, `gr`, er et tidygraph objekt kan 'relativt let' tilføje en variabel på node-delen af vores data, der fortæller hvilken komponent de forskellige noder tilhører. Til det formål skal vi lige aktivere node-delen (`activate(noder)`) hvorefter vi i mutate kan lave en variabel, jeg kalder comp, hvor `group_components()` funktionen giver hver node et nummer alt efter hvilken komponent de tilhører.
+
+```{r}
+gr <- gr %>% 
+  activate(nodes) %>% 
+  mutate(comp = group_components())
+```
+
+
+Hvis vi vil vide noget om komponentstrukturen kan vi lave 'exportere' node-dataen som `tibble` (tidydataformat) og kigge på det:
+
+```{r}
+gr %>% activate(nodes) %>% as_tibble() %>% count(comp)
+```
+
+der er 3 komponenter. Den største har 307 'medlemmer'. den næst-største har 3 osv.
+
+vi kan nu regne densiteten i komponenterne: 
+```{r}
+edge_density(gr %>% filter(comp == 1))
+edge_density(gr %>% filter(comp == 2))
+edge_density(gr %>% filter(comp == 3))
+```
+
+
+## Visualisering af den største komponenter
+
+```{r}
+gr %>% filter(comp==1) %>% 
+  ggraph(layout = "fr") +
+  geom_edge_link0(color = "gray70", width = 0.1) +
+  geom_node_point(size=1.5) +
+  theme_graph()
+```
+
+# Transitivitet ----
+
+I kursets forelæsninger har I diskuteret Granovetters teori om styrken af svage forbindelser og Burts tanker om strukturelle huller. Begge dele taler ind i spørgsmålet om hvor 'sammenklumpet' et netværk er og om triadic closure vs. ikke closure betyder. 
+
+Med begrebet transitivitet måler måler vi det faktiske antal af lukkede trekanter i forhold til det mulige antal.
+
+Vi kan lige se på to eksempler:
+
+1) En ring graf, med ingen triader
+
+```{r}
+g1 <- make_ring(10)
+autograph(g1) + theme_graph()
+```
+Her er transitiviteten 0 
+
+```{r}
+transitivity(g1)
+```
+
+
+
+2) Et tilfældigt netværk med x noder og en given densitet (p er sandsynligheden for at der er en forbindelse mellem to noder : altså densiteten)
+
+```{r}
+g2 <- sample_gnp(30, p = 10/100) 
+autograph(g2) + 
+  geom_node_point(aes(filter = {count_triangles(g2) > 0}, color = {count_triangles(g2) >0})) +
+  theme_graph() + guides(color = "none")
+```
+Alle noder der indgår i en lukket trekant er røde
+Her er transitiviteten:
+
+```{r}
+transitivity(g2)
+```
+
+Vi har indtil nu kigget på transitivitet som et mål for hele netværkets grad af lukning. Høj global transitivitet fortæller os der er mange 'strong ties' som skaber closure (og dermed tæthed i netværket). En lav transitivitet peger omvendt på at der er såkaldte 'weak ties' så trekanter ikke 'lukkes'. Det skaber mulighed for at 'bridge' strukturelle huller.
+
+Man kan også beregne en lokal transitivitet, som fortæller os hvor mange af de mulige lukkede triader et given node kan indgå som faktisk er lukkede:
+A kender B og C - kender B og C så hinanden? Hvis ja er triaden lukket ellers ikke.
+
+Lad os vende tilbage til banknetværket og kigge på det:
+
+Banknetværkets globale transitivitet er:
+```{r}
+tr_g <- transitivity(gr, type = "global")
+tr_g
+```
+Det er altså ret så lukket og tæt samlet set.
+
+hvis vi ændrer type til 'local' får vi den lokale transitivitet:
+
+```{r}
+tr_l <- transitivity(gr, type = "local") 
+head(tr_l, 20)
+```
+
+For at forstå hvad det betyder kan vi lave et lille hjælpe data, hvor vi for hver node 
+  1) tæller hvor mange forbindelser de har (degree - det vender vi tilbage til næste gang), 
+  2) regner ud hvor mange lukkede trekanter de således teoretisk kan indgå i, og
+  3) hvor mange trekanter de faktisk indgår i
+
+```{r}
+k <- degree(gr)
+possible_triangles <- choose(k, 2)
+actual_triangles   <- count_triangles(gr)
+
+data.frame(degree = k, 
+           possible = possible_triangles,
+           actual = actual_triangles, 
+           transitivitet = tr_l) %>% head(20)
+```
+
+
+Vi kan også lige lave en visualisering, hvor vi tager den største komponent og fremhæver de noder der har en lav lokal transitivitet. Dvs indgår i åbne trekanter. Det kommer til at spille en rolle, når vi senere i kurset dykker mere ned i Burts teorier om constraint..
+
+```{r}
+gr %>% filter(comp==1) %>% 
+  ggraph(layout = "fr") +
+  geom_edge_link0(color = "gray70", width = 0.1) +
+  geom_node_point(size=1.5) +
+  geom_node_point(aes(filter = centrality_degree() != 1 & local_transitivity() < .3), color = "red")+
+  geom_node_label(aes(filter = centrality_degree() != 1 & local_transitivity() < .3, label = local_transitivity() %>% round(2)), color = "red", repel = TRUE)+
+  theme_graph()
+```
+
+# Stilængder gennemsnitlig afstand og diameter ----
+
+Når vi taler om afstande i netværk taler vi om stilængder. Afstanden mellem et par er noder er således defineret ved den korteste sti (shortest path) der findes mellem to noder. Hvis A fx. kan nå D ad to veje: 1) A - C - F - Q - D og 2) A - B - H - D, er 2 den korteste vej og afstanden er tre fordi der er tre steps mellem A og D.
+
+Når vi kender den korteste vej mellem alle par af noder (det kan Igraph beregne) kan vi måle forskellige ting, der kan være beskrivende for netværkets overordnede struktur (eller topologi).
+
+Disse mål giver kun mening for en sammenhængende kompontent, så først skal vi lige subsette vores netværk, så vi kun regner på den største komponent.
+Vi laver et nyt graf- eller netværksobjekt kun med den største komponent. Fordi gr er et tidygraph objekt kan vi bruge tidyverse-funktioner som fx. filter()
+
+```{r}
+comp1 <- gr %>% filter(comp == 1)
+```
+
+igraph funktionen `distances` giver os en matrice, der viser hvor lang den korteste vej mellem samtlige par af noder er:
+
+```{r}
+dist <- distances(comp1) 
+
+dist[1:10,1:10]
+
+```
+
+Et et-tal betyder at de er direkte forbundne, et to-tal at de skal igennem en anden node (en vens ven), et tre-tal at den koreste vej går gennem to andre noder osv.
+
+Når vi kender alle afstande kan vi beregne den gennemsnitlige afstand, eller vi kan beregne den direkte med igraph funktionen `mean_distance()`
+
+```{r}
+mean_distance(comp1)
+```
+
+Hvilket fortæller os at alle par af noder 'i gennemsnit' kan nå hinanden i lidt under 3 led.
+
+Den længste 'korteste sti' i netværket kalder vi netværkets diameter. Det fortæller os noget om hvor langt to noder kan være fra hinanden i en sammenhængende komponent. 
+
+diameter på den største komponent i vores banknetværk
+```{r}
+diameter(comp1, directed = FALSE)
+```
+er 6. Tætheden i netværket er altså relativt stor, da to bankfolk aldrig er mere end 6 led fra hinanden. 
+
+
+hvilke to personer er så længst fra hinanden
+```{r}
+farthest_vertices(comp1, directed = FALSE)
+```
+
+Anders Hestbech, som er bestyrelsesformand i DANSKE ANDELSKASSERS BANK A/S (Bestyrelse) og Poul Dahlgaard, som er med i Arbejdsgruppen om ledelsesbekendtgørelsen for Pengeinstitutter
+
+Den vej Anders skal 'gå' for at møde Poul er:
+```{r}
+diam <- get_diameter(comp1, directed = FALSE)
+diam
+```
+
+
+Vi kan visualisere den længste sti:
+
+til de formål skal vi bruge navnene fra `diam` objektet
+```{r}
+diam <- names(diam)
+```
+Visualisering kræver at vi 1) gemmer en variabel i node-data-delen, der fortæller (TRUE/FALSE) om de ligger på stien:
+
+```{r}
+comp1 <- comp1 %>% activate(nodes) %>% 
+  mutate(diameter = name %in% diam) 
+```
+og 2) at vi gemmer en variabel til egdes, der fortæller (TRUE/FALSE) om de indgår i stien:
+vi aktiverer først edge-dataen `activate(edges)` og laver en variabel hvor alle edges har værdien FALSE, i læste skridt bruger vi morph() (`morph()` er en tidygraf funktion der laver en midlertidig opdeling af grafen). Her giver vi den funktionen `to_shortest_path` og beder den om kun at tage de edges, der går fra det første (`first()`) navn i `diam` (Anders) til det sidste (`last()`). Det udsnit af edges giver så værdien TRUE og unmorpher grafen igen.
+
+```{r}
+comp1 <- comp1 %>% activate(edges) %>% 
+  mutate(diameter = FALSE) %>% 
+  morph(to_shortest_path, from = .N()$name == first(diam), to = .N()$name == last(diam)) %>% 
+  mutate(diameter = TRUE) %>% unmorph()
+```
+
+Med de to variable kan vi plotte den største komponent igen og fremhæve stien mellem de to noder der har den største afstand i data:
+```{r}
+comp1 %>% 
+  ggraph() +
+  geom_edge_link0(aes(filter=diameter==FALSE), color = "gray60") + 
+  geom_node_point(aes(filter=diameter==FALSE), color = "black") +
+  geom_edge_link0(aes(filter=diameter==TRUE), color = "red", width = 1.5) +
+  geom_node_point(aes(filter=diameter==TRUE), color = "red", size =2) +
+  geom_node_label(aes(filter=diameter==TRUE, label = name), nudge_y = -0.3, size =2.5, repel = TRUE) + 
+  labs(title = 'Diameter in EliteDBs finance component') +
+  theme_graph() 
+
+```
+
+
+
+# Ekstra : Den korteste vej mellem to specifikke noder
+
+Lad os sige vi gerne vil finde vise den korteste vej mellem to bestemt noder
+
+```{r}
+node1 <- "Ulrik Rammeskow Bang-Pedersen 51259" # som sidder i finansiel stabilitet
+node2 <- "Carsten Egeriis 66665"          # adm. direktør i danske bank
+```
+```{r}
+comp1 <- comp1 %>% activate(nodes) %>% 
+  mutate(sh_path = FALSE) %>% 
+  morph(to_shortest_path, from = .N()$name == node1, to = .N()$name == node2) %>%
+  mutate(sh_path = TRUE) %>% unmorph()
+
+comp1 <- comp1 %>% activate(edges) %>% 
+  mutate(sh_path = FALSE) %>% 
+  morph(to_shortest_path, from = .N()$name == node1, to = .N()$name == node2) %>%
+  mutate(sh_path = TRUE) %>% unmorph()
+
+
+comp1 %>% 
+  ggraph(layout='fr') + 
+  geom_edge_link0(aes(filter=sh_path==FALSE), color='grey50', alpha=0.5) + 
+  geom_node_point(aes(filter=sh_path==FALSE), color='black', size=3, alpha=0.25) + 
+  geom_edge_link0(aes(filter=sh_path==TRUE), color='red', width=1.2) + 
+  geom_node_point(aes(filter=sh_path==TRUE), color='darkred', size=5, alpha=0.5) + 
+  geom_node_label(aes(filter=sh_path==TRUE, label=name), color='red', size=2, alpha = 0.8, repel = T) + 
+  theme_graph()
+
+```
+
+
+
+# Øvelse
+
+Her kan I downloade et script med øvelser til dagens session
+[Scriptet - Session3_øvelser.R](scripts til undervisning/Session3_øvelse.R){.btn .btn-primary}
+
+og et datasæt til øvelse:
+[Datasættet - pharma.csv](data/pharma.csv){.btn .btn-primary}
+som du skal lægge i undermappen /data i din r-projekt-mappe
+
+Du kan også downloade øvelsen med svar (men prøv først selv :) )
+[Scriptet - Session3_øvelser_med_svar.R](scripts til undervisninSession3_øvelse med svar.R){.btn .btn-primary}

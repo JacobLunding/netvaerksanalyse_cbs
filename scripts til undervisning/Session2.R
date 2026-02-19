@@ -12,7 +12,7 @@ source("functions/read_orbis.R", echo = FALSE)
 
 #read_orbisxlsx funktionen oversætter bl.a. variabelnavne fra orbis til noget mere meningsfuld og læseligt. Vigtigt: `Current or previous` variablen hedder nu `role_status`. Der er også en ny variabel, `person`, som ud fra identifikationsnummeret 'gætter' om personen faktisk er en person.
 
-df <- read_orbisxlsx(path = "data/tobaco_and_alcohol.xlsx")
+df <- read_orbisxlsx(path = "data/tobaco_and_alcohol.xlsx", resultsheet = 2)
 
 df %>% count(sector, sort = T)
 

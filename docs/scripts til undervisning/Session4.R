@@ -18,6 +18,7 @@ library(tidyverse)
 library(igraph)
 library(ggraph)
 library(Matrix)
+source("functions/correlationplots.R")
 # Download nye functions filer
 download.file("https://jacoblunding.quarto.pub/virkstrat2025/functions/networkfunctions.R", "functions/networkfunctions.R")
 

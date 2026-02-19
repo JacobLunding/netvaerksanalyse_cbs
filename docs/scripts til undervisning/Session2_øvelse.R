@@ -30,7 +30,7 @@ library(Matrix)
 #      - en adjacency med personer
 #      - en adjacency med virksomheder
 #  Husk: xtabs(......, sparse = T) og %*% samt t()
-  
+
 
 
 # 4: Lav tre netværksobjekter med funktioner fra Igraph
