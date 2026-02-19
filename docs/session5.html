@@ -360,15 +360,15 @@ person {TRUE/FALSE}</code></pre>
 <pre><code># A tibble: 10 × 2
    person_countries               n
    &lt;chr&gt;                      &lt;int&gt;
- 1 Virgin Islands (British)       2
- 2 United Kingdom;Japan;India     2
- 3 Israel                         6
- 4 Norway;Sweden;Netherlands      4
- 5 Spain;Sweden                   1
- 6 Germany                       34
- 7 Sweden;Thailand                2
- 8 Iceland                       61
- 9 Finland;United Kingdom         7
+ 1 Denmark;Norway;Sweden          3
+ 2 Canada                         9
+ 3 Jamaica                        2
+ 4 Iran (Islamic Republic of)    10
+ 5 United States                 80
+ 6 Pakistan                       1
+ 7 Finland;Denmark                1
+ 8 Mexico                         3
+ 9 United States;Sweden           2
 10 United States;Venezuela        2</code></pre>
 </div>
 </div>
@@ -468,9 +468,9 @@ person {TRUE/FALSE}</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>net_virk <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">adjmatrix =</span> adj_virk, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>net_virk</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH 07cb28d UN-- 596 266 -- 
+<pre><code>IGRAPH 42a9c31 UN-- 596 266 -- 
 + attr: name (v/c)
-+ edges from 07cb28d (vertex names):
++ edges from 42a9c31 (vertex names):
  [1] A/S ORTHANA KEMISK FABRIK--BIOFAC A/S                 
  [2] A/S ORTHANA KEMISK FABRIK--DANIPHARM A/S              
  [3] A/S ORTHANA KEMISK FABRIK--PHARMADAN A/S              
@@ -488,9 +488,9 @@ person {TRUE/FALSE}</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>net_ind <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(<span class="at">adjmatrix =</span> adj_ind, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="fu">simplify</span>()</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>net_ind</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IGRAPH b91e8ab UN-- 261 433 -- 
+<pre><code>IGRAPH 90b65e7 UN-- 261 433 -- 
 + attr: name (v/c)
-+ edges from b91e8ab (vertex names):
++ edges from 90b65e7 (vertex names):
  [1] David Lawrence Stern     --Dr Henrijette Elisabeth Richter
  [2] David Lawrence Stern     --Mr Mark Smith                  
  [3] David Lawrence Stern     --Mr Nicholas Haft               

@@ -33,11 +33,12 @@ library(Matrix)
   
 
 
-# 4: Lav tre netværksobjekter
+# 4: Lav tre netværksobjekter med funktioner fra Igraph
 ##    - brug graph_from_biadjacency_matrix til biadjacency (twomode)
 ##        directed ?? TRUE eller FALSE, multiple?? TRUE eller FALSE
 ##    - graph_from_adjacency_matrix til adjacency (onemode)
 ##        mode ?? directed eller undirected? og diag = FALSE
+##      I kan lave dem til tidygraph format bagefter med as_tbl_graph()
 
 
 

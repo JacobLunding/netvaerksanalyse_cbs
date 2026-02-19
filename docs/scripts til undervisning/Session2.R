@@ -104,13 +104,10 @@ gr %>% ggraph() +
 #Som I kan se består netværket af flere 'klynger'. Det kaldes i netværksanalysesprog for komponenter. Det kommer vi tilbage til i løbet af kurset, men en netværkskomponent er et sammenhængende sæt af vertices. Lad os i første omgang prøve at bruge vores branchekode-variabel til at se om vi kan finde noget logik i hvordan komponenterne ser ud. Er der komponenter, hvor der er bestyrelsesoverlap (dvs. edges) mellem virksomheder der fremstiller hhv. alkohol og tobak. Det kræver at vi får lagt vores branchekode ind i grafobjektet som en vertex attribute.
 
 ##### Tilføj vertice attributes
+#Fordi vores netværksdata objekt er et tidygraph objekt kan vi relativt 'let' tilføje variable til data. For at tilgå de forskellige dele af netværksobjektet bruges funktionen `activate()` fra `tidygraph`. 
 
-#Det gør vi ved først at lave et nyt datasæt, som vi kalder sector, der indeholder én række for hver virksomhed + branchekode (`distinct(affiliation, sector)`), dernæst overskriver vi sector, så vi kun har de to første cifre i branchekoden (da vi er ligeglade med underkategorier), altså en 'substring', `substr(sector, start = 1, stop = 2)`, endelig omkoder vi branchekodens talværdier til et label (`case_when(sector == "12"~"Tobak", sector == "11"~"Alkohol", .default = NA)`). Logikken i case_when-verbet er at man har et logisk udtryk efterfult af `~` hvad der så skal stå, et nyt logisk udtryk efterfulgt af `~` hvad der så skal stå. Altså formen, hvis\~så, hvis\~så osv., afsluttende med `.default =`, hvor vi definerer hvad værdien skal være, hvis ingen af de logisk udtryk passer.
-
-# add sector as attribute...
-
-
-#Nu mangler vi bare at flette sectorvariablen på så de rigtige værdier kommer til at stå ud for de rigtige virksomhedsnavne. Her har tidyverse en genial funktion, `left_join()`, som gør netop det. Hvis vi har datasæt x, vores data.frame med virksomhedsnavne, og datasæt y, vores sector datasæt med virksomhedsnavne og branchelabel, så gør left_join det at den ved at matche på virksomhedsnavnet, `by = "affiliation`, fletter den anden variabel i y på x, altså left_join'er y på x.
+#I vores oprindelige data har vi jo variablen `sector` den vil vi gerne tilføje til node-delen af netværksobjektet. Derfor skal vi aktivere node-delen: `activate(nodes)`. Dernæst skal vi bruge `left_join()` som 'joiner' et datasæt på et andet. 
+#Vi skal 'kun' bruge `sector` og `affiliation` (for at kunne matche navnene) så vi bruger `select()`. Desuden skal vi lige sørge for at der kun er en række per affiliation / sector kombination, så den ved hvad der skal joines. Sidst men ikke mindst skal vi fortælle left_join hvilke variable der skal matches. Her `name` og `affiliation`
 
 gr <- gr %>% activate(nodes) %>% 
   left_join(df_current %>% ungroup() %>% select(affiliation, sector) %>% distinct(), by = c("name" = "affiliation"))
