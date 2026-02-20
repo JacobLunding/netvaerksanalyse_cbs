@@ -19,6 +19,7 @@ download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/data/danish_e
 
 source("functions/clique_plot.R")
 source("functions/triangle_plot.R")
+source("functions/show_tags.R")
 ###############################################################/
 # 1. Indlæs og udvalg/behandling af data ----
 ###############################################################/
@@ -45,11 +46,7 @@ den %>% distinct(affiliation, .keep_all = T) %>% count(affiliation_branche_nivea
 # Tags
 ###################################################/
 
-#Kigger vi på `affiliation_tags` som vi er nød til først at splitte `str_split()` og unliste `unlist()` fordi der kan være flere tags per virksomhed. De er separeret med "; ", så det splitter vi på: 
-  
-all_tags <- den %>% pull(affiliation_tags) %>% str_split("; ") %>% unlist() %>% table() %>% enframe() %>% separate_wider_delim(name, delim = "_", names_sep = "_", too_few = "align_start")
-
-c(all_tags$name_1 %>% unique(), all_tags$name_2 %>% unique(), all_tags$name_3 %>% unique(), all_tags$name_4 %>% unique()) %>% table() %>% sort(decreasing = TRUE)
+show_tags(den, level = 2)
 
 
 # Laver 'er_bank' variabel ud fra branchekode og tags

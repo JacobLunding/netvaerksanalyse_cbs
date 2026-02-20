@@ -2,7 +2,7 @@
 title: "Sammenhængskraft, Densitet, kliker og strukturelle huller"
 ---
 
-```{r, echo = F}
+```{r, echo = TRUE, message=FALSE}
 library(tidyverse)
 library(tidygraph)
 library(igraph)
@@ -25,13 +25,17 @@ og funktioner:
 [funktionen - triangle_plot.R]("functions/triangle_plot.R"){.btn .btn-primary}
 
 [funktionen - clique_plot.R]("functions/clique_plot.R"){.btn .btn-primary}
-som begge lægges i undermappen /functions i r-projekt-mappen
+
+[funktionen - show_tags.R]("functions/show_tags.R"){.btn .btn-primary}
+
+som lægges i undermappen /functions i r-projekt-mappen
 
 
-Når de to funktioner ligger der kan de sources
+Når de funktioner ligger der kan de sources
 ```{r}
 source("functions/clique_plot.R", echo = FALSE)
 source("functions/triangle_plot.R", echo = FALSE)
+source("functions/show_tags.R", echo = FALSE)
 ```
 
 ## Data: Det danske elitenetværk
@@ -52,10 +56,10 @@ den %>% distinct(affiliation, affiliation_branche_niveau5) %>% count(affiliation
 ```
 24 virksomheder med branchekoden "Banker, sparekasser og andelskasser"
 
-Kigger vi på `affiliation_tags` som vi er nød til først at splitte `str_split()` og unliste `unlist()` fordi der kan være flere tags per virksomhed. De er separeret med "; ", så det splitter vi på: 
+Hvis I vil kiugge på `affiliation_tags` kan I bruge funktionen `show_tags()` som jeg har skrevet. Tags'ne er kodet i en hierarkisk struktur. Med funktionen kan I inspicere tags'ne på 4 niveauer. 
 
 ```{r}
-den %>% pull(affiliation_tags) %>% str_split("; ") %>% unlist() %>% table() %>% head(25)
+show_tags(den, level = 2)
 ```
 
 Her kan vi se at der er et tag for "Erhvervsliv_Finans_Banker"
@@ -500,3 +504,4 @@ som du skal lægge i undermappen /data i din r-projekt-mappe
 
 Du kan også downloade øvelsen med svar (men prøv først selv :) )
 [Scriptet - Session3_øvelser_med_svar.R](scripts til undervisninSession3_øvelse med svar.R){.btn .btn-primary}
+

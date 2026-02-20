@@ -236,78 +236,11 @@ window.Quarto = {
 
 
 <div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.4     ✔ readr     2.1.5
-✔ forcats   1.0.0     ✔ stringr   1.5.1
-✔ ggplot2   3.5.2     ✔ tibble    3.2.1
-✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-✔ purrr     1.0.4     
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
-ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
-
-Attaching package: 'tidygraph'
-
-
-The following object is masked from 'package:stats':
-
-    filter
-
-
-
-Attaching package: 'igraph'
-
-
-The following object is masked from 'package:tidygraph':
-
-    groups
-
-
-The following objects are masked from 'package:lubridate':
-
-    %--%, union
-
-
-The following objects are masked from 'package:dplyr':
-
-    as_data_frame, groups, union
-
-
-The following objects are masked from 'package:purrr':
-
-    compose, simplify
-
-
-The following object is masked from 'package:tidyr':
-
-    crossing
-
-
-The following object is masked from 'package:tibble':
-
-    as_data_frame
-
-
-The following objects are masked from 'package:stats':
-
-    decompose, spectrum
-
-
-The following object is masked from 'package:base':
-
-    union
-
-
-
-Attaching package: 'Matrix'
-
-
-The following objects are masked from 'package:tidyr':
-
-    expand, pack, unpack</code></pre>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidygraph)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="bank-sektoren-i-det-danske-elitenetværk" class="level1">
 <h1>Bank sektoren i det danske elitenetværk</h1>
@@ -315,11 +248,14 @@ The following objects are masked from 'package:tidyr':
 <p>scriptet: <a href="scripts til undervisning/Session3.R" class="btn btn-primary">Scriptet - Session3.R</a></p>
 <p>datasættet: <a href="data/danish_elitenetworks2024.csv" class="btn btn-primary">Datasættet - danish_elitenetworks2024.csv</a> som du skal lægge i undermappen /data i din r-projekt-mappe</p>
 <p>og funktioner: <a href="&quot;functions/triangle_plot.R&quot;" class="btn btn-primary">funktionen - triangle_plot.R</a></p>
-<p><a href="&quot;functions/clique_plot.R&quot;" class="btn btn-primary">funktionen - clique_plot.R</a> som begge lægges i undermappen /functions i r-projekt-mappen</p>
-<p>Når de to funktioner ligger der kan de sources</p>
+<p><a href="&quot;functions/clique_plot.R&quot;" class="btn btn-primary">funktionen - clique_plot.R</a></p>
+<p><a href="&quot;functions/show_tags.R&quot;" class="btn btn-primary">funktionen - show_tags.R</a></p>
+<p>som lægges i undermappen /functions i r-projekt-mappen</p>
+<p>Når de funktioner ligger der kan de sources</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions/clique_plot.R"</span>, <span class="at">echo =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions/triangle_plot.R"</span>, <span class="at">echo =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions/triangle_plot.R"</span>, <span class="at">echo =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions/show_tags.R"</span>, <span class="at">echo =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="data-det-danske-elitenetværk" class="level2">
 <h2 class="anchored" data-anchor-id="data-det-danske-elitenetværk">Data: Det danske elitenetværk</h2>
@@ -352,61 +288,24 @@ The following objects are masked from 'package:tidyr':
 </div>
 </div>
 <p>24 virksomheder med branchekoden “Banker, sparekasser og andelskasser”</p>
-<p>Kigger vi på <code>affiliation_tags</code> som vi er nød til først at splitte <code>str_split()</code> og unliste <code>unlist()</code> fordi der kan være flere tags per virksomhed. De er separeret med “;”, så det splitter vi på:</p>
+<p>Hvis I vil kiugge på <code>affiliation_tags</code> kan I bruge funktionen <code>show_tags()</code> som jeg har skrevet. Tags’ne er kodet i en hierarkisk struktur. Med funktionen kan I inspicere tags’ne på 4 niveauer.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>den <span class="sc">%&gt;%</span> <span class="fu">pull</span>(affiliation_tags) <span class="sc">%&gt;%</span> <span class="fu">str_split</span>(<span class="st">"; "</span>) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>() <span class="sc">%&gt;%</span> <span class="fu">table</span>() <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">25</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_tags</span>(den, <span class="at">level =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>.
-                                       Erhvervsliv 
-                                               782 
-                                Erhvervsliv_Finans 
-                                               367 
-                         Erhvervsliv_Finans_Banker 
-                                               306 
-                          Erhvervsliv_Finans_Bolig 
-                                                19 
-                     Erhvervsliv_Finans_Forsikring 
-                                               453 
-                    Erhvervsliv_Finans_Investering 
-                                               587 
-                        Erhvervsliv_Finans_Pension 
-                                               368 
-                                 Erhvervsliv_Fonde 
-                                              1706 
-                     Erhvervsliv_Handel og service 
-                                              1029 
-Erhvervsliv_Handel og service_Konsulent &amp; Revision 
-                                               548 
-                              Erhvervsliv_Industri 
-                                              1357 
-                      Erhvervsliv_Industri_Byggeri 
-                                               764 
-                       Erhvervsliv_Industri_Energi 
-                                              1006 
-            Erhvervsliv_Industri_Medicinalindustri 
-                                               425 
-                         Erhvervsliv_Industri_Tech 
-                                               561 
-                    Erhvervsliv_Industri_Transport 
-                                               648 
-                              Erhvervsliv_Landbrug 
-                                              2598 
-                      Erhvervsliv_Landbrug_Fiskeri 
-                                               336 
-                     Erhvervsliv_Landbrug_Skovbrug 
-                                               170 
-                         Events eller begivenheder 
-                                              1439 
-                                          Ideologi 
-                                                25 
-                                   Ideologi_Kultur 
-                                               755 
-                        Ideologi_Kultur_Arkitektur 
-                                                78 
-                       Ideologi_Kultur_Billedkunst 
-                                               117 
-                            Ideologi_Kultur_Design 
-                                                91 </code></pre>
+<pre><code># A tibble: 33 × 2
+   level2                            n
+   &lt;chr&gt;                         &lt;int&gt;
+ 1 Erhvervsliv_Finans              173
+ 2 Erhvervsliv_Fonde               204
+ 3 Erhvervsliv_Handel og service   151
+ 4 Erhvervsliv_Industri            404
+ 5 Erhvervsliv_Landbrug            260
+ 6 Ideologi_Kultur                 174
+ 7 Ideologi_Medier                  36
+ 8 Ideologi_Religion                19
+ 9 Ideologi_Sport                   22
+10 Ideologi_Videnskab              981
+# ℹ 23 more rows</code></pre>
 </div>
 </div>
 <p>Her kan vi se at der er et tag for “Erhvervsliv_Finans_Banker”</p>
@@ -759,7 +658,7 @@ Erhvervsliv_Handel og service_Konsulent &amp; Revision
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">transitivity</span>(g2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.2021277</code></pre>
+<pre><code>[1] 0.122449</code></pre>
 </div>
 </div>
 <p>Vi har indtil nu kigget på transitivitet som et mål for hele netværkets grad af lukning. Høj global transitivitet fortæller os der er mange ‘strong ties’ som skaber closure (og dermed tæthed i netværket). En lav transitivitet peger omvendt på at der er såkaldte ‘weak ties’ så trekanter ikke ‘lukkes’. Det skaber mulighed for at ‘bridge’ strukturelle huller.</p>
@@ -958,7 +857,7 @@ Anja C. Jensen 58972                             0</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">farthest_vertices</span>(comp1, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$vertices
-+ 2/307 vertices, named, from fd99604:
++ 2/307 vertices, named, from f6e3c8f:
 [1] Anders Hestbech 14538 Poul Dahlgaard 70290 
 
 $distance
@@ -971,7 +870,7 @@ $distance
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>diam <span class="ot">&lt;-</span> <span class="fu">get_diameter</span>(comp1, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>diam</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>+ 7/307 vertices, named, from fd99604:
+<pre><code>+ 7/307 vertices, named, from f6e3c8f:
 [1] Anders Hestbech 14538     Jan Pedersen 18274       
 [3] Charlotte Skovgaard 18276 Inge Berneke 63780       
 [5] Kim Haggren 49144         Kirstine Thorsen 58934   
