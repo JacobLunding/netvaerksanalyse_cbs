@@ -54,13 +54,15 @@ I denne session arbejder vi især med begreberne densitet, stilængde, diameter 
 
 [Download triangle_plot funktionen her](functions/triangle_plot.R){.btn .btn-primary}
 
+[Download show_tags funktionen her](functions/show_tags.R){.btn .btn-primary}
+
 [Scriptet - Session3_øvelser.R](scripts til undervisning/Session3_øvelse.R){.btn .btn-primary}
 
 [Øvelsesdatasæt - pharma.csv](data/pharma.csv){.btn .btn-primary}
 som du skal lægge i undermappen /data i din r-projekt-mappe
 
 Du kan også downloade øvelsen med svar (men prøv først selv :) )
-[Scriptet - Session3_øvelser_med_svar.R](scripts til undervisninSession3_øvelse med svar.R){.btn .btn-primary}
+[Scriptet - Session3_øvelser_med_svar.R](scripts til undervisning/Session3_øvelse med svar.R){.btn .btn-primary}
 
 ---
 
