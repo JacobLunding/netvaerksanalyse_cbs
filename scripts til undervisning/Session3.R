@@ -14,6 +14,7 @@ library(Matrix)
 # Her downloades de opdaterede udgaver af data og funktioner:
 download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/functions/clique_plot.R", "functions/clique_plot.R")
 download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/functions/triangle_plot.R", "functions/triangle_plot.R")
+download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/functions/show_tags.R", "functions/show_tags.R")
 download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/data/danish_elitenetworks2024.csv", "data/danish_elitenetworks2024.csv")
 
 
@@ -46,7 +47,7 @@ den %>% distinct(affiliation, .keep_all = T) %>% count(affiliation_branche_nivea
 # Tags
 ###################################################/
 
-show_tags(den, level = 2)
+show_tags(den, level = 4) %>% View()
 
 
 # Laver 'er_bank' variabel ud fra branchekode og tags
@@ -108,7 +109,7 @@ gr %>% ggraph() +
 ##################################################################/
 
 # eksempler: forskellige netværk med 40 noder  ### maksimale antal edges = (N_noder * N_noder - 1) / 2
-(40 * (40-1)) / 2
+(45 * (45-1)) / 2
 
 ############################################################################/
 # Lad os lige se hvad antallet af noder betyder for det teoretiske max !!
@@ -141,10 +142,10 @@ e1 %>% ggraph() +
 edge_density(e1, loops=FALSE)
 
 # Et andet 'ekstremt' eksempel er en stjerne-graf, hvor én node er forbundet til alle, mens de andre kun er forbundet til den (og altså ikke til hinanden)
-e2 <- make_star(40, mode = "undirected")
+e2 <- make_star(1000, mode = "undirected")
 e2 <- e2 %>% as_tbl_graph()
 
-e2 %>% ggraph() +
+e2 %>% ggraph("fr") +
   geom_edge_link0(edge_width = 0.1, alpha = 0.4) +
   geom_node_point(color = "steelblue1", size = 4) +
   theme_graph()
@@ -212,7 +213,7 @@ transitivity(g1) # 0 - no triads
 # I et tilfældigt netværk med x noder og en given densitet
 g2 <- sample_gnp(30, p = 10/100)  # p er sandsynligheden for at der er en forbindelse mellem to noder : altså densiteten
 autograph(g2) + 
-  geom_node_point(aes(filter = {count_triangles(g2) > 0}, color = {count_triangles(g2) >0})) +
+  geom_node_point(aes(filter = {count_triangles(g2) > 0}, color = {count_triangles(g2) >0}) ,size = 2) +
   theme_graph() + guides(color = "none")
 transitivity(g2) 
 
