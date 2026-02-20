@@ -29,6 +29,10 @@ den <- read_csv("data/danish_elitenetworks2024.csv")
 # Lad os først vælge et subset af datasættet. 
 # Til det har vi forskellige mulgiheder med hhv affiliation_branche_niveau1 til den$affiliation_branche_niveau5 og affiliation_tags
 ###################################################/
+
+###################################################/
+# Branchekoder
+###################################################/
 den %>% distinct(affiliation, .keep_all = T) %>% count(affiliation_branche_niveau1, 
                                                        affiliation_branche_niveau2, 
                                                        affiliation_branche_niveau3, 
@@ -37,11 +41,18 @@ den %>% distinct(affiliation, .keep_all = T) %>% count(affiliation_branche_nivea
 
 # lad os kigge det, der på niveau5 hedder: "Banker, sparekasser og andelskasser"
 
+###################################################/
+# Tags
+###################################################/
+
 #Kigger vi på `affiliation_tags` som vi er nød til først at splitte `str_split()` og unliste `unlist()` fordi der kan være flere tags per virksomhed. De er separeret med "; ", så det splitter vi på: 
   
-den %>% pull(affiliation_tags) %>% str_split("; ") %>% unlist() %>% table()
+all_tags <- den %>% pull(affiliation_tags) %>% str_split("; ") %>% unlist() %>% table() %>% enframe() %>% separate_wider_delim(name, delim = "_", names_sep = "_", too_few = "align_start")
+
+c(all_tags$name_1 %>% unique(), all_tags$name_2 %>% unique(), all_tags$name_3 %>% unique(), all_tags$name_4 %>% unique()) %>% table() %>% sort(decreasing = TRUE)
 
 
+# Laver 'er_bank' variabel ud fra branchekode og tags
 den <- den %>% mutate(er_bank = affiliation_branche_niveau5 == "Banker, sparekasser og andelskasser" | 
                         grepl("Erhvervsliv_Finans_Banker", affiliation_tags, ignore.case = T))
 den %>% count(er_bank)
