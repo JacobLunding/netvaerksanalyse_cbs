@@ -41,6 +41,8 @@ Denne øvelsesgang vil fokusere på to ting; datakilder og transformering af for
 
 [Download øvelsesscript til Session 2 her](scripts til undervisning/Session2_øvelse.R){.btn .btn-primary}
 
+[Download øvelsesscript til Session 2 med svar her](scripts til undervisninSession2_øvelse med svar.R){.btn .btn-primary}
+
 [Download øvelsesdata til Session 2 her](data/Session2_exampledata.csv){.btn .btn-primary}
 
 ---
