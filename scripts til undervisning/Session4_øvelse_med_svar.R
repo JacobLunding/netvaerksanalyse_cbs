@@ -34,8 +34,9 @@ pharma <- read_csv("data/pharma.csv")
         # lave en ny variabel n_afil som tæler [n_distinct] unikke affilialtions for hver person
         # 
 pharma <- pharma %>% distinct(name, affiliation, .keep_all = TRUE) %>% 
-  mutate(n_ind  = n_distinct(name), .by = affiliation) %>% 
-  mutate(n_afil = n_distinct(affiliation), .by = name) 
+  group_by(affiliation) %>% mutate(n_ind  = n_distinct(name)) %>% 
+  group_by(name) %>% mutate(n_afil = n_distinct(affiliation)) %>% 
+  ungroup()
 
 pharma <- pharma %>% filter(n_afil > 1 & !is.na(revenue) & n_ind > 1)
 
@@ -43,18 +44,19 @@ pharma <- pharma %>% filter(n_afil > 1 & !is.na(revenue) & n_ind > 1)
 # 4. Lav et virksomhed x virksomhed netværk ----
 # dvs. lav først biadjacency m. xtabs og dernæst adjacency m. t(B) %*% B og tilsidst graph_from_adjacency_matrix
 
-biadj   <- xtabs(data = pharma, ~name +affiliation , sparse = T)
+biadj   <- xtabs(data = pharma, ~name + affiliation , sparse = T)
 
 adj_virk <- t(biadj) %*% biadj
 
-net     <- graph_from_adjacency_matrix(adj_virk, mode = "undirected", weighted = TRUE, diag = FALSE)
-
+net     <- graph_from_adjacency_matrix(adj_virk, mode = "undirected", weighted = NULL, diag = FALSE) %>% simplify()
+net     <- net %>% as_tbl_graph()
 # 5. Se på grafens komponentstruktur og lav et nyt grafobjekt med den størte komponent ----
-comp.list <- components(net)
-comp.list$no
-comp.list$csize %>% table()
+net <- net %>% 
+  mutate(comp = group_components())
 
-l_comp <- largest_component(net)
+net %>% as_tibble() %>% count(comp)
+
+l_comp <- net %>% filter(comp == 1)
 
 l_comp %>% 
   ggraph(layout = 'fr') +
@@ -67,30 +69,27 @@ l_comp %>%
 
 # 6. Udregn forskellige centralitets mål ----
   # og gem dem som vertex attributes i grafobjektet
-  # og lave en tibble med vertices og vertex attributes fra grafobjektet:
 
-V(l_comp)$degree          <- degree(l_comp) 
-V(l_comp)$betweenness     <- betweenness(l_comp) 
-V(l_comp)$closeness       <- closeness(l_comp) 
-V(l_comp)$eigen           <- eigen_centrality(l_comp)$vector
+l_comp <- l_comp %>% 
+  mutate(degree = centrality_degree(), 
+         betweenness = centrality_betweenness(), 
+         closeness = centrality_closeness(), 
+         eigencentrality = centrality_eigen())
 
-
-net_metrics <- as_data_frame(l_comp, what = "vertices") %>% tibble()
 
 # 7. Tilføj en rankvariable for hver af centralitetsmålene
 # enten sådan 1)
-net_metrics <- net_metrics %>% mutate(degree_rnk     = dense_rank(desc(degree)),
-                                      betw_rnk       = dense_rank(desc(betweenness)),
-                                      closeness_rnk  = dense_rank(desc(closeness)),
-                                      eigen_rnk      = dense_rank(desc(eigen)))
-# eller
-# sådan 2)
-net_metrics <- net_metrics %>% mutate(across(.cols = -name, .fns = ~dense_rank(desc(.x)), .names = "{.col}_rnk"))
+l_comp <- l_comp %>% 
+  mutate(degree_rnk = dense_rank(desc(degree)),
+         betw_rnk = dense_rank(desc(betweenness)),
+         closeness_rnk  = dense_rank(desc(closeness)),
+         eigencentrality_rnk = dense_rank(desc(eigencentrality)))
 
 
 
-# 8. Åben jeres tibble med centralitetsmål i Vieweren ----
+# 9. Lav en tibble med centralitetsmålene og åben den i Vieweren ----
   # ... og kig lidt på hvilke virksomheder der ligger i toppen på de forskellige centralitetsmål
+net_metrics <-
 View(net_metrics)  
 
 
@@ -111,7 +110,7 @@ lay %>% arrange(betweenness) %>% ggraph() +
   geom_node_point(aes(filter = betweenness >0, color=betweenness, size = betweenness)) + scale_size_continuous(range = c(0.5,7)) + scale_alpha(range = c(0.5,1)) + 
   theme_graph() + scale_color_viridis(direction = 1) + guides(size = "none") + labs(color="Betweenness") +
   geom_node_label(aes(
-    filter=net_metrics$betweenness_rnk <= 10, label=name), alpha=0.8, size = 3, repel=T, force = 20) 
+    filter=betw_rnk <= 10, label=name), alpha=0.8, size = 3, repel=T, force = 10) 
 
 ggsave('output/pharma-graph-betweenness.png', width=30, height=17.5, unit='cm')
 
@@ -121,7 +120,7 @@ lay %>% arrange(closeness) %>% ggraph() +
   geom_node_point(aes(color=closeness, size = closeness)) + scale_size_continuous(range = c(0.5,5)) + scale_alpha(range = c(0.5,1)) + 
   theme_graph() + scale_color_viridis(direction = 1) + guides(size = "none") + labs(color="closeness") +
   geom_node_label(aes(
-    filter=net_metrics$betweenness_rnk <= 10, label=name), alpha=0.8, size = 3, repel=T, force = 20) 
+    filter=closeness_rnk <= 10, label=name), alpha=0.8, size = 3, repel=T, force = 20) 
 
 ggsave('output/pharma-graph-closeness.png', width=30, height=17.5, unit='cm')
 
@@ -131,7 +130,7 @@ ggsave('output/pharma-graph-closeness.png', width=30, height=17.5, unit='cm')
 rev <- pharma %>% group_by(affiliation) %>% summarise(revenue = sum(unique(revenue)))
 net_metrics <- net_metrics %>% left_join(., rev, by = c("name"="affiliation"))
 
-cor(net_metrics %>% select(revenue), net_metrics %>% select(betweenness, degree, closeness, eigen))
+cor(net_metrics %>% select(revenue), net_metrics %>% select(betweenness, degree, closeness, eigencentrality))
 
-fit <- lm(data = net_metrics, formula = revenue~betweenness+degree+closeness+eigen)
+fit <- lm(data = net_metrics, formula = revenue~betweenness+degree+closeness+eigencentrality)
 summary(fit)

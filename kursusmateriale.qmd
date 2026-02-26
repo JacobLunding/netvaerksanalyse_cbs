@@ -74,6 +74,15 @@ Endelig ser vi også på, hvordan man kan visualisere centrale aktører i et net
 
 [Download script til Session 4 her](scripts til undervisning/Session4.R){.btn .btn-primary}
 
+[Download Øvelse til Session 4 her](scripts til undervisninSession4_øvelse.R){.btn .btn-primary}
+
+[Download data til Øvelse: nordic pharma](data/nordic_pharma2025.xlsx){.btn .btn-primary}
+
+[Download data til Øvelse: eu car data](data/Cardata.xlsx){.btn .btn-primary}
+
+[Download data til Øvelse: nordic electricity data](data/nordic_electricity.xlsx){.btn .btn-primary}
+
+[Download data til Øvelse: world wide shipping data](data/shipping.xlsx){.btn .btn-primary}
 
 ---
 
