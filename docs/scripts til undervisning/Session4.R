@@ -516,5 +516,6 @@ ggarrange(plotlist = list(p0, p1, p2, p3)) %>% annotate_figure(., top = text_gro
 
 
 #I kan downloade øvelsen her:
-download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/scripts%20til%20undervisning/Session4_øvelse.R", "test.R")
-download.file("https://jacoblunding.quarto.pub/virkstrat2025/scripts%20til%20undervisning/Session4_øvelse_med_svar.R", "scripts/Session3_øvelse_med_svar.R")
+download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/scripts%20til%20undervisning/Session4_øvelse.R", "Session4_øvelse.R")
+
+

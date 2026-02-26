@@ -658,7 +658,7 @@ window.Quarto = {
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">transitivity</span>(g2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0</code></pre>
+<pre><code>[1] 0.03370787</code></pre>
 </div>
 </div>
 <p>Vi har indtil nu kigget på transitivitet som et mål for hele netværkets grad af lukning. Høj global transitivitet fortæller os der er mange ‘strong ties’ som skaber closure (og dermed tæthed i netværket). En lav transitivitet peger omvendt på at der er såkaldte ‘weak ties’ så trekanter ikke ‘lukkes’. Det skaber mulighed for at ‘bridge’ strukturelle huller.</p>
@@ -857,7 +857,7 @@ Anja C. Jensen 58972                             0</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">farthest_vertices</span>(comp1, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$vertices
-+ 2/307 vertices, named, from 6c39937:
++ 2/307 vertices, named, from e4880ae:
 [1] Anders Hestbech 14538 Poul Dahlgaard 70290 
 
 $distance
@@ -870,7 +870,7 @@ $distance
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>diam <span class="ot">&lt;-</span> <span class="fu">get_diameter</span>(comp1, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>diam</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>+ 7/307 vertices, named, from 6c39937:
+<pre><code>+ 7/307 vertices, named, from e4880ae:
 [1] Anders Hestbech 14538     Jan Pedersen 18274       
 [3] Charlotte Skovgaard 18276 Inge Berneke 63780       
 [5] Kim Haggren 49144         Kirstine Thorsen 58934   

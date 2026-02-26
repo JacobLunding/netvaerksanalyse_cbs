@@ -19,6 +19,7 @@ library(tidyverse)
 library(ggplot2)
 library(ggpubr)
 library(igraph)
+library(tidygraph)
 library(ggraph)
 library(Matrix)
 ```
@@ -26,6 +27,11 @@ library(Matrix)
 # Indlæs data og lav netværksobjekter:
 
 Næste skridt er en række gentagelser ([se Session1](session1.html)), hvor vi indlæser og subsetter den17 datasættet.
+
+[Download Danish Elite Network 2017](data/den17-no-nordic-letters.csv){.btn .btn-primary} 
+
+og læg den i `/data` mappen
+
 
 ```{r, message=FALSE}
 den <- read_csv("data/den17-no-nordic-letters.csv")
@@ -60,22 +66,27 @@ Og laver to grafobjekter vha. igraph `graph_from_adjaceny_matrix()`-funktion
 ```{r}
 # individ netværket 
 gr_ind    <- adj_ind %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE) 
+gr_ind    <- gr_ind %>% as_tbl_graph()
 # virksomheds netværket 
 gr_virk   <- adj_virk %>% graph_from_adjacency_matrix(mode = "undirected", weighted = TRUE, diag = FALSE) 
+gr_virk   <- gr_virk %>% as_tbl_graph()
+
 ```
 
-I det følgende ser vi nærmere på virksomhedsnetværket... (`gr_virk`). Lad os først lige se på netværkets komponent-struktur. Hvor mange komponenter består det af? Funktionen `components()` giver os en liste af resultater, der fortæller os 1) `$memberships`, dvs. hvilke virksomheder hører til hvilken komponent, 2) `$csize` hvor mange virksomheder er der i hver komponent og 3) `$no`, for mange komponenter er der i alt
+I det følgende ser vi nærmere på virksomhedsnetværket... (`gr_virk`). Lad os først lige se på netværkets komponent-struktur. Hvor mange komponenter består det af? 
 
 ```{r}
-complist <- components(gr_virk)
-complist$csize
-complist$no
+gr_virk <- gr_virk %>% 
+  mutate(comp = group_components())
+
+gr_virk %>% as_tibble() %>% count(comp) %>% head(10)
+
 ```
 
-Husk fra sidst at funktionen `largest_component()` returnerer subgrafen for netværkets største komponent:
+Vi kan nu bruge den nye variabel i vores `node-data` til at subsette netværket til den største komponent kun:
 
 ```{r}
-largest_comp_virk <- gr_virk %>% largest_component()
+largest_comp_virk <- gr_virk %>% filter(comp == 1)
 ```
 
 I næste skridt gemmer vi to netværksvisualiseringer, én af hele netværket med alle komponenter (det plot kalder vi p1) og ét med netværket for den største komponent (det kalder vi p2):
@@ -118,8 +129,9 @@ I det følgende skal kigge på en række forskellige måder at konceptualisere c
 Linton C Freeman (1979) påpeger at det idealtypiske billede på centralitet er en såkaldt stjernegraf, hvor en node er forbundet til alle andre, der hver især kun er forbundet til denne:
 
 ```{r}
-star <- make_star(10, mode = "undirected")
-V(star)$name <- LETTERS[1:10]
+star <- create_star(10, mode = "undirected")
+star <- star %>%
+  mutate(name = LETTERS[1:10])
 star %>% ggraph("kk") +
   geom_edge_link0() +
   geom_node_label(aes(label = name, size = degree(star)), show.legend = F) +
@@ -158,13 +170,11 @@ deg <- degree(largest_comp_virk)
 table(deg)
 ```
 
-fordi degree er udregnet på grafobjektet (og derfor er sorteret på samme måde), kan vi uden problemer tilføje vores degree variable som en ny vertex attribute. Det kan vi gøre på to måder: 1) med `V(netværksobjekt)$"nyt attribute" <- degree` 2) med en funktion `set_vertex_attr()`
+Fordi vores netværks objekt er et tidygraph objekt, kan vi bruge en tidy-måde til at tilføje forskellige variable til `node-data` delen:
 
 ```{r, message=FALSE, warning=FALSE}
-#1)
-V(largest_comp_virk)$degree <- deg
-#2)
-largest_comp_virk <- set_vertex_attr(largest_comp_virk, name = "degree", value = deg)
+largest_comp_virk <- largest_comp_virk %>% 
+  mutate(degree = centrality_degree())
 ```
 
 Lad os undersøge hvordan degree fordelingen ser ud (`med et histogram`) og hvordan degree fordelingen beskriver netværket (`med et grafplot`):
@@ -204,7 +214,8 @@ eig <- eig$vector
 lad os igen gemme eigencentraliteten som en vertex attribute
 
 ```{r, warning= FALSE, message= FALSE}
-V(largest_comp_virk)$eigencentrality <- eig
+largest_comp_virk <- largest_comp_virk %>% 
+  mutate(eigencentrality = centrality_eigen())
 ```
 
 og plotte fordelingen og netværket
@@ -232,45 +243,6 @@ En anden gruppe af centralitetsmål er mere fokuseret på den strukturelle posit
 
 **Beslutninger:** 1) skal stilængderne i netværket vægtes i udregningen (i kraft af edge weights), hvis vi ikke skriver noget influerer evt. edge-weights på stilængderne (hvis der er en weight attribute i grafobjektet), skriver vi `weights = NA` ignoreres edge weights så alle edges har samme vægt (w = 1)
 
-## Excentricitets centralitet:
-
-**Ide**: Et netværk har yderpunkter, dvs. noder der er længst fra hinanden. De siges at ligge i periferien og deres afstand er derfor netværkets **diameter**. Den/de noder der har den *korteste* afstand deres *fjerneste* node, kalder vi **centrum** i netværket, og afstanden til periferien, **radius**.
-
-**Praksis**: En nodes eccentricitet er deres maksimale afstand (korteste sti) til en anden node.
-
-![](images/eccentricity.png)
-
-Det er almindeligt at bruge den inverse eccentricitet (dvs $1 \over eccentricity$) som centralitetsmål, så perifære noder får et lavere tal og centrale noder et højre.
-
-```{r }
-ecc <- 1 / eccentricity(largest_comp_virk, weights = NA)
-```
-
-lad os igen gemme eccentricity centraliteten som en vertex attribute i vores grafobjekt:
-
-```{r, warning=FALSE}
-V(largest_comp_virk)$eccentricity <- ecc
-```
-
-og kigge på fordelingen og netværket
-
-```{r, warning=FALSE}
-hist_ecc <- ecc %>% tibble() %>% 
-  ggplot() +
-  geom_histogram(aes(x=.), fill = "grey20") +
-  scale_y_continuous(name = "Antal") + scale_x_continuous(breaks = seq(0,max(ecc), .01), name ="1/Eccentricity") +
-  theme_minimal(base_family = "serif")
-
-p_ecc <- largest_comp_virk %>% 
-  ggraph(layout='stress') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
-  geom_node_point(aes(color=eccentricity), alpha=0.8)  + 
-  labs(title = paste0("Den største komponent (n=", vcount(largest_comp_virk),")"), subtitle = "1/Eccentricity", color = "") +
-  theme_graph() + theme(plot.title = element_text(family = "serif", size = 12), plot.subtitle = element_text(family = "serif", size = 12), legend.position = "bottom")
-
-ggarrange(plotlist = list(hist_ecc, p_ecc), widths = c(1.4,2))
-```
-
 ## Closeness centralitet:
 
 Ide: en central netværks-aktør er en der (i gennemsnit) er tæt på de andre i netværket. En der hurtigt kan række ud i netværket og derfor har en grad af *uafhængighed*. Hvor eccentricitet måler hvor langt der er til den fjerneste nabo, måler closeness i stedet hvor langt der i gennemsnit er til alle naboer.
@@ -284,7 +256,8 @@ clo  <- closeness(largest_comp_virk, weights = NA)
 Igen, lad os gemme closeness centraliteten i vores grafobjekt som en vertex attribute:
 
 ```{r}
-V(largest_comp_virk)$closeness <- clo
+largest_comp_virk <- largest_comp_virk %>% 
+  mutate(closeness = centrality_closeness())
 ```
 
 og producere det samme overblik over fordelingen og netværket:
@@ -318,7 +291,8 @@ bet <- betweenness(largest_comp_virk, weights = NA)
 ```
 
 ```{r, message=FALSE, warning = FALSE}
-V(largest_comp_virk)$betweenness <- bet
+largest_comp_virk <- largest_comp_virk %>% 
+  mutate(betweenness = centrality_betweenness())
 ```
 
 ```{r, message=FALSE, warning = FALSE}
@@ -345,58 +319,58 @@ Nu har vi set på en række forskellige centralitetsmål, der teoretisk/konceptu
 |---------------|---------------|---------------|---------------|---------------|
 | degree centralitet | `degree()` |  | hvis ja: `mode ="in"`, `"out"` eller `"all"` | `normalized = TRUE` eller `FALSE` |
 | eigenvector centralitet | `eigen_centrality()` | `weights = NA` ignorerer vægte | `directed = TRUE` eller `FALSE` | altid normaliseret |
-| eccentricity centralitet | 1 / `eccentricity()` | `weights = NA` ignorerer vægte | hvis ja: `mode ="in"`, `"out"` eller `"all"` | `normalized = TRUE` eller `FALSE` |
 | closeness centralitet | `closeness()` | `weights = NA` ignorerer vægte | hvis ja: `mode ="in"`, `"out"` eller `"all"` | `normalized = TRUE` eller `FALSE` |
 | betweenness centralitet | `betweenness()` | `weights = NA` ignorerer vægte | `directed = TRUE` eller `FALSE` | `normalized = TRUE` eller `FALSE` |
 
-Lad os samle alle centralitetsmålene, som nu ligger som vertex attributes i vores grafobjekt, i en data.frame med `igraph`-funktionen `as_data_frame()`
-
-```{r }
-cent_metrics <- as_data_frame(largest_comp_virk, what = "vertices") %>% tibble()
-```
 
 ## Centralitetsrank
 
 Det kan være en god ide at lave en rankvariabel for de forskellige mål, som ranker alle noder efter deres centralitet på de forskellige mål. Funktionen `dense_rank()` kombineret med `desc()` (descending) giver os et rank hvor noden med den højeste centralitet bliver nr 1 og de andre noder, 2,3,4,5 osv. jo lavere deres centralitet er. Det gør det lidt lettere at overskue, hvor en bestemt node er placeret på de forskellige centralitetsmål.
 
-Når vi skriver i stedet for at skrive koden for hver eneste centralitets mål kan vi bruge funktionen `across()` inde i `mutate()` det betyder at vi i denne sammen hæng gør 'noget' henover alle kolonner undtagen name `.cols = -name`, det vi gør er en funktion `.fns =` som er (`~` betyder her funktion) `dense_rank(desc(.x))` (hvor `.x` betyder elmeneterne i `.cols`, altså for hver af kolonnerne der ikke er name), det sidste udtryk vi skriver i across funktionen er hvad der skal ske med variablene. Hvis vi ikke skriver noget her, overskriver vi de gamle variable. Hvis vi som nedenfor skriver `.names = "{.col}_rnk"` betyder det at vi laver nye variable der kommer til at hedde det samme som de gamle `"{.col}"` + \_rnk. Dvs. rangeringen af degree bliver til ny variabel degree_rnk.
-
 ```{r}
-cent_metrics_rnk <- cent_metrics %>% mutate(across(.cols = -name, .fns = ~dense_rank(desc(.x)), .names = "{.col}_rnk"))
+largest_comp_virk <- largest_comp_virk %>% 
+  mutate(degree_rnk = degree %>% desc %>% dense_rank(),
+         closeness_rnk = closeness %>% desc %>% dense_rank(),
+         betweenness_rnk = betweenness %>% desc %>% dense_rank(),
+         eigencentrality_rnk = eigencentrality %>% desc() %>% dense_rank())
 ```
 
 ## Måler de forskellige centralitetsmål i realiteten noget forskelligt?
 
-Jeg har skrevet en plot-funktion der ligger i `networkfunctions.R` som kan downloads her:
+Jeg har skrevet en plot-funktion der ligger i `correlationsplots.R` som kan downloads her:
 
-[Download functions](functions/networkfunctions.R){.btn .btn-primary}
+[Download functions](functions/correlationplots.R){.btn .btn-primary}
 
 eller hentes på kursets hjemmeside.
 
 Hvis I lægger den i functionsmappen i rprojekt-mappen, kan i source den som med andre scripts:
 
 ```{r}
-source("functions/networkfunctions.R", echo = FALSE)
+source("functions/correlationplots.R")
 ```
 
 med `cor_plots()` funktionen kan vi lave et hurtigt plot, der viser korrelationen mellem de f orskellige centralitetsmål:
 
-Vi kan lige normalisere alle målene, så de går fra 0 til 1 det gør vi ved at dividere alle med max (for dem der allerede er normaliseret betyder det ingen ting da x/1 jo er x). Undtagen selvfølgelig name variablen (så den skipper vi i across funktionen `across(.cols = -name, ...)`)
-
-```{r}
-cent_metrics_norm <- cent_metrics %>% mutate(across(.cols = -name, .fns = ~.x / max(.x))) 
-```
-
 I `cor_plots()` skal I huske at skrive hvilken variabel i jeres dataobjekt, der er en navne-variabel (som default leder den efter "name" eller "affiliation"). Der er også mulighed for at sætte en `plot.title`, (default er "Korrelationer mellem centralitetsmål") og en `title.size` (default er 12):
 
+
+Vi kan lige sørge for at closeness og betweenness målene er normaliseret.
+
 ```{r}
-cent_metrics_norm %>% cor_plots(., name_var = "name")
+largest_comp_virk <- largest_comp_virk %>% 
+  mutate(betweenness_norm = centrality_betweenness(normalized = T),
+         closeness_norm = centrality_closeness(normalized = T))
+```
+
+
+```{r}
+largest_comp_virk %>% as_tibble() %>% select(name, degree, closeness_norm, eigencentrality, betweenness_norm) %>%  cor_plots(., name_var = "name")
 ```
 
 og vi kan se de parvise correlationer mellem målenen (vi 'smider' igen name-variablen ud `select(-name)`)
 
 ```{r}
-cent_metrics_norm  %>% select(-name) %>% cor(, method = "kendall")
+largest_comp_virk %>% as_tibble() %>% select(degree, closeness_norm, eigencentrality, betweenness_norm) %>% cor(, method = "kendall")
 
 ```
 
@@ -410,9 +384,49 @@ Jo mere et netværk 'ligner' en stjernegraf eller dvs. jo mere kerne-periferi ag
 
 # Kerne/periferi struktur:
 
-## Coreness eller K-core decomposition
-
 En anden måde at tænke centralitet på, med udgangspunkt i netværkets kerne/periferi struktur
+
+## Excentricitets centralitet:
+
+**Ide**: Et netværk har yderpunkter, dvs. noder der er længst fra hinanden. De siges at ligge i periferien og deres afstand er derfor netværkets **diameter**. Den/de noder der har den *korteste* afstand deres *fjerneste* node, kalder vi **centrum** i netværket, og afstanden til periferien, **radius**.
+
+**Praksis**: En nodes eccentricitet er deres maksimale afstand (korteste sti) til en anden node.
+
+![](images/eccentricity.png)
+
+Det er almindeligt at bruge den inverse eccentricitet (dvs $1 \over eccentricity$) som centralitetsmål, så perifære noder får et lavere tal og centrale noder et højre.
+
+```{r }
+ecc <- 1 / eccentricity(largest_comp_virk, weights = NA)
+```
+
+lad os igen gemme eccentricity centraliteten som en vertex attribute i vores grafobjekt:
+
+```{r, warning=FALSE}
+largest_comp_virk <- largest_comp_virk %>% 
+  mutate(eccentricity = 1/node_eccentricity())
+```
+
+og kigge på fordelingen og netværket
+
+```{r, warning=FALSE}
+hist_ecc <- ecc %>% tibble() %>% 
+  ggplot() +
+  geom_histogram(aes(x=.), fill = "grey20") +
+  scale_y_continuous(name = "Antal") + scale_x_continuous(breaks = seq(0,max(ecc), .01), name ="1/Eccentricity") +
+  theme_minimal(base_family = "serif")
+
+p_ecc <- largest_comp_virk %>% 
+  ggraph(layout='stress') + 
+  geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
+  geom_node_point(aes(color=eccentricity), alpha=0.8)  + 
+  labs(title = paste0("Den største komponent (n=", vcount(largest_comp_virk),")"), subtitle = "1/Eccentricity", color = "") +
+  theme_graph() + theme(plot.title = element_text(family = "serif", size = 12), plot.subtitle = element_text(family = "serif", size = 12), legend.position = "bottom")
+
+ggarrange(plotlist = list(hist_ecc, p_ecc), widths = c(1.4,2))
+```
+
+## Coreness eller K-core decomposition
 
 **ide**: Første lag K=0: Alle noder; Andet lag K=1 alle noder med \< 1 forbindelse slettes; næste lag K=2 alle noder der nu har \<2 forbindelser slettes; K=3 alle noder der nu har \<3 forbindelser slettes osv. indtil man ikke kan slette noder uden at antallet af de reterende noders forbindelser falder....
 
@@ -421,17 +435,27 @@ core <- coreness(largest_comp_virk)
 table(core)
 ```
 
-Lad os prøve at visualisere logikken med en funktion fra `networkfunctions.R`
+Lad os prøve at visualisere logikken med en funktion fra `coreness_viz.R`
+
+som kan downloades her:
+
+[Download functions](functions/coreness_viz.R){.btn .btn-primary}
+
+og lægges i `functions`
+
+```{r}
+source("functions/coreness_viz.R")
+```
 
 ```{r, fig.height=10, warning=FALSE}
-coreness_viz(largest_comp_virk, algorithm = 'kk') 
+coreness_viz(largest_comp_virk, algorithm = 'fr') 
 ```
 
 lad os lige tilføje coreness til vores cent_metrics data og til grafobjektet
 
 ```{r}
-cent_metrics <- cent_metrics %>% mutate(coreness = core)
-V(largest_comp_virk)$coreness <- core
+largest_comp_virk <- largest_comp_virk %>% 
+  mutate(coreness = node_coreness())
 ```
 
 # Visualiernger af netværk
@@ -442,8 +466,8 @@ V(largest_comp_virk)$coreness <- core
 largest_comp_virk %>% ggraph(layout='stress') + 
   geom_edge_link0(color='grey', width=0.6, alpha=0.35) +
   geom_node_point(aes(color=eccentricity, size = eccentricity, alpha = eccentricity), show.legend = F) + 
-  theme_graph() + scale_color_viridis(direction = -1) + labs(color="1/Eccentricity") +
-  geom_node_label(aes( filter=name %in% {cent_metrics %>% filter(eccentricity %in% c(min(eccentricity), max(eccentricity))) %>% pull(name)}, label=name), alpha=0.65, size = 3, repel=T, force = 10) 
+  theme_graph() + scale_color_viridis(direction = -1) + labs(color="1/Eccentricity")
+
 ```
 
 ## Visualisering af betweenness
@@ -453,7 +477,7 @@ largest_comp_virk %>% ggraph(layout='stress') +
   geom_edge_link0(color='grey', width=0.6, alpha=0.35) + 
   geom_node_point(aes(color=betweenness, size = betweenness, alpha = betweenness), show.legend = F) + 
   theme_graph() + scale_color_viridis(direction = -1) + labs(color="Betweenness") + 
-  geom_node_label(aes( filter=name %in% {cent_metrics_rnk %>% filter(betweenness_rnk <= 10) %>% pull(name)}, label=name), alpha=0.65, size = 3, repel=T, force = 20)
+  geom_node_label(aes( filter=betweenness_rnk <= 10, label=name), alpha=0.65, size = 3, repel=T, force = 20)
 ```
 
 ## Visualisering af closeness
@@ -464,7 +488,7 @@ largest_comp_virk %>% ggraph(layout='stress') +
   geom_node_point(aes(color=closeness, size = closeness, alpha = closeness), show.legend = F) + 
   theme_graph() + scale_color_viridis(direction = -1) + 
   labs(color="Closeness") + 
-  geom_node_label(aes( filter=name %in% {cent_metrics_rnk %>% filter(closeness_rnk <= 10) %>% pull(name)}, label=name), alpha=0.65, repel=T,size=3, force = 20)
+  geom_node_label(aes( filter=closeness_rnk <= 10, label=name), alpha=0.65, repel=T,size=3, force = 20)
 
 ```
 
@@ -487,7 +511,7 @@ eig_cent  <- centr_eigen(largest_comp_virk)$centralization
 eig_cent
 
 
-stargr <- make_star(vcount(largest_comp_virk), mode = "undirected") 
+stargr <- create_star(vcount(largest_comp_virk), mode = "undirected") 
 
 lay1 <- create_layout(largest_comp_virk, layout = "fr") 
 
@@ -527,6 +551,4 @@ ggarrange(plotlist = list(p0, p1, p2, p3)) %>% annotate_figure(., top = text_gro
 
 ```
 
-[I kan downloade scriptet her](scripts%20til%20undervisning/Session3.R){.btn .btn-primary} [Øvelser her](scripts%20til%20undervisning/Session3_øvelse.R){.btn .btn-primary} [Øvelser med svar her](scripts%20til%20undervisning/Session3_øvelse_med_svar.R){.btn .btn-primary}
 
-Husk at lægge dem i scripts mappen i r-projektmappen

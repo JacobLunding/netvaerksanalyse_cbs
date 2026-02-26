@@ -27,12 +27,16 @@ source("functions/read_orbis.R")
 ##################################/
 
 #Nordisk pharma
+download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/data/nordic_pharma2025.xlsx", "data/nordic_pharma2025.xlsx")
 dt <- read_orbisxlsx("data/nordic_pharma2025.xlsx")
 #Europæiske biler
+download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/data/Cardata.xlsx", "data/Cardata.xlsx")
 dt <- read_orbisxlsx("data/Cardata.xlsx")
 #Nordisk Elektricitet
+download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/data/nordic_electricity.xlsx", "data/nordic_electricity.xlsx")
 dt <- read_orbisxlsx("data/nordic_electricity.xlsx")
 #Shipping world-wide
+download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/data/shipping.xlsx", "data/shipping.xlsx")
 dt <- read_xlsx("data/shipping.xlsx")
 
 # Antal poster per individ
