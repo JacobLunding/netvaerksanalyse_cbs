@@ -74,9 +74,9 @@ Endelig ser vi også på, hvordan man kan visualisere centrale aktører i et net
 
 [Download script til Session 4 her](scripts til undervisning/Session4.R){.btn .btn-primary}
 
-[Download correlationplots-funktion til Session 4 her](functions/correlationplots.R){.btn .btn-primary} og læg den i data
+[Download correlationplots-funktion til Session 4 her](functions/correlationplots.R){.btn .btn-primary} og læg den i functions
 
-[Download coreness_viz funktionen her](functions/coreness_viz.R){.btn .btn-primary}
+[Download coreness_viz funktionen her](functions/coreness_viz.R){.btn .btn-primary} og læg den i functions
 
 [Download Øvelse til Session 4 her](scripts til undervisning/Session4_øvelse.R){.btn .btn-primary}
 

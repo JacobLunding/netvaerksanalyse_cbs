@@ -429,7 +429,7 @@ gr_virk <- gr_virk %>%
 gr_virk %>% as_tibble(active = "nodes") %>% View()
 
 # et visualierngs eksempel | bruger en funktion fra 
-# download.file("https://jacoblunding.quarto.pub/virkstrat2025/scripts%20til%20undervisning/Session4_øvelse.R", "scripts/Session3_øvelse.R")
+download.file("https://jacoblunding.quarto.pub/virkstrat2025/functions/coreness_viz.R", "scripts/coreness_viz.R")
 source("functions/coreness_viz.R")
 coreness_viz(gr_virk, algorithm = 'fr')
 
