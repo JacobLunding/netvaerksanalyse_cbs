@@ -1,70 +1,26 @@
-##############  #Lektion03 ################
-# 
-# Virksomhedsstrategi i et netværksperspektiv 
-# Centralitetsmål - øvelse
-#
-###########################################
-
-# 1. Indlæs (library) nødvendige pakker: ----
-# vi skal bruge tidyverse, som altid
-# igraph til grafobjekter og centralitetsmål
-# ggraph og ggplot2 og ggpubr til grafplots
-# og "functions/networkfunctions.R" som skal sources
-library(tidyverse)
-library(tidygraph)
-library(igraph)
-library(ggraph)
-library(ggplot2)
-library(ggpubr)
-library(Matrix)
-library(readxl)
-source("functions/read_orbis.R")
-
-##################################/
-# Vælg et af følgende datasæt 
-# ELLER
-# indlæs noget andet
-##################################/
-
-#Nordisk pharma
-dt <- read_orbisxlsx("data/nordic_pharma2025.xlsx")
-#Europæiske biler
-dt <- read_orbisxlsx("data/Cardata.xlsx")
-#Nordisk Elektricitet
-dt <- read_orbisxlsx("data/nordic_electricity.xlsx")
-#Shipping world-wide
-dt <- read_xlsx("data/shipping.xlsx")
-
-# Antal poster per individ
-dt <- dt %>% 
-  group_by(person_id) %>% 
-  mutate(n_memberships = n_distinct(affiliation)) %>% 
-  ungroup()
-# Antal individer per bestyrelse
-dt <- dt %>% 
-  group_by(affiliation) %>%
-  mutate(n_members = n_distinct(person_id)) %>% 
-  ungroup()
-
-## Byg filter overvej hvilke kriterier I vil bruge
-dt <- dt %>% 
-  filter(role_status == "Current") %>% 
-  filter(person)
-
-
-##################################/
-# NETVÆRK
-##################################/
-
-bi_adj <- xtabs(data = dt, formula = ~name + affiliation)
-
-# Hvilket netværk vil I lave, individer eller virksomheder?
-# 
-# 
-
-
-##################################/
-# ANALYSE
-# beregn forskellige centralitetsmål
-##################################/
+cor_plots <- function(metrics_table, plot.title = "Korrelationer mellem centralitetsmål", title.size = 12, name_var = c("name", "affiliation")) {
+  require(ggplot2)
+  require(tidyverse)
+  require(ggpubr)
+  metrics_table <- metrics_table %>% select(-any_of(name_var))
+  deg <- lapply(colnames(metrics_table), function(t) { 
+    lapply(colnames(metrics_table), function(z) {
+      tmp <- cbind(metrics_table %>% select(matches(z)), 
+                   metrics_table %>% select(matches(t))) 
+      colnames(tmp) <- c("x", "y")
+      ggplot(data = tmp, aes(x = x, y = y)) + 
+        geom_point(alpha = .5) + #geom_smooth(method = smooth_fun, se = FALSE, color = "salmon") + 
+        xlab(z) + ylab(t) + theme_minimal(base_family = "serif") + 
+        xlim(min(metrics_table %>% pull(var = matches(z))),max(metrics_table %>% pull(var = matches(z)))) +
+        ylim(min(metrics_table %>% pull(var = matches(t))),max(metrics_table %>% pull(var = matches(t)))) #+
+      # annotate(geom="text", 
+      #                 x=max(metrics_table %>% pull(var = matches(z)))*0.1, 
+      #                 y=max(metrics_table %>% pull(var = matches(t)))*0.95, 
+      #                 label=paste0("τ= ", cor(metrics_table %>%  select(matches(z)),  metrics_table %>%  select(matches(t)), method = method) %>% round(.,3)), color="salmon", hjust = 0) 
+    })
+  })
+  
+  names(deg) <- colnames(metrics_table)
+  ggarrange(plotlist = do.call(what = base::c, deg), align = "hv") %>% annotate_figure(.,top = text_grob(plot.title, face = "bold", size = title.size, family = "serif"))
+}
 

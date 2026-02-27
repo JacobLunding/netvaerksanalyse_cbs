@@ -20,8 +20,10 @@ library(igraph)
 library(ggraph)
 library(Matrix)
 library(readxl)
-source("functions/correlationplots.R")
 
+download.file("https://jacoblunding.github.io/netvaerksanalyse_cbs/functions/correlationplots.R", "functions/correlationplots.R")
+
+source("functions/correlationplots.R")
 
 
 #############################################################/
@@ -133,13 +135,9 @@ p2
 
 
 ######################################################/
-# LAD OS GÅ VIDERE MED ET ANDET NETVÆRK
-# TØJ I EU
+# LAD OS GÅ VIDERE MED VIRKSOMHEDSNETVÆRKET
 ######################################################/
-#
-# som vi jo har gemt i tidygraph objektet gr_virk
-#
-gr_virk <- net %>% as_tbl_graph()
+
 ##################################################################/
 # 3. Kig på komponenter & plot ----
 ##################################################################/
@@ -392,7 +390,7 @@ gr_virk %>% as_tibble(active = "nodes") %>% write_csv("output/centralitetsmål.x
 
 
 # korrrelation mellem forskellige former for centralitet 
-  # med en 'hjemmelavet' plotfunktion fra 'networkfunctions.R' kan vi lave et hurtigt plot, der viser korrelationen mellem de forskellige centralitetsmål.
+  # med en 'hjemmelavet' plotfunktion fra 'correlationplots.R' kan vi lave et hurtigt plot, der viser korrelationen mellem de forskellige centralitetsmål.
 gr_virk %>% 
   as_tibble() %>% 
   select(name, contains("_norm"), eigencentrality) %>% 
@@ -429,7 +427,7 @@ gr_virk <- gr_virk %>%
 gr_virk %>% as_tibble(active = "nodes") %>% View()
 
 # et visualierngs eksempel | bruger en funktion fra 
-download.file("https://jacoblunding.quarto.pub/virkstrat2025/functions/coreness_viz.R", "scripts/coreness_viz.R")
+# download.file("https://jacoblunding.quarto.pub/virkstrat2025/functions/coreness_viz.R", "scripts/coreness_viz.R")
 source("functions/coreness_viz.R")
 coreness_viz(gr_virk, algorithm = 'fr')
 
