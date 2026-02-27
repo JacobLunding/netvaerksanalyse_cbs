@@ -40,6 +40,8 @@ head(c25)
 c25_cvr <- c25$cvr
 
 
+
+
 # For at lave netværket af c25 virksomheder ud fra DEN skal vi først identificere c25 virksomhederne data. 
 #   Det gør vi ved at lave en ny variabel, som jeg kalder c25_virk, hvor jeg "spørger" med 'case_when' om en affiliation er i listen af c25 virksomheder. Hvis JA, får den nye variabel værdien "yes", hvis IKKE (.default =), får den værdien "no"
 den <- den %>% 
@@ -115,7 +117,7 @@ gr_bi <- gr_bi %>%
 
 p1 <- gr_bi %>% filter(!(c25_virk == "no" & type == TRUE)) %>% 
   ggraph("kk") + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
+  geom_edge_link0(color='grey', width=0.6, alpha=0.8) + 
   geom_node_point(aes(filter = centrality_degree() > 0, color=type, size = type), alpha=0.9)  + 
   geom_node_label(aes(filter = centrality_degree() > 1, label = name, color = type), size = 3, repel = T, show.legend = F)  + 
   scale_color_manual(values = c("salmon2", "steelblue3")) +
@@ -144,7 +146,7 @@ p2
 gr_virk <- gr_virk %>% 
   activate(nodes) %>% 
   mutate(comp = group_components())
-
+gr_virk
 # Hvordan ser komponent strukturen ud
 gr_virk %>% activate(nodes) %>% as_tibble() %>% count(comp)
 
@@ -175,7 +177,7 @@ gr_virk <- gr_virk %>%
 #Kun c25
 p1 <- gr_virk %>% filter(c25_virk == "yes") %>% 
   ggraph(layout='fr') + 
-  geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
+  geom_edge_link0(color='grey', width=0.6, alpha=0.9) + 
   geom_node_point(size = 5)  + 
   geom_node_label(aes(label = name), size = 4, repel = T) +
   labs(title = paste0("Netværket af C25 virksomheder")) +
@@ -356,14 +358,14 @@ ggarrange(plotlist = list(hist_bet, p_bet), widths = c(1.4,2))
 
 # igraph:
 degree(gr_virk)
-eigen_centrality(gr_virk)
+eigen_centrality(gr_virk)$vector
 betweenness(gr_virk)
 closeness(gr_virk)
 #
 # vs.
 #
 # tidygraph:
-gr_virk <- gr_virk %>% 
+gr_virk <- gr_virk %>% activate(nodes) %>% 
   mutate(degree = centrality_degree(),
          eigencentrality = centrality_eigen(), 
          closeness = centrality_closeness(),
@@ -372,6 +374,7 @@ gr_virk <- gr_virk %>%
          degree_norm = centrality_degree(normalized = T),
          closeness_norm = centrality_closeness(normalized = T),
          betweenness_norm = centrality_betweenness(normalized = T))
+gr_virk %>% as_tibble %>% View()
 
 ################################/
 # Centralitetsrank ----
@@ -386,7 +389,8 @@ gr_virk <- gr_virk %>%
          betweenness_rnk = betweenness %>% desc() %>% dense_rank())
          
 # Hvis vi vil have et dataobjekt (en 'tibble') med de udvalgte centralitetsmål
-gr_virk %>% as_tibble(active = "nodes") %>% write_csv("output/centralitetsmål.xlsx")
+gr_virk %>% as_tibble(active = "nodes") %>% writexl::write_xlsx("output/centralitetsmål.xlsx")
+gr_virk %>% as_tibble(active = "nodes") %>% write_csv("output/centralitetsmål.csv")
 
 
 # korrrelation mellem forskellige former for centralitet 
@@ -420,6 +424,7 @@ gr_virk %>% as_tibble() %>% select(contains("_norm"), eigencentrality) %>% cor(,
 ##############################################/
   # En anden måde at tænke centralitet på, med udgangspunkt i netværkets kerne/periferi struktur
   # ide: Første lag K=0: Alle noder; Andet lag K=1 alle noder med < 1 forbindelse slettes; næste lag K=2 alle noder der nu har <2 forbindelser slettes; K=3 alle noder der nu har <3 noder slettes osv. indtil man ikke kan slette noder uden at antallet de reterende noders forbindelser falder....
+
 gr_virk <- gr_virk %>% 
   mutate(coreness = node_coreness())
 
