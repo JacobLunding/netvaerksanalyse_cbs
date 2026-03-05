@@ -11,21 +11,26 @@ library(tidyverse)
 library(readxl)
 library(writexl)
 library(igraph)
+library(tidygraph)
 library(ggraph)
 library(patchwork)
 library(ggpubr)
 library(Matrix)
 ```
 
-Som tidligere kan I downloade opdaterede R scripts med hjælpe-funktioner her [Download costum_functions.R her](functions/custom_functions.R){.btn .btn-primary}
+Datafil
+[Download read_orbis.R her]("data/nordic_pharma2025.xlsx"){.btn .btn-primary}
 
-[Download networkfunctions.R her](functions/networkfunctions.R){.btn .btn-primary}
+[Download read_orbis.R her](functions/read_orbis.R){.btn .btn-primary}
+[Download ego_neighborhoods.R her](functions/ego_neighborhoods.R){.btn .btn-primary}
+[Download ego_neighborhoods.R her](functions/ego_net_plot.R.R){.btn .btn-primary}
 
 De skal lige 'sources' så funktionerne ligger i vores global environment
 
 ```{r}
-source("functions/networkfunctions.R")
-source("functions/custom_functions.R")
+source("functions/read_orbis.R")
+source("functions/ego_neighborhoods.R")
+source("functions/ego_net_plot.R")
 ```
 
 # Data
@@ -57,7 +62,8 @@ head(pharma_nordic)
 Vi laver en ny variabel, `executive`, som er `TRUE` hvise `role_type` indeholder *enten* "BoD" *eller* "ExeB" *eller* "SenMan" *eller* "ExeC" **ELLER** hvis `role` indeholder forskellige ord, der indikerer executive level:
 
 ```{r}
-pharma_nordic <- pharma_nordic %>% mutate(executive = grepl("BoD|ExeB|SenMan|ExeC", role_type) | grepl("Director|directeur|Head of|general|Chief|executive|president|Chairman", role, ignore.case =T))
+pharma_nordic <- pharma_nordic %>% mutate(executive = grepl("BoD|ExeB|SenMan|ExeC", role_type) | 
+                                            grepl("Director|directeur|Head of|general|Chief|executive|president|Chairman", role, ignore.case =T))
 ```
 
 Vi har hentet to forskellige variable på Orbis for personernes geografiske oprindelse: `person_country` og `person_contries`. Den første er fødested, den anden er countr(y/ies) of nationality.
@@ -174,14 +180,14 @@ herfra kan vi vha `igraph` lave et netværksobjekt, som er `undirected` og ikke 
 ::: g-col-6
 ```{r}
 net_virk <- graph_from_adjacency_matrix(adjmatrix = adj_virk, mode = "undirected", diag = FALSE) %>% simplify()
-net_virk
+net_virk <- net_virk %>% as_tbl_graph()
 ```
 :::
 
 ::: g-col-6
 ```{r}
 net_ind <- graph_from_adjacency_matrix(adjmatrix = adj_ind, mode = "undirected", diag = FALSE) %>% simplify()
-net_ind
+net_ind <- net_ind %>% as_tbl_graph()
 ```
 :::
 :::::
@@ -193,8 +199,8 @@ med funktionen `count_components` finder vi ud af hvor mange sammenhægende komp
 ::::: grid
 ::: g-col-6
 ```{r}
-count_components(net_virk)
-components(net_virk)$csize %>% table()
+net_virk <- net_virk %>% mutate(comp = group_components())
+net_virk %>% as_tibble(active = "nodes") %>% count(comp) %>% count(n)
 ```
 
 Vi har altså 343 isolerede virksomheder (komponenter med én virksomhed) og 32 par af virksomheder osv. og en stor komponent på 63 virksomheder
@@ -202,8 +208,8 @@ Vi har altså 343 isolerede virksomheder (komponenter med én virksomhed) og 32 
 
 ::: g-col-6
 ```{r}
-count_components(net_ind)
-components(net_ind)$csize %>% table()
+net_ind <- net_ind %>% mutate(comp = group_components())
+net_ind %>% as_tibble(active = "nodes") %>% count(comp) %>% count(n)
 ```
 
 Vi har altså 14 isolerede individer. og 17 par af individer osv. og en stor komponent på 77 invidider.
@@ -217,15 +223,17 @@ med `largest_component()` fra *igraph* og `get_n_largest_component()` fra *netwo
 ::::: grid
 ::: g-col-6
 ```{r}
-comp1_virk <- largest_component(net_virk)
-comp2_virk <- get_n_largest_component(net_virk, n = 2)
+comp1_virk <- net_virk %>% filter(comp == 1)
+comp2_virk <- net_virk %>% filter(comp == 2)
+
+
 ```
 :::
 
 ::: g-col-6
 ```{r}
-comp1_ind <- largest_component(net_ind)
-comp2_ind <- get_n_largest_component(net_ind, n = 2)
+comp1_ind <- net_ind %>% filter(comp == 1)
+comp2_ind <- net_ind %>% filter(comp == 2)
 ```
 :::
 :::::
@@ -239,8 +247,7 @@ Som vi har talt om tidligere kan man ikke udenvidere tilføje vertex attributes 
 for virksomhedsgrafen kommer `V(.)$name` jo fra `affiliation` variablen, så den er `match_var` her. Lad os sige jeg gerne vil tilføje, country, sector, revenue, assets, employees, global ultimate owner (name + country), domestic ultimate owner (name + country) til det fulde netværk og til mine to komponenter
 
 ```{r}
-net_virk <- add_vertex_attr(graph = net_virk, 
-                     data = pharma_nordic %>% 
+net_virk <- net_virk %>% left_join(pharma_nordic %>% 
                             select(affiliation, 
                                    affiliation_country, 
                                    sector, 
@@ -250,14 +257,13 @@ net_virk <- add_vertex_attr(graph = net_virk,
                                    guo_name, 
                                    guo_country, 
                                    duo_name,
-                                   duo_country),
-                     match_var = "affiliation")
+                                   duo_country) %>% distinct() %>%  rename(name= affiliation))
+                    
 
 ```
 
 ```{r}
-comp1_virk <- add_vertex_attr(graph = comp1_virk, 
-                     data = pharma_nordic %>% 
+comp1_virk <- comp1_virk %>% left_join(pharma_nordic %>% 
                             select(affiliation, 
                                    affiliation_country, 
                                    sector, 
@@ -267,25 +273,23 @@ comp1_virk <- add_vertex_attr(graph = comp1_virk,
                                    guo_name, 
                                    guo_country, 
                                    duo_name,
-                                   duo_country),
-                     match_var = "affiliation")
+                                   duo_country) %>% distinct() %>%  rename(name= affiliation))
 
 ```
 
 ```{r}
-comp2_virk <- add_vertex_attr(graph = comp2_virk, 
-                         data = pharma_nordic %>% 
-                           select(affiliation, 
-                                  affiliation_country, 
-                                  sector, 
-                                  revenue,
-                                  total_assets, 
-                                  n_employees, 
-                                  guo_name, 
-                                  guo_country, 
-                                  duo_name,
-                                  duo_country),
-                         match_var = "affiliation")
+comp2_virk <- comp2_virk %>% left_join(pharma_nordic %>% 
+                            select(affiliation, 
+                                   affiliation_country, 
+                                   sector, 
+                                   revenue,
+                                   total_assets, 
+                                   n_employees, 
+                                   guo_name, 
+                                   guo_country, 
+                                   duo_name,
+                                   duo_country) %>% distinct() %>%  rename(name= affiliation))
+
 
 ```
 :::
@@ -298,12 +302,10 @@ for individgrafen kommer `V(.)$name` jo fra `name` variablen, så den er `match_
 \
 
 ```{r}
-net_ind <- add_vertex_attr(graph = net_ind, 
-                         data = pharma_nordic %>% 
+net_ind <- net_ind %>% left_join(pharma_nordic %>% 
                            select(name, 
                                   person_gender, 
-                                  person_geo),
-                         match_var = "name")
+                                  person_geo) %>% distinct(name, .keep_all = T))
 
 ```
 
@@ -314,12 +316,10 @@ net_ind <- add_vertex_attr(graph = net_ind,
 \
 
 ```{r}
-comp1_ind <- add_vertex_attr(graph = comp1_ind, 
-                         data = pharma_nordic %>% 
+comp1_ind <- comp1_ind %>% left_join(pharma_nordic %>% 
                            select(name, 
                                   person_gender, 
-                                  person_geo),
-                         match_var = "name")
+                                  person_geo) %>% distinct(name, .keep_all = T))
 ```
 
 \
@@ -330,12 +330,10 @@ comp1_ind <- add_vertex_attr(graph = comp1_ind,
 \
 
 ```{r}
-comp2_ind <- add_vertex_attr(graph = comp2_ind, 
-                             data = pharma_nordic %>% 
-                               select(name, 
-                                      person_gender, 
-                                      person_geo),
-                             match_var = "name")
+comp2_ind <- comp2_ind %>% left_join(pharma_nordic %>% 
+                           select(name, 
+                                  person_gender, 
+                                  person_geo) %>% distinct(name, .keep_all = T))
 ```
 :::
 :::::
@@ -360,7 +358,12 @@ p1 <- comp1_virk %>% ggraph("fr") +
   theme_graph(base_family = "serif")
 
 
-p + p1 
+p2 <- comp2_virk %>% ggraph("fr") +
+  geom_edge_link0(width = 0.3, alpha = 0.3) +
+  geom_node_point(aes(color = affiliation_country), size = 1.2) + ggtitle(paste0("Største komponent (n=", vcount(comp1_virk), ")")) + guides(color = guide_legend("Country")) +
+  theme_graph(base_family = "serif")
+
+p + p1
 ```
 
 # Netværksmål
@@ -375,6 +378,8 @@ diameter <- diameter(comp1_virk)
 ```
 
 Lad os gemme dem i en med navne i en vector (en `named vector`). Det gør vi ved at skrive "det navn værdien skal have" = værdien. Sådan en named vector kan laves om til en `tibble` (dataformat) med `enframe`, så navne kommer i en kolonne og værdierne i en anden:
+
+`vcount()` tæller antallet af noder (vertices), `ecount()` tæller antallet af edges. `count_components` tæller antallet af komponenter
 
 ```{r}
 net_description <- c("nb. of nodes" = vcount(net_virk),
@@ -433,7 +438,7 @@ ggpubr::ggarrange(plotlist = pl, labels = c("1st neighbourhood", "2nd neighbourh
 
 ```
 
-Vi har talt om trekantslukninger (når A og B *og* B og C er venner, er der sandsynlighed for at A og C også med tiden bliver det) og om hvordan det skaber closure i et netværk og bidrager til lokal densitet og cohesion - som skaber grundlag for tillid, sammenhold, norm-konformitet osv. Social kapital som gruppe fænomen.
+Vi har talt om trekantslukninger (**triadic closure**) (når A og B er venner *og* B og C er venner, er der sandsynlighed for at A og C også med tiden bliver det) og om hvordan det skaber closure i et netværk og bidrager til lokal densitet og cohesion - som skaber grundlag for tillid, sammenhold, norm-konformitet osv. Social kapital som gruppe fænomen.
 
 Lad os begynde med at se på hvordan lokal transitivitet ser ud. For hver node i vores netværk kan vi se hvor mange af dens forbindelser der er lukkede (to venner der også kender hinanden) og hvor mange der er åbne (åbne/lukkede kalder vi transitivitet). Lad os tage 12 tilfældige noder (`sample()` på 12 fra vertex navne) og sortere dem, så den med højest transitivitet kommer først. Bemærk at `transitivity()` returnerer `NaN` - not a number - når en node ikke er en del af nogen triplets (så er der hverken faktisk lukkede eller mulige lukkede trekanter at regne på). Hvis vi gerne vil sortere er vi nødt til at erstatte `NaN` med `NA`.
 
@@ -499,19 +504,20 @@ local_betw    <-  betweenness(comp1_virk, cutoff = 2, normalized = TRUE)
 Lad os samle de nodespecifikke centralitetsmål for den største komponent og gemme dem i en xslx fil.
 
 ```{r}
-cent_metrics <- tibble(
-  name        = V(comp1_virk)$name,
-  degree      = deg, 
-  betweenness = betw,
-  local_betweenness = local_betw,
-  closeness   = close,
-  eigen       = eig,
-  constraint  = constr,
-  brokerage   = 1/ constr,
-  coreness    = core,
-  local_trans = local_transitivity)
+comp1_virk <- comp1_virk %>% mutate(
+  degree      = centrality_degree(), 
+  betweenness = centrality_betweenness(normalized = T),
+  local_betweenness = centrality_betweenness(cutoff = 2, normalized = T),
+  closeness   = centrality_closeness(normalized = T),
+  eigen       = centrality_eigen(directed = FALSE),
+  constraint  = node_constraint(),
+  brokerage   = 1/ constraint,
+  coreness    = node_coreness(),
+  local_trans = local_transitivity())
   
-cent_metrics <- cent_metrics %>% mutate(degree_rank      = dense_rank(desc(degree)),
+
+
+comp1_virk <- comp1_virk %>% mutate(degree_rank          = dense_rank(desc(degree)),
                                         betw_rank        = dense_rank(desc(betweenness)),
                                         local_betw_rank  = dense_rank(desc(local_betweenness)),
                                         closeness_rank   = dense_rank(desc(closeness)),
@@ -519,14 +525,9 @@ cent_metrics <- cent_metrics %>% mutate(degree_rank      = dense_rank(desc(degre
                                         eigen_rank       = dense_rank(desc(eigen)),
                                         local_trans_rank = dense_rank(local_trans))
 
-write_xlsx(cent_metrics, "output/pharma_nordic_example_centralitymetrics.xlsx")
+cent_metrics <- comp1_virk %>% as_tibble(active = "nodes")
+write_xlsx(cent_metrics, "output/pharma_nordic_example_nodes.xlsx")
 
-```
-
-Inden vi går videre til næste del af denne øvelse gemmer vi lige alle centralitetsmålene som vertex attributes i grafobjektet: Husk I kan bruge `add_vertex_attr()` funktionen til det.
-
-```{r}
-comp1_virk <- add_vertex_attr(graph= comp1_virk, data = cent_metrics, match_var = "name")
 ```
 
 I det følgende trækker vi et par eksempler ud og ser hvordan det lokale netværk kan være en constraint eller omvendt åbne muligheder for brokerage:
@@ -538,7 +539,7 @@ Det gør vi fra det dataobjekt med centralitetsmål vi lige har gemt. Først sor
 ```{r}
 brokers <- cent_metrics %>% 
   arrange(brokerage_rank) %>% 
-  filter(brokerage_rank %in% c(1,5,10,15, 20, 30)) %>% 
+  filter(brokerage_rank %in% c(1,5, 10,15, 20, 30)) %>% 
   distinct(brokerage_rank, .keep_all = T) %>% 
   pull(name)
 
@@ -556,6 +557,18 @@ p <- ggpubr::ggarrange(plotlist = pl, common.legend = T, legend = "none")
 
 ggsave(plot = p, filename = "output/constraint_brokerage.pdf", height = 6, width = 8)
 
+```
+```{r}
+p <- comp1_virk %>% ggraph() +
+  geom_edge_link0(width = 0.4, alpha = 0.3) +
+  geom_node_point() +
+  geom_node_point(aes(filter = brokerage_rank <= 5), color = "salmon2", size = 5) +
+  geom_node_text(aes(filter = brokerage_rank <= 5, label = brokerage_rank)) +
+  labs(caption = paste0(cent_metrics %>% arrange(brokerage_rank) %>% filter(brokerage_rank <= 5) %>% pull(brokerage_rank), ": ", 
+                        cent_metrics %>% arrange(brokerage_rank) %>% filter(brokerage_rank <= 5) %>% pull(name), " (",
+                        cent_metrics %>% arrange(brokerage_rank) %>% filter(brokerage_rank <= 5) %>% pull(constraint) %>% round(2), ")") %>% paste0(., collapse = "\n")) +
+  theme_graph()
+p
 ```
 
 # Assortativity (assortative mixing) - Homofili i netværk
@@ -582,31 +595,23 @@ I mange tilfælde vil det være interessant at beregne assortativity på netvær
 først sætter vi lige missing (`NA`) til 0 på antal ansatte, omsætning og assets:
 
 ```{r}
-V(comp1_virk)$n_employees[is.na(V(comp1_virk)$n_employees)] <- 0
-V(comp1_virk)$revenue[is.na(V(comp1_virk)$revenue)] <- 0
-V(comp1_virk)$total_assets[is.na(V(comp1_virk)$total_assets)] <- 0
+comp1_virk <- comp1_virk %>% mutate(
+  n_employees = replace_na(n_employees, 0),
+  revenue = replace_na(revenue, 0),
+  total_assets = replace_na(total_assets, 0)
+  )
 ```
 
 ```{r}
-assortativity(comp1_virk, values = V(comp1_virk)$n_employees)
-assortativity(comp1_virk, values = V(comp1_virk)$revenue)
-assortativity(comp1_virk, values = V(comp1_virk)$total_assets)
+assort <- comp1_virk %>% with_graph(tibble(employees  = graph_assortativity(attr = n_employees), # Kontinuert
+                                           revenue    = graph_assortativity(attr = revenue),     # Kontinuert
+                                           assets     = graph_assortativity(attr = total_assets),# Kontinuert 
+                                           country    = graph_assortativity(attr = affiliation_country))) # Nominiel
 
+assort
 ```
 
-Heller ikke den store 'effekt' her.
-
-## Assortativity for kategorielle variable
-
-funktionen `assortativity_nominal()` bruges til at beregne netværksassortativity for kategorielle variable
-
-Vi gemte fx virksomhedens nationalitet som en vertex attribute, lad os se om det betyder noget: Her skal man lige huske at variablen skal behandles som en factor for at funktionen virker.
-
-```{r}
-assortativity_nominal(comp1_virk, types = factor(V(comp1_virk)$affiliation_country))
-```
-
-Ikke så overraskende er der en høj assortativity her. Hvis I scroller op, kan i måske huske at den største komponent i høj grad var en komponent af svenske virksomheder.
+Heller ikke den store 'effekt' her med undtagelse af country(!). Ikke så overraskende er der en høj assortativity her. Hvis I scroller op, kan i måske huske at den største komponent i høj grad var en komponent af svenske virksomheder.
 
 En anden kategoriel variable kunne være Global Ultimate Owner (guo): Selskaber der ikke er en del af en koncern har `NA` på guo_name variablen, der sætter vi virksomhedens eget navn ind i stedet:
 
@@ -615,5 +620,13 @@ V(comp1_virk)$guo_name[is.na(V(comp1_virk)$guo_name)] <- V(comp1_virk)$name[is.n
 ```
 
 ```{r}
-assortativity_nominal(comp1_virk, types = factor(V(comp1_virk)$guo_name))
+assort <- comp1_virk %>% with_graph(tibble(employees  = graph_assortativity(attr = n_employees), # Kontinuert
+                                           revenue    = graph_assortativity(attr = revenue),     # Kontinuert
+                                           assets     = graph_assortativity(attr = total_assets),# Kontinuert 
+                                           country    = graph_assortativity(attr = affiliation_country),  # Nominiel
+                                           owner      = graph_assortativity(attr = guo_name))) # Nominiel
+
+
+
+assort
 ```
