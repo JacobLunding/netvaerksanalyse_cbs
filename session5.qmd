@@ -19,11 +19,11 @@ library(Matrix)
 ```
 
 Datafil
-[Download read_orbis.R her]("data/nordic_pharma2025.xlsx"){.btn .btn-primary}
+[Download pharmadata her]("data/nordic_pharma2025.xlsx"){.btn .btn-primary}
 
 [Download read_orbis.R her](functions/read_orbis.R){.btn .btn-primary}
 [Download ego_neighborhoods.R her](functions/ego_neighborhoods.R){.btn .btn-primary}
-[Download ego_neighborhoods.R her](functions/ego_net_plot.R.R){.btn .btn-primary}
+[Download ego_net_plot.R her](functions/ego_net_plot.R){.btn .btn-primary}
 
 De skal lige 'sources' så funktionerne ligger i vores global environment
 
@@ -598,8 +598,9 @@ først sætter vi lige missing (`NA`) til 0 på antal ansatte, omsætning og ass
 comp1_virk <- comp1_virk %>% mutate(
   n_employees = replace_na(n_employees, 0),
   revenue = replace_na(revenue, 0),
-  total_assets = replace_na(total_assets, 0)
-  )
+  revenue = case_when(revenue<0~0, .default = revenue),
+  total_assets = replace_na(total_assets, 0),
+  guo_name = case_when(is.na(guo_name)~name, .default = guo_name))
 ```
 
 ```{r}
@@ -616,7 +617,7 @@ Heller ikke den store 'effekt' her med undtagelse af country(!). Ikke så overra
 En anden kategoriel variable kunne være Global Ultimate Owner (guo): Selskaber der ikke er en del af en koncern har `NA` på guo_name variablen, der sætter vi virksomhedens eget navn ind i stedet:
 
 ```{r}
-V(comp1_virk)$guo_name[is.na(V(comp1_virk)$guo_name)] <- V(comp1_virk)$name[is.na(V(comp1_virk)$guo_name)]
+comp1_virk <- comp1_virk %>% mutate(case_when(is.na(guo_name)~name, .default = guo_name))
 ```
 
 ```{r}

@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-553db639d176b1f1e5eb8f34e19f9014.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-bd192f0b7177c10948837637c5954a59.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -241,8 +241,8 @@ window.Quarto = {
 
 <p>I denne session bygger vi videre på nogle af koncenterne fra sidst (centralitet <a href="session3.html">se Session3</a>, transitivitet, netværks-lukning og strukturelle huller <a href="session4.html">se Session4</a>)</p>
 <p>Først indlæser vi de pakker vi skal bruge:</p>
-<p>Datafil <a href="&quot;data/nordic_pharma2025.xlsx&quot;" class="btn btn-primary">Download read_orbis.R her</a></p>
-<p><a href="functions/read_orbis.R" class="btn btn-primary">Download read_orbis.R her</a> <a href="functions/ego_neighborhoods.R" class="btn btn-primary">Download ego_neighborhoods.R her</a> <a href="functions/ego_net_plot.R.R" class="btn btn-primary">Download ego_neighborhoods.R her</a></p>
+<p>Datafil <a href="&quot;data/nordic_pharma2025.xlsx&quot;" class="btn btn-primary">Download pharmadata her</a></p>
+<p><a href="functions/read_orbis.R" class="btn btn-primary">Download read_orbis.R her</a> <a href="functions/ego_neighborhoods.R" class="btn btn-primary">Download ego_neighborhoods.R her</a> <a href="functions/ego_net_plot.R" class="btn btn-primary">Download ego_net_plot.R her</a></p>
 <p>De skal lige ‘sources’ så funktionerne ligger i vores global environment</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"functions/read_orbis.R"</span>)</span>
@@ -342,16 +342,16 @@ role_level)
 <pre><code># A tibble: 10 × 2
    person_countries          n
    &lt;chr&gt;                 &lt;int&gt;
- 1 Denmark                 285
- 2 Ireland                   1
- 3 Vietnam                   1
- 4 Norway;Bermuda            2
- 5 Jamaica                   2
- 6 Ghana                     1
- 7 Ireland;Sweden            6
- 8 France                   43
- 9 Sweden;United Kingdom     3
-10 Finland;Sweden            2</code></pre>
+ 1 China                     5
+ 2 Norway;Sweden            12
+ 3 Poland                    6
+ 4 Netherlands              17
+ 5 Norway;United Kingdom     7
+ 6 United States            80
+ 7 Norway;Denmark            8
+ 8 Germany;Denmark           2
+ 9 Italy                     1
+10 Mozambique                1</code></pre>
 </div>
 </div>
 <p>Lad os lave en geografi-variabel <code>person_gep</code>, hvor vi bruger nationalitet når fødested er <code>NA</code> (der, hvor der er flere adskilt af “;”, lad da tage den første) og ellers bruger fødested (<code>.default= person_country</code>):</p>
@@ -923,8 +923,9 @@ role_level)
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>comp1_virk <span class="ot">&lt;-</span> comp1_virk <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(</span>
 <span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_employees =</span> <span class="fu">replace_na</span>(n_employees, <span class="dv">0</span>),</span>
 <span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">revenue =</span> <span class="fu">replace_na</span>(revenue, <span class="dv">0</span>),</span>
-<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">total_assets =</span> <span class="fu">replace_na</span>(total_assets, <span class="dv">0</span>)</span>
-<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">revenue =</span> <span class="fu">case_when</span>(revenue<span class="sc">&lt;</span><span class="dv">0</span><span class="sc">~</span><span class="dv">0</span>, <span class="at">.default =</span> revenue),</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">total_assets =</span> <span class="fu">replace_na</span>(total_assets, <span class="dv">0</span>),</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">guo_name =</span> <span class="fu">case_when</span>(<span class="fu">is.na</span>(guo_name)<span class="sc">~</span>name, <span class="at">.default =</span> guo_name))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>assort <span class="ot">&lt;-</span> comp1_virk <span class="sc">%&gt;%</span> <span class="fu">with_graph</span>(<span class="fu">tibble</span>(<span class="at">employees  =</span> <span class="fu">graph_assortativity</span>(<span class="at">attr =</span> n_employees), <span class="co"># Kontinuert</span></span>
@@ -943,7 +944,7 @@ role_level)
 <p>Heller ikke den store ‘effekt’ her med undtagelse af country(!). Ikke så overraskende er der en høj assortativity her. Hvis I scroller op, kan i måske huske at den største komponent i høj grad var en komponent af svenske virksomheder.</p>
 <p>En anden kategoriel variable kunne være Global Ultimate Owner (guo): Selskaber der ikke er en del af en koncern har <code>NA</code> på guo_name variablen, der sætter vi virksomhedens eget navn ind i stedet:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(comp1_virk)<span class="sc">$</span>guo_name[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>guo_name)] <span class="ot">&lt;-</span> <span class="fu">V</span>(comp1_virk)<span class="sc">$</span>name[<span class="fu">is.na</span>(<span class="fu">V</span>(comp1_virk)<span class="sc">$</span>guo_name)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>comp1_virk <span class="ot">&lt;-</span> comp1_virk <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="fu">case_when</span>(<span class="fu">is.na</span>(guo_name)<span class="sc">~</span>name, <span class="at">.default =</span> guo_name))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>assort <span class="ot">&lt;-</span> comp1_virk <span class="sc">%&gt;%</span> <span class="fu">with_graph</span>(<span class="fu">tibble</span>(<span class="at">employees  =</span> <span class="fu">graph_assortativity</span>(<span class="at">attr =</span> n_employees), <span class="co"># Kontinuert</span></span>
