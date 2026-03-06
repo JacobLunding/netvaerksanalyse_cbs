@@ -97,7 +97,7 @@ I denne session har vi fokus på Burts constraint som et mål for brobygning vs 
 
 [Download script til Session 5 her](scripts til undervisning/Session5.R){.btn .btn-primary}
 
-[Download pharmadata her]("data/nordic_pharma2025.xlsx"){.btn .btn-primary}
+[Download pharmadata her](data/nordic_pharma2025.xlsx){.btn .btn-primary}
 
 Funktioner:
 [Download read_orbis.R her](functions/read_orbis.R){.btn .btn-primary}

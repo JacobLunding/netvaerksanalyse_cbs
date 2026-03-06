@@ -340,18 +340,18 @@ role_level)
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="co"># Vi tager 10 tilfældige rækker</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 2
-   person_countries          n
-   &lt;chr&gt;                 &lt;int&gt;
- 1 China                     5
- 2 Norway;Sweden            12
- 3 Poland                    6
- 4 Netherlands              17
- 5 Norway;United Kingdom     7
- 6 United States            80
- 7 Norway;Denmark            8
- 8 Germany;Denmark           2
- 9 Italy                     1
-10 Mozambique                1</code></pre>
+   person_countries                 n
+   &lt;chr&gt;                        &lt;int&gt;
+ 1 Israel                           6
+ 2 Norway;Bermuda                   2
+ 3 United States;United Kingdom     7
+ 4 France;United Kingdom            2
+ 5 Norway;United Kingdom            7
+ 6 United Kingdom;Norway            9
+ 7 Finland                        360
+ 8 Finland;Sweden                   2
+ 9 United States;Venezuela          2
+10 Germany;United Kingdom           1</code></pre>
 </div>
 </div>
 <p>Lad os lave en geografi-variabel <code>person_gep</code>, hvor vi bruger nationalitet når fødested er <code>NA</code> (der, hvor der er flere adskilt af “;”, lad da tage den første) og ellers bruger fødested (<code>.default= person_country</code>):</p>
