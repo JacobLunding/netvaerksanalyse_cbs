@@ -59,6 +59,7 @@ source("functions/ego_net_plot.R")
 pharma_nordic <- read_orbisxlsx("data/nordic_pharma2025.xlsx")
 colnames(pharma_nordic)
 head(pharma_nordic)
+
 ###################################################################################################/
 # 2. Omkod data m.m. ----
 ###################################################################################################/
@@ -89,9 +90,10 @@ pharma_nordic %>% count(person_geo, sort = TRUE)
 # dvs at bestyrelser der har udveklet medlemmer historisk også tæller som en forbindelse!
 
 pharma_nordic <- pharma_nordic %>% filter(person == TRUE)
-# pharma_nordic <- pharma_nordic %>% filter(role_status == "Current")
+pharma_nordic <- pharma_nordic %>% filter(role_status == "Current")
 pharma_nordic <- pharma_nordic %>% filter(executive == TRUE)
 pharma_nordic <- pharma_nordic %>% distinct(name, affiliation, .keep_all = T)
+
 
 ###################################################################################################/
 # 2. Definerer et netværksobjekt for virksomheder ----
@@ -102,12 +104,15 @@ adj_affil <- t(bi_adj) %*% bi_adj
 net       <- adj_affil %>% graph_from_adjacency_matrix(mode = "undirected") %>% simplify()
 net       <- net %>% as_tbl_graph()
 
+net
 
 ###################################################################################################/
 # 3. Tilføjer udvalgte virksomhedsvariable til netværksobjektet ----
 ###################################################################################################/
 
-pharma_nordic <- pharma_nordic %>% group_by(affiliation) %>% mutate(women_share = sum(person_gender == "F", na.rm = T) / sum(person_gender %in% c("M", "F"), na.rm = T))
+pharma_nordic <- pharma_nordic %>% 
+  group_by(affiliation) %>% 
+  mutate(women_share = sum(person_gender == "F", na.rm = T) / sum(person_gender %in% c("M", "F"), na.rm = T))
 
 # først laver vi et datasæt, der kun har én række per virksomhed (distinct(affiliation, .keep_all = TRUE))
 variables_to_add <- pharma_nordic %>% 
@@ -116,12 +121,11 @@ variables_to_add <- pharma_nordic %>%
   select(affiliation, affiliation_country, guo_name, guo_country, n_employees, revenue, total_assets, women_share)  
 
 # og left_joiner det på netværksobjektet (vi renamer affiliation til name, så det matcher med name i netværksobjektet)
-net       <- net %>% left_join(variables_to_add %>% rename(name = affiliation))
+net       <- net %>% left_join(variables_to_add, by = c("name" = "affiliation"))
 
 ###################################################################################################/
 # 4. Hurtig visualisering ----
 ###################################################################################################/
-
 
 net %>% ggraph() +
   geom_edge_link0(width = 0.3, alpha = 0.2) +
@@ -131,6 +135,7 @@ net %>% ggraph() +
 ###################################################################################################/
 # 5. Komponenter ----
 ###################################################################################################/
+
 net       <- net %>% mutate(comp = group_components())
 
 net_c1    <- net %>% filter(comp == 1)
@@ -155,6 +160,7 @@ net_description <- c("nb. of nodes" = vcount(net), # vcount tæller noder/vertic
                      "largest component: radius" = radius,
                      "largest component: density" = dens, 
                      "largest component: transitivity" = trans) %>% enframe(name = "Measures", value = "value")
+net_description
 
 write_xlsx(net_description, "output/pharma_nordic_example_net_description.xlsx")
 
@@ -297,7 +303,10 @@ p <- ggpubr::ggarrange(plotlist = pl, common.legend = T, legend = "none")
 p
 ggsave(plot = p, filename = "output/constraint_brokerage.pdf", height = 6, width = 8)
 
-
+net_c1 %>% ggraph() +
+  geom_edge_link0() +
+  geom_node_point(aes(color = name == "ALZINOVA AB", size = name == "ALZINOVA AB")) +
+  theme_graph()
 ###################################################################################################/
 # 11. Visualiseringer af netværk ----
 ###################################################################################################/
@@ -347,13 +356,20 @@ p3<- net_c1 %>% as_tbl_graph() %>% arrange(brokerage_burt) %>% ggraph("stress") 
   geom_edge_link0(width =.3, alpha = 0.3) +
   geom_node_point(aes(color = brokerage_burt, size = degree)) + 
   scale_size_continuous(range = c(2,5)) + 
-  geom_node_label(aes(filter=brokerage_burt_rank<=5, label = paste0(brokerage_burt_rank, ": ", name)), size = 3, repel = T, force = 25) +
+  geom_node_label(aes(filter=brokerage_burt_rank<=10, label = paste0(brokerage_burt_rank, ": ", name)), size = 3, repel = T, force = 25) +
   guides(label = "none", size = "none") +
   theme_graph(base_family = "serif")
 
+p4<- net_c1 %>% as_tbl_graph() %>% arrange(brokerage_igraph) %>% ggraph("stress") +
+  geom_edge_link0(width =.3, alpha = 0.3) +
+  geom_node_point(aes(color = brokerage_igraph, size = degree)) + 
+  scale_size_continuous(range = c(2,5)) + 
+  geom_node_label(aes(filter=brokerage_igraph_rank<=10, label = paste0(brokerage_igraph_rank, ": ", name)), size = 3, repel = T, force = 25) +
+  guides(label = "none", size = "none") +
+  theme_graph(base_family = "serif")
 
-p <- ggarrange(plotlist = list(p0, p1, p2, p3)) %>%  annotate_figure(., top = paste0("Største komponent (n=", vcount(net_c1), ") top-5:"))
-
+p <- ggarrange(plotlist = list(p3, p4)) %>%  annotate_figure(., top = paste0("Største komponent (n=", vcount(net_c1), ") top-5:"))
+p
 ggsave("output/pharma_nordic_example_net_plots.pdf", plot = p, width = 15, height = 10)
 
 
@@ -393,7 +409,7 @@ net_c1 <- net_c1 %>% mutate(
 
 
 # Assortativity score udregnet i tidygraph!!
-assort <- net_c1 %>% with_graph(tibble(employees  = graph_assortativity(attr = n_employees),             # Kontinuert
+assort <- net_c1 %>% with_graph(tibble(employees      = graph_assortativity(attr = n_employees),         # Kontinuert
                                            revenue    = graph_assortativity(attr = revenue),             # Kontinuert
                                            assets     = graph_assortativity(attr = total_assets),        # Kontinuert 
                                            gender     = graph_assortativity(attr = women_share),         # Kontinuert 

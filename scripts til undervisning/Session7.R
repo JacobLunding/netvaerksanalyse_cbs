@@ -11,6 +11,7 @@
 library(tidyverse)
 library(ggraph)
 library(igraph)
+library(tidygraph)
 library(graphlayouts)
 library(RColorBrewer)
 library(readxl) 
@@ -28,78 +29,109 @@ source("functions/custom_functions.R")
 # 1. Læs datafil ----
 #
 ##################################################################################################/
-den <- read_csv("data/den17-no-nordic-letters.csv")
+den <- read_csv("data/danish_elitenetworks2024.csv")
 
 
 ###################################################################################################/
 # 2. Subset og evt. omkod data m.m. ----
 ###################################################################################################/
 
-finans_tags <- c("Finance", "FINA", "Banks", "Pensions", "Insurance", "Venture- og kapitalfonde", "Investment")
+landbrugs_virksomheder <- den %>% filter(affiliation_orig_name != "GYLLINGNÆS A/S" & (affiliation_branche_niveau3 == "Husdyravl" | grepl("Erhvervsliv_Landbrug($|;)", affiliation_tags))) %>% 
+  pull(affiliation_orig_name) %>% unique()
 
-# Udvælger tags der har med finance at gøre
-den_fin <- has.tags(den, tags = finans_tags, result = "den", mode = "or")
+landbrugs_personer <- den %>% filter(affiliation_orig_name %in% landbrugs_virksomheder & position_leader == TRUE) %>% 
+  pull(person_name) %>% 
+  unique()
 
-den_fin <- den_fin %>% filter(sector != "Events")
+landbrugs_mødesteder <- den %>% filter(person_name %in% landbrugs_personer & 
+                                         !grepl("Events eller begivenheder|Mødested_Adelige", affiliation_tags) & affiliation_orig_name != "Viet-Jacobsen Fonden") %>% pull(affiliation_orig_name) %>% unique()
+
+
+den %>% filter(person_name %in% landbrugs_personer) %>%  View()
+# subsetter til de personer, der er i en virksomhed med husdyravl
+den_dyr           <- den %>% filter(affiliation_orig_name %in% landbrugs_mødesteder)
+
+den_dyr <- den_dyr %>% group_by(affiliation_orig_name) %>% mutate(members = n_distinct(person_name)) %>% ungroup
+
+den_dyr <- den_dyr %>% filter(members < 35 & members > 1)
+
+
+den_dyr <- den_dyr %>% mutate(type = ifelse(grepl("avl af", affiliation_branche_niveau5, ignore.case = T), "Avl af dyr", 
+                                            ifelse(affiliation_branche_niveau2 == "Fremstilling af fødevarer", "Fremstilling af fødevarer",
+                                                   ifelse(affiliation_branche_niveau5 == "Landbrugskonsulenter", "Landbrugskonsulenter",
+                                                          ifelse(affiliation_branche_niveau5 == "Erhvervs- og arbejdsgiverorganisationer", "Erhvervs- og arbejdsgiverorganisationer", NA)))))
+
 ###################################################################################################/
 # 3. Definerer et netværksobjekt for virksomheder ----
 ###################################################################################################/
 
 # lav en sparse incidence matrice name x affiliation: 
-bi_adj <- xtabs(formula = ~ name + affiliation, 
-                   data = den_fin, 
+bi_adj <- xtabs(formula = ~ person_name + affiliation_orig_name, 
+                   data = den_dyr, 
                    sparse = TRUE)
 
 # lav virksomhed x virksomhed adjacency matricen: 
 adj_c  <- t(bi_adj) %*% bi_adj
 
 # lav netværks objektet
-gr <- graph_from_adjacency_matrix(adjmatrix = adj_c, mode = "undirected") %>% simplify()
+gr <- graph_from_adjacency_matrix(adjmatrix = adj_c, mode = "undirected") %>% simplify() %>% as_tbl_graph()
+
+
 
 ###################################################################################################/
-# 4. Netværkets komponenter? ----
+# 4. Tilføj netværkseksterne node attributes til netværksobjektet ----
 ###################################################################################################/
 
-comp.list <- components(gr)
-comp.list$no
-table(comp.list$csize)
+gr <- gr %>% 
+  left_join(den_dyr %>% select(name = affiliation_orig_name, affiliation_branche_niveau5, type) %>% distinct())
+
+gr <- gr %>% mutate(type = case_when(grepl("LANDBRUG & FØDEVARER|DI ", name, ignore.case = T)~"Erhvervs- og arbejdsgiverorganisationer", 
+                                       grepl("VL-", name, ignore.case = T)~"VL-grupper", 
+                                       grepl("Engroshandel", affiliation_branche_niveau5)~"Engroshandel",
+                                       .default = type),
+                      landbrugs_virk = name %in% landbrugs_virksomheder)
+
+brobyggere <- V(gr)$name[which(neighborhood(gr, order = 1) %>% sapply(., function(x) sum(names(x) %in% landbrugs_virksomheder) > 1))]
+
+gr <- gr %>% filter(name %in% brobyggere)
 
 
-comp1     <- largest_component(gr)
 
 ###################################################################################################/
-# 6. Tilføj netværkseksterne node attributes til netværksobjektet ----
+# 5. Netværkets komponenter? ----
 ###################################################################################################/
-den_fin <- den_fin %>% mutate(tags = gsub("FINA, |, FINA$", "", tags))
-# Tags 
-comp1   <- add_vertex_attr(graph = comp1, 
-                           data = den_fin %>% 
-                             select(affiliation, tags, sector),
-                           match_var = "affiliation")
-# omkod tags
-V(comp1)$tags <- case_when(grepl("Insurance|Pension", V(comp1)$tags) ~"Insurance&Pension",
-                                    grepl("Bank", V(comp1)$tags) ~"Banks",
-                                    .default = "Other finance")
+
+gr <- gr %>% 
+  mutate(comp = group_components())
+
+gr %>% as_tibble() %>% count(comp)
+
+
+gr1     <- gr %>% filter(comp == 1)
+
 
 ###################################################################################################/
 # 7. Tilføj Netværks mål som attributes til netværksobjektet ----
 ###################################################################################################/
 
-# degree
-V(comp1)$degree          <- degree(comp1)
-V(comp1)$degree_rnk      <- dense_rank(desc(V(comp1)$degree))
-#betweenness 
-V(comp1)$betweenness     <- betweenness(comp1, normalized = T)
-V(comp1)$betweenness_rnk <- dense_rank(desc(V(comp1)$betweenness))
-#lokal betweenness
-V(comp1)$loc_betweenness     <- betweenness(comp1, normalized = T, cutoff = 2)
-V(comp1)$loc_betweenness_rnk <- dense_rank(desc(V(comp1)$loc_betweenness))
-# closeness 
-V(comp1)$closeness       <-  closeness(comp1)
-V(comp1)$closeness_rnk   <- dense_rank(desc(V(comp1)$closeness))
-# brokerage
-V(comp1)$brokerage       <-  1/constraint(comp1)
-V(comp1)$brokerage_rnk   <- dense_rank(desc(V(comp1)$brokerage))
+
+gr1 <- gr1 %>% 
+  mutate(
+    # degree
+    degree = centrality_degree(),
+    degree_rnk = degree %>% desc %>% dense_rank,
+    # betweenness
+    betweenness = centrality_betweenness(normalized = T),
+    betweenness_rnk = betweenness %>% desc %>% dense_rank,
+    # local betweenness
+    local_betweenness = centrality_betweenness(normalized = T, cutoff = 2),
+    local_betweenness_rnk = local_betweenness %>% desc %>% dense_rank,
+    # closeness
+    closeness = centrality_closeness(normalized = T),
+    closeness_rnk = closeness %>% desc %>% dense_rank,
+    # brokerage
+    brokerage = 1/node_constraint(),
+    brokerage_rnk = brokerage %>% desc %>% dense_rank)
 
 #################################################/
 # 8. VISUALISERING ----
@@ -120,7 +152,7 @@ layouts <- c(
   'kk',
   'fr',
   'nicely',
-  'dh',
+#  'dh',
   'drl',
   'gem',
   'graphopt',
@@ -128,7 +160,7 @@ layouts <- c(
   'mds')
 
 pl <- map(layouts, function(x)
-  comp1 %>% ggraph(layout = x) +
+  gr1 %>% ggraph(layout = x) +
     geom_edge_link0(color='grey', width=0.6, alpha=0.45) + 
     geom_node_point(color='black', alpha=0.6)  + 
     theme_graph() +
@@ -140,7 +172,7 @@ ggarrange(plotlist = pl)
 ############################################/
 # 1: create layout: 'initialize plot'
 ############################################/
-p <- comp1 %>% 
+p <- gr1 %>% 
   ggraph(layout = "stress")
           #layout: en af layout algoritmerne fra listen nedenfor. Mest almindelige er nok; fr, kk, nicely, stress 
 p
@@ -169,7 +201,6 @@ p
 
 p + geom_node_point()
 #Lige som med edges kan vi sætte forskellige parametre: size, color, alpha, shape, fill etc.
-generateRPointShapes()
 p + geom_node_point(size = 3)
 p + geom_node_point(size = 3, shape = 17)
 p + geom_node_point(size = 3, shape = 20, color = "steelblue")
@@ -187,11 +218,10 @@ p + geom_node_point(size = 3, shape = 21, fill = "salmon2", color = "steelblue",
 
 p <- p + geom_node_point(
     # med aes() [Aesthetic mappings] sætter vi forskellige varierende aesthetics, color, size etc. Her bestemmer tag farven og betweenness størrelsen
-    mapping = aes(color=tags, size = betweenness),
+    mapping = aes(size = betweenness, color = type),
     # andre aesthetics som vi ikke vil 'mappe' men bare give en fast værdi
     alpha = 0.85) 
 p
-
 
 # Layer 3 labels
 ############################################/
@@ -199,12 +229,13 @@ p
 ############################################/
 p <- p + geom_node_label(
     # her laver vi et filter, så vi kun plotter lables for de 5 mest centrale noder
-    mapping = aes(filter=betweenness_rnk <= 5, color=tags, label=name), 
+    mapping = aes(filter=betweenness_rnk <= 10, label=name), 
     size=2, 
     repel=TRUE,
     show.legend = FALSE) 
 
 p
+
 # Layer 4
 ############################################/
 # 2b: tilføg ekstra geom layers
@@ -213,7 +244,7 @@ p
 p <- p +
   # tilføj et ekstra lille punkt oven i punktet for de 5 mest centrale på betweenness:
   geom_node_point(
-    mapping = aes(filter=betweenness_rnk <= 5), 
+    mapping = aes(filter=betweenness_rnk <=10), 
     color = "black", 
     size =0.5,
     # shape! Her kan man med en google søgning "R point shapes" se hvilke former man kan vælge
@@ -238,7 +269,7 @@ p
 
 display.brewer.all()
 
-my_colors <- brewer.pal(3, name = "Set2")
+my_colors <- brewer.pal(7, name = "Set2")
 # colorRampPalette(my_colors)(15)
 # HVis man har brug for flere farver end skalaen umiddelbart tillader...
   # my_colors <- brewer.pal(9, name = "Spectral") Første tal, 9 indikerer hvor mange farver vi vil hive ud af paletten, 1 til max. 
@@ -246,14 +277,14 @@ my_colors <- brewer.pal(3, name = "Set2")
 # colorRampPalette(my_colors)(n_distinct(V(comp1)$tag)) 
 
 p <- p + 
-  scale_color_manual(name = "Type", values = my_colors, labels = c("Banker", "Forsikring/Pension", "Anden finans"))
+  scale_color_manual(name = "Type", values = my_colors)
 p
 
 
 ############################################/
 # 4: Guides / legends
 # Vi kan ændre forskellige ting ved vores legends... fx størrelsen på markøren og titlen
-p <- p + guides(color = guide_legend(override.aes = list(size = 5), title = "Virksomhedstype"), 
+p <- p + guides(color = guide_legend(override.aes = list(size = 5), title = "Sektor"), 
                 size = guide_legend(title = "Betweenness centralitet"))
 p
 # Alternativ løsning, hvis man 'bare' vil ændre titel på legends
@@ -263,8 +294,8 @@ p <- p + labs(size="Betweenness centralitet",
 
 ############################################/
 # 5: Tilføj titel, undertitel, caption
-p <- p + labs(title = "Figure 1: Corporate interlocks i den finansielle sektor", 
-                subtitle = paste0("n = ", vcount(comp1)),
+p <- p + labs(title = "Figure 1: Mødesteder i Landbrugssektoren", 
+                subtitle = paste0("n = ", vcount(gr1)),
               caption = "layout with ggraph::stress")
 p
 ############################################/
@@ -280,7 +311,7 @@ p <- p + theme_graph(base_family = "serif") # for også at ændre text type i la
 p
 
 # vi kan overskrive layer 3 (som var vores labels)
-p$layers[[3]] <- geom_node_label(mapping = aes(filter=betweenness_rnk <= 5, color=tags, label=name), 
+p$layers[[3]] <- geom_node_label(mapping = aes(filter=betweenness_rnk <=10, color=type, label=name), 
                                  size=2, repel=TRUE, family = "serif", show.legend = FALSE) 
 p
 
@@ -294,7 +325,7 @@ ggsave('output/elitedb-graph-lektion07_01.pdf', plot = p, width=20, height=12.5,
 # 7. Et andet eksempel closeness (farver efter kontinuert variabel)
 ############################################/
 # base graph
-p1 <- comp1 %>% 
+p1 <- gr1 %>% 
   ggraph(layout = "graphopt") + 
   geom_edge_link0(width=.5, alpha=0.4, color = "grey70") + 
   geom_node_point(mapping = aes(color=closeness, size=degree)) + 
@@ -305,7 +336,7 @@ p1 <-  p1 + scale_size_continuous(range=c(2, 10))
 
 # color scale for en kontinuert variabel
 p1 + scale_color_viridis() 
-mid <- V(comp1)$closeness %>% mean()
+mid <- gr1 %>% as_tibble() %>% pull(closeness) %>% mean()
 # Vi kan også lave en farvesskala selv: kig på edit(colors())
 p1 <- p1 + scale_color_gradient2(low='wheat', mid='lightpink1',  high='magenta', na.value='green', midpoint = mid) 
 p1
@@ -321,7 +352,7 @@ ggsave('output/elitedb-graph-lektion06_01.png', plot = p1, width=30, height=17.5
 ###############################################/
 
 # Vi kan lave et layout objekt, som vi kan sortere og plotte fra
-layout <- create_layout(comp1, "stress")
+layout <- create_layout(gr1, "stress")
 names(layout)
 
 layout %>% arrange(closeness) %>% 
@@ -335,9 +366,11 @@ layout %>% arrange(closeness) %>%
 # Nu har vi fået noderne placret i den rigtige rækkefølge, men det er gået helt galt med edges....
 # Der er desværre ikke nogen 'nem' måde at fikse det på, men jeg har skrevet en funktion I kan bruge
 
+source("~/Dropbox/GitHub/netværksanalyse_cbs/functions/get_edge_coord.R")
+
 p_clo <- layout %>% arrange(closeness) %>% 
   ggraph() + 
-  geom_edge_link0(data = get_edge_coord(comp1, layout), 
+  geom_edge_link0(data = get_edge_coord(gr1, layout), 
                   mapping = aes(x = x, y = y, xend = xend, yend = yend), 
                   width=.5, alpha=0.4) + 
   geom_node_point(mapping = aes(color=closeness, size=degree)) + 
@@ -350,7 +383,7 @@ p_clo
 
 p_bet <- layout %>% arrange(betweenness) %>% 
   ggraph() + 
-  geom_edge_link0(data = get_edge_coord(comp1, layout), 
+  geom_edge_link0(data = get_edge_coord(gr1, layout), 
                   mapping = aes(x = x, y = y, xend = xend, yend = yend), 
                   width=.5, alpha=0.4) + 
   geom_node_point(mapping = aes(color=betweenness, size=degree)) + 
@@ -363,7 +396,7 @@ p_bet
 
 p_brok <- layout %>% arrange(brokerage) %>% 
   ggraph() + 
-  geom_edge_link0(data = get_edge_coord(comp1, layout), 
+  geom_edge_link0(data = get_edge_coord(gr1, layout), 
                   mapping = aes(x = x, y = y, xend = xend, yend = yend), 
                   width=.5, alpha=0.4) + 
   geom_node_point(mapping = aes(color=brokerage, size=degree)) + 
@@ -374,13 +407,13 @@ p_brok <- layout %>% arrange(brokerage) %>%
   theme_graph() 
 p_brok
 
-p_lbet <- layout %>% arrange(loc_betweenness) %>% 
+p_lbet <- layout %>% arrange(local_betweenness) %>% 
   ggraph() + 
-  geom_edge_link0(data = get_edge_coord(comp1, layout), 
+  geom_edge_link0(data = get_edge_coord(gr1, layout), 
                   mapping = aes(x = x, y = y, xend = xend, yend = yend), 
                   width=.5, alpha=0.4) + 
-  geom_node_point(mapping = aes(color=loc_betweenness, size=degree)) + 
-  geom_node_label(mapping = aes(filter = loc_betweenness_rnk <= 5, label = name), 
+  geom_node_point(mapping = aes(color=local_betweenness, size=degree)) + 
+  geom_node_label(mapping = aes(filter = local_betweenness_rnk <= 5, label = name), 
                   family = "serif", repel = T) +
   scale_size_continuous(range=c(2, 8)) +
   scale_color_viridis() +
@@ -402,7 +435,9 @@ metrics <- tibble(
   betweenness =   betweenness(comp1, normalized = T),
   closeness =     closeness(comp1), 
   brokerage =     1/constraint(comp1) 
-)       
+)   
+
+metrics <- gr1 %>% as_tibble() %>% select(name, type, degree, betweenness, closeness, brokerage)
 ### HVIS VI VIL SÆTTE LABLE PÅ UDVALGTE PUNKTER
 # ggplot har ikke den filter funktion der er i ggraph
 # så vi må lave en variable, name2, hvor vi gemmer alle navne, 
@@ -415,8 +450,8 @@ library(ggrepel)
 # Option 1: to mål overfor hinanden (closeness vs brokerage)
 metrics %>% 
 ggplot() + 
-  geom_point(mapping = aes(x = brokerage, y = betweenness, color=tags, size=degree)) + 
-  geom_label_repel(mapping = aes(x = brokerage, y = betweenness, label = name2)) +
+  geom_point(mapping = aes(x = brokerage, y = betweenness, color=type, size=degree)) + 
+  #geom_label_repel(mapping = aes(x = brokerage, y = betweenness, label = name2)) +
   scale_color_manual(values = my_colors) +
   scale_x_continuous(breaks = seq(1,max(metrics$brokerage), 1), name = "1/Burts constraint") +
   scale_y_continuous(name = "Betweenness") +
@@ -427,16 +462,14 @@ ggplot() +
 # Option 2: et mål delt op på tags
 metrics %>% 
 ggplot() + 
-  geom_density(mapping = aes(x = brokerage, fill=tags)) + 
+  geom_density(mapping = aes(x = betweenness, fill=type)) + 
   labs(y='share') + 
-  facet_wrap(~tags) + 
+  facet_wrap(~type) + 
   scale_fill_manual(values = my_colors) + 
   guides(fill = "none") +
   theme_minimal(base_family = "serif") + 
   theme(strip.text.x = element_text(size = 12, face = "bold")) 
 
-# Option 3: alle mål i en matrice
-cor_plots(metrics_table = metrics %>% select(-name, -name2, -tags))
 
 
 

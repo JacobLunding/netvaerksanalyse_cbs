@@ -1,3 +1,117 @@
 ---
 title: "Identifikation af communities og produktion af poster"
 ---
+
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+library(writexl)
+library(igraph)
+library(tidygraph)
+library(ggraph)
+library(ggpubr)
+
+```
+
+# Data - den danske magtelite anno 2024
+
+Til denne session skal vi undersøge community strukturen i den danske magtelite. Magtelite er fundet gennem en kerne-analyse af hele det store Danish Elite Network.
+
+Først indlæser vi en R-data fil, som indeholder to forskellige data objekter:
+
+-   Et tidygraph objekt `net.pe24` , der indeholder nodes og edges i netværket.
+-   Et datasæt `pe24` med en række variable der knytter sig til de i alt `401` personer
+
+```{r, message=FALSE}
+load("data/Power Elite 2024.Rda")
+```
+
+lad os se, hvad `pe24` indeholder:
+
+navn, om det er en kvinde hvilken primære organisation vedkommende er knyttet til og hvilken samfundssektor han eller hun primært repræsenterer.
+
+```{r}
+glimpse(pe24)
+```
+
+lad os tilføje de variable til vores netværks objekt ved at bruge `left_join()` .
+
+```{r}
+net.pe24 <- net.pe24 %>% left_join(pe24, by = c("name"))
+```
+
+bemærk at netværksobjektet har en edge variabel `weight`. Det er i dette tilfælde en værdi der udtrykker afstanden mellem de to noder i nettet. For at kunne bruge de som en reel `vægt` i det følgende skal vi vende den om, så lille afstand bliver lig stor vægt.
+
+```{r}
+net.pe24 <- net.pe24 %>% activate(edges) %>%
+  mutate(weight_inv = 1/weight) %>% 
+  activate(nodes)
+```
+
+Det er altså et vægtet netværk vi har at gøre med, hvor forbindelserne mellem folk har en vægt alt efter hvor mange (og i hvilke sammenhænge) de kender hinanden. Det er fx 'bedre' at kende hinanden fra en lille bestyrelse, end at have været deltagere i det samme store topmøde.
+
+## Centralitet, med og uden vægt
+
+Når netværket er vægtet er det afgørende for udregningen af fx centralitet at vi forholder os til at om vægten af forbindelsen skal tælle med, når vi udregner målene.
+
+Lad os udregne nogle af de nodespecifikke centralitetsmål med og uden vægte:
+
+```{r}
+net.pe24 <- net.pe24 %>% activate(nodes) %>% 
+  mutate(
+  degree        = centrality_degree(),
+  betweenness   = centrality_betweenness(),
+  closeness     = centrality_closeness(),
+  eigen         = centrality_eigen(),
+  constraint    = node_constraint(),
+  brokerage     = 1/ constraint,
+  local_trans   = local_transitivity(),
+  degree_w      = centrality_degree(weights = weight_inv),
+  betweenness_w = centrality_betweenness(weights = weight_inv),
+  closeness_w   = centrality_closeness(weights = weight_inv),
+  eigen_w       = centrality_eigen(weights = weight_inv),
+  constraint_w  = node_constraint(weights = weight_inv),
+  brokerage_w   = 1/ constraint_w,
+  local_trans_w = local_transitivity(weights = weight_inv))
+```
+
+Hvem er fx de 5 mest centrale målt på betweenness med og uden vægte:
+
+```{r}
+net.pe24 %>% as_tibble("nodes") %>% 
+  pull(betweenness) %>% 
+  sort(decreasing = TRUE) %>% 
+  head(5) %>% 
+  names()
+
+net.pe24 %>% as_tibble("nodes") %>% 
+  pull(betweenness_w) %>% 
+  sort(decreasing = TRUE) %>% 
+  head(5) %>% 
+  names()
+```
+
+Claus Jensen fra Dansk Metal går igen, (1. og 3. plads), men ellers er det andre navne.
+
+## Grupperinger i magteliten?
+
+Lad os starte med at lave et fast layout, så alle følgende plots ser ens ud!!
+
+```{r}
+layout <- create_layout(net.pe24, "fr", weights = weight_inv)
+```
+
+Dernæst kan vi plotte netværket, hvor vi farver noderne efter køn
+
+```{r, warning=F}
+
+net.pe24 %>% ggraph(layout = layout) +
+  geom_edge_link0(aes(width = weight_inv, alpha = weight_inv), color = "grey40", show.legend = FALSE) +
+  scale_edge_alpha_continuous(range = c(0.1,0.2)) +
+  scale_edge_width_continuous(range = c(0.1,0.4)) +
+  geom_node_point(aes(fill = women, size = betweenness_w), color = "black", shape = 21) +
+  theme_graph() +
+  guides(size = "none")
+```
+
+Vi har tidligere kigget på assortativity; altså tendensen til at noder, der er ens på et eller andet parameter, i højere grad danner forbindelser med hinanden.

@@ -36,20 +36,34 @@ De forskellige muligheder i ggplot kan findes [her](https://ggplot2.tidyverse.or
 
 Lad os komme igang.
 
+Til denne session skal I downloade:
+
+scriptet:
+[Scriptet - Session7_new.R](scripts%20til%20undervisning/Session7_new){.btn .btn-primary}
+
+datasættet:
+[Datasættet - finans_den17](data/finans_den17.csv){.btn .btn-primary}
+som lægges i undermappen /data i din r-projekt-mappe
+
+og funktionen:
+[funktionen - get_edge_coord.R]("functions/get_edge_coord.R"){.btn .btn-primary}
+som lægges i undermappen /functions i r-projekt-mappen
+
+
 # Indlæs pakker
 
-```{r, echo = F}
+```{r, echo = T, message=FALSE}
 library(tidyverse)
 library(ggraph)
 library(igraph)
+library(tidygraph)
 library(graphlayouts)
 library(RColorBrewer)
 library(readxl) 
 library(writexl)
 library(ggpubr)
 library(Matrix)
-source("functions/custom_functions.R")
-source("functions/networkfunctions.R")
+source("functions/get_edge_coord.R")
 ```
 
 # Indlæs data
@@ -57,63 +71,15 @@ source("functions/networkfunctions.R")
 Lad os arbejde med noget vi kender godt. Vi indlæser den17 fra datamappen:
 
 ```{r, warnings = F, messages = F}
-den <- read_csv("data/den17-no-nordic-letters.csv")
-```
-
-## Subset data
-
-Og udvælger en række tags, der tilsammen udgør finansverdenen i den17
-
-```{r, warnings = F, messages = F}
-finans_tags <- c("Finance", "FINA", "Banks", "Pensions", "Insurance", "Venture- og kapitalfonde")
-```
-
-herfra har vi to muligheder.
-
-1\) Enten subsetter vi den til alle positioner, der har et af de pågældende tags:
-
-```{r, warnings = F, messages = F}
-den_finans1  <- has.tags(den, tags = finans_tags, result = "den", mode = "or")
-head(den_finans1, 10)
-```
-
-2\) Eller også vælger vi at få en vector med navnene på alle de affiliations, der har et af de pågældende tags:
-
-```{r, warnings = F, messages = F}
-finans_affils  <- has.tags(den, tags = finans_tags, result = "affil", mode = "or")
-head(finans_affils, 10)
-```
-
-Gør vi dét, har vi nemlig mulighed for også at udvælge særlige ting, der ikke har et af de pågældende tags. Det kunne fx være at vi gerne vil have alle VL-grupper med også. Vi laver derfor en vektor med navnene på alle tværgående netværksgrupper, hvor der sidder et individ, som har et finans tag:
-
-```{r, warnings = F, messages = F}
-finans_ind <- has.tags(den, tags = finans_tags, result = "name", mode = "or")
-head(finans_ind)
-```
-
-```{r, warnings = F, messages = F}
-den %>% count(type)
-vl_grupper <- den %>% 
-  filter(type == "Netvaerk (VL-gruppe)" & name %in% finans_ind) %>%  
-  distinct(affiliation) %>% 
-  pull(affiliation)
-```
-
-Når vi har de to vektorer med affiliation-navne kan vi bruge dem til at subsette data med:
-
-```{r, warnings = F, messages = F}
-den_finans2 <- den %>% filter(affiliation %in% c(finans_affils, vl_grupper))
-dim(den_finans2)
+den <- read_csv("data/finans_den17.csv")
 ```
 
 # Konstruktion af netværksmatricer
 
-Lad os fortsætte med den_finans2 (hvor vi har inkluderet netværk også)
-
 ## individ x affiliation matrice:
 
 ```{r, warnings = F, messages = F}
-bi_adj <- xtabs(den_finans2, formula = ~name + affiliation, sparse = T)
+bi_adj <- xtabs(den, formula = ~name + affiliation, sparse = T)
 ```
 
 Fra individ x affiliation matricen, kan vi lave to matricer (det er vigtigt at `Matrix` pakken er læst ind her - `library(Matrix)`)
@@ -137,7 +103,10 @@ adj_affil <- t(bi_adj) %*% bi_adj
 fra individ x affiliation matricen (`bi_adj`) laver vi et bipartite/two-mode netværksobjekt
 
 ```{r, warnings = F, messages = F}
-net_twomode <- graph_from_biadjacency_matrix(bi_adj, directed = FALSE, multiple = FALSE) %>% simplify()
+net_twomode <- bi_adj %>% 
+  graph_from_biadjacency_matrix(, directed = FALSE, multiple = FALSE) %>% 
+  simplify() %>% 
+  as_tbl_graph()
 net_twomode
 ```
 
@@ -146,14 +115,20 @@ net_twomode
 fra individ x individ matricen (`adj_ind`) laver vi et one-mode netværk for individer
 
 ```{r, warnings = F, messages = F}
-net_ind <- graph_from_adjacency_matrix(adj_ind, mode = "undirected", diag = FALSE) %>% simplify()
+net_ind <- adj_ind %>% 
+  graph_from_adjacency_matrix(, mode = "undirected", diag = FALSE) %>% 
+  simplify() %>% 
+  as_tbl_graph()
 net_ind
 ```
 
 ## Affiliation-netværk
 
 ```{r, warnings = F, messages = F}
-net_affil <- graph_from_adjacency_matrix(adj_affil, mode = "undirected", diag = FALSE) %>% simplify()
+net_affil <- adj_affil %>% 
+  graph_from_adjacency_matrix(, mode = "undirected", diag = FALSE) %>% 
+  simplify() %>% 
+  as_tbl_graph()
 net_affil
 ```
 
@@ -162,9 +137,9 @@ net_affil
 I det fleste tilfælde vil vi gerne nøjes med at visualere de største komponenter i vores netværk, så vi laver tre reducerede netværksobjekter, som kun indeholder de største komponenter:
 
 ```{r, warnings = F, messages = F}
-net_twomode_l <- largest_component(net_twomode)
-net_ind_l     <- largest_component(net_ind)
-net_affil_l   <- largest_component(net_affil)
+net_twomode_l <- net_twomode %>% mutate(comp = group_components()) %>% filter(comp ==1)
+net_ind_l     <- net_ind %>% mutate(comp = group_components()) %>% filter(comp ==1)
+net_affil_l   <- net_affil %>% mutate(comp = group_components()) %>% filter(comp ==1)
 ```
 
 # Visualiseringer:
@@ -315,16 +290,10 @@ Indtil nu har vi sat nogle faste værdier for størrelse og tykkelse mv. Vi kunn
 
 Lad os derfor først lige tilføje sektor-variablen til vores netværksobjekt som en vertex attribute:
 
-først vil vi gerne lige sørge for at `sector = NA` bliver til `sector = "Unknown"`
 
 ```{r, warnings = F, messages = F}
-den <- den %>% mutate(sector = case_when(is.na(sector)~"Unknown", .default = sector))
-```
-
-```{r, warnings = F, messages = F}
-net_affil_l <- add_vertex_attr(graph = net_affil_l, 
-                               data = den %>% select(affiliation, sector, tags) %>% distinct(),
-                               match_var = "affiliation")
+net_affil_l <- net_affil_l %>% left_join(
+  den %>% select(name = affiliation, type) %>% distinct())
 ```
 
 ## 1) Farve
@@ -349,14 +318,14 @@ Vi kan lade size, shape, alpha og color forblive uden for vores mapping, dvs. so
 
 ```{r, warnings = F, messages = F}
 p + geom_node_point(size = 3, shape = 21, alpha = 0.75, color = "grey15",
-                    mapping = aes(fill = sector))
+                    mapping = aes(fill = type))
 ```
 
-vi kan også mappe sector henover color og lade både indhold og omkreds være styret af sector.
+vi kan også mappe sector henover color og lade både indhold og omkreds være styret af type
 
 ```{r, warnings = F, messages = F}
 p + geom_node_point(size = 3, shape = 21, alpha = 0.75,
-                    mapping = aes(color = sector, fill = sector))
+                    mapping = aes(color = type, fill = type))
 ```
 
 Eller samlet :
@@ -365,7 +334,7 @@ Eller samlet :
 p <- ggraph(net_affil_l) + 
   geom_edge_link0(color = "grey70", width = 0.3, alpha = 0.3) +
   geom_node_point(size = 3, shape = 21, alpha = 0.75,
-                  mapping = aes(color = sector, fill = sector)) + 
+                  mapping = aes(color = type, fill = type)) + 
   theme_graph() +
   labs(title = "Virksomhedsnetværket i finanssektoren", 
               subtitle = paste0("n = ", vcount(net_affil_l)), 
@@ -398,7 +367,7 @@ p + scale_color_brewer(palette = "Set1", aesthetics = c("color", "fill"))
 Vi kan også konstruere vores egen farve skale:
 
 ```{r, warnings = F, messages = F}
-colors <- c("Commissions" = "deeppink4", "Corporations" = "steelblue1", "Family" = "forestgreen", "Foundations" ="steelblue4", "NGO" = "salmon1" , "State" = "magenta", "Unknown"= "grey25", "VL_networks" = "brown")
+colors <- c("Finance" = "deeppink4", "Banks" = "steelblue1", "Pension" = "forestgreen", "Leadership networks" ="steelblue4", "Insurance" = "salmon1")
 ```
 
 og bruge den med `scale_*_manual()`
@@ -415,8 +384,8 @@ Som udgangspunkt får vores legend navn efter den variabel vi mapper. Det kan jo
 Her kan vi bruge `guides()` funktionen + `guide_legend()`
 
 ```{r, warnings = F, messages = F}
-p <- p + guides(fill = guide_legend(title = "Sektor"), 
-           color = guide_legend(title = "Sektor"))
+p <- p + guides(fill = guide_legend(title = "Virksomhedstype"), 
+           color = guide_legend(title = "Virksomhedstype"))
 p
 ```
 
@@ -431,14 +400,15 @@ p + theme(legend.position = "bottom")
 Hvis vi gerne vil ændre rækkefølgen af værdierne på vores legend kan vi definere det i `scale_*_*` elementet for både color og fill samtidigt.
 
 ```{r, warnings = F, messages = F}
-p + scale_color_manual(values = colors, breaks = c("Family", "VL_networks", "Corporations", "Foundations", "State", "Commissions", "NGO", "Unknown"), aesthetics = c("color", "fill"))
+p + scale_color_manual(values = colors, breaks = c("Finance", "Insurance", "Banks", "Pension", "Leadership networks"), aesthetics = c("color", "fill"))
 ```
 
 Vi kan også ændre navnene:
 
 ```{r, warnings = F, messages = F}
-p <- p + scale_color_manual(values = colors, breaks = c("Family", "VL_networks", "Corporations", "Foundations", "State", "Commissions", "NGO", "Unknown"), 
-                       labels = c("Familie", "VL-grupper", "Virksomheder", "Fonde", "Staten", "Kommissioner", "NGOer", "Ukendt"), 
+p <- p + scale_color_manual(values = colors, 
+                            breaks = c("Finance", "Insurance", "Banks", "Pension", "Leadership networks"), 
+                            labels = c("Finans", "Forsikring", "Banker", "Pension", "VL-grupper"), 
                        aesthetics = c("color", "fill"))
 p
 ```
@@ -448,24 +418,18 @@ p
 Lad os beregne betweenness centralitet i vores netværk og lave en rank variabel også
 
 ```{r, warnings = F, messages = F}
-bet     <- betweenness(net_affil_l, normalized = T)
-bet_rnk <- dense_rank(desc(bet))
-```
+net_affil_l     <- net_affil_l %>% 
+  mutate(bet = centrality_betweenness(normalized = T),
+         bet_rnk = bet %>% desc %>% dense_rank)
 
-dem kan vi tilføje til grafobjektet
-
-```{r, warnings = F, messages = F}
-V(net_affil_l)$bet <- bet
-V(net_affil_l)$bet_rnk <- bet_rnk
 ```
 
 Vi gør det samme for closeness (fordi vi skal bruge det senere)
 
 ```{r, warnings = F, messages = F}
-clo     <- closeness(net_affil_l, normalized = T)
-clo_rnk <- dense_rank(desc(clo))
-V(net_affil_l)$clo <- clo
-V(net_affil_l)$clo_rnk <- clo_rnk
+net_affil_l     <- net_affil_l %>% 
+  mutate(clo = centrality_closeness(normalized = T),
+         clo_rnk = clo %>% desc %>% dense_rank)
 ```
 
 ## 1) Size efter et kontinuert mål (fx. betweenness)
@@ -494,8 +458,8 @@ med `scale_size_*` vælger vi størrelsesskalaen for punkterne. Da betweenness e
 p <- ggraph(net_affil_l) + 
   geom_edge_link0(color = "grey70", width = 0.3, alpha = 0.3) +
   geom_node_point(shape = 21, alpha = 0.75,
-                  mapping = aes(size = bet, fill = sector)) + 
-  scale_fill_brewer(name = "Sektor", palette = "Set1") +
+                  mapping = aes(size = bet, fill = type)) + 
+  scale_fill_brewer(name = "Virksomhedstype", palette = "Set1") +
   scale_size_continuous(name = "Betwenness centrality", range = c(1,8)) + 
   theme_graph() +
   labs(title = "Virksomhedsnetværket i finanssektoren", 
@@ -527,8 +491,8 @@ Vi kan nu sortere (`arrange()`) layoutfilen efter betweenness (`bet`) før vi 's
 layout %>% arrange(bet) %>% ggraph() + 
   geom_edge_link0(color = "grey70", width = 0.3, alpha = 0.3) +
   geom_node_point(shape = 21, alpha = 0.75,
-                  mapping = aes(size = bet, fill = sector)) + 
-  scale_fill_brewer(name = "Sektor", palette = "Set1") +
+                  mapping = aes(size = bet, fill = type)) + 
+  scale_fill_brewer(name = "Virksomhedstype", palette = "Set1") +
   scale_size_continuous(name = "Betwenness centrality", range = c(1,8)) + 
   theme_graph() +
   labs(title = "Virksomhedsnetværket i finanssektoren", 
@@ -536,9 +500,9 @@ layout %>% arrange(bet) %>% ggraph() +
               caption = "datakilde: Danish Elitenetwork 2017")
 ```
 
-UPS!!!
+UPS!!! Det går helt galt med edges, som nu ikke længere passer med noderne. Det er fordi koordinaterne nu er sorteret efter betweenness, mens 'referencen' til linjerne (from - to) stadig referer til de 'tidligere' række numre
 
-Jeg har skrevet en funktion `get_edge_coord()` som sources med `networkfunctions.R` scriptet.
+Jeg har skrevet en funktion `get_edge_coord()` som sources med `get_edge_coord.R` 
 
 hvis I sætter den funktion ind i `geom_edge_link0` elementet som `data = get_edge_coord('netværksobjeltet', 'layout tibble')`, så beregner den de rigtige koordinater, som så skal mappes over x, y, xend og yend i `aes()`
 
@@ -546,8 +510,8 @@ hvis I sætter den funktion ind i `geom_edge_link0` elementet som `data = get_ed
 p <- layout %>% arrange(bet) %>% ggraph() + 
   geom_edge_link0(data = get_edge_coord(net_affil_l, layout), mapping = aes(x = x, y = y, xend = xend, yend = yend), color = "grey70", width = 0.3, alpha = 0.3) +
   geom_node_point(shape = 21, alpha = 0.75,
-                  mapping = aes(size = bet, fill = sector)) + 
-  scale_fill_brewer(name = "Sektor", palette = "Set1") +
+                  mapping = aes(size = bet, fill = type)) + 
+  scale_fill_brewer(name = "Virksomhedstype", palette = "Set1") +
   scale_size_continuous(name = "Betwenness centrality", range = c(1,8)) + 
   theme_graph() +
   labs(title = "Virksomhedsnetværket i finanssektoren", 
@@ -630,10 +594,10 @@ Lad os efter samme fremgangsmåde som før lave et plot med closeness i stedet:
 p_clo <- layout %>% arrange(clo) %>% ggraph() + 
   geom_edge_link0(data = get_edge_coord(net_affil_l, layout), mapping = aes(x = x, y = y, xend = xend, yend = yend), color = "grey70", width = 0.3, alpha = 0.3) +
   geom_node_point(shape = 21, alpha = 0.75,
-                  mapping = aes(size = clo, fill = sector)) + 
+                  mapping = aes(size = clo, fill = type)) + 
   geom_node_label(mapping = aes(filter = clo_rnk<=3, label = name), size = 3, alpha = 0.8, family = "serif", repel = T) +
-  scale_fill_brewer(name = "Sektor", palette = "Set1") +
-  scale_size_continuous(name = "Closeness centrality", range = c(1,8)) + 
+  scale_fill_brewer(name = "Virksomhedstype", palette = "Set1") +
+  scale_size_continuous(name = "Closeness centrality", range = c(1,5)) + 
   theme_graph(base_family = "serif", 
               base_size = 12, 
               title_size = 16, 
@@ -673,8 +637,7 @@ Vi kan beregne en række centralitetsmål:
 ```{r, warnings = F, messages = F}
 metrics <- tibble(
   name              = V(net_affil_l)$name,
-  sector            = V(net_affil_l)$sector,
-  tags              = V(net_affil_l)$tags,
+  type              = V(net_affil_l)$type,
   degree            = degree(net_affil_l),
   betweenness       = betweenness(net_affil_l, normalized = T),
   local_betweenness = betweenness(net_affil_l, cutoff = 2, normalized = T),
@@ -690,7 +653,7 @@ Vi kan fx plotte korrelationen mellem betweenness og brokerage
 ```{r, warnings = F, messages = F}
 metrics %>% 
 ggplot() + 
-  geom_point(aes(x = brokerage, y = betweenness, color=sector, size=degree)) + 
+  geom_point(aes(x = brokerage, y = betweenness, color=type, size=degree)) + 
   #geom_label(aes(x = brokerage, y = closeness, label = name2)) +
   scale_color_manual(values=colors) +
   scale_x_continuous(breaks = seq(1,max(metrics$brokerage), 1), name = "1/Burts constraint") +
@@ -708,87 +671,78 @@ Der er ikke ret mange noder i kategorierne Commissions og Unknown, så dem filte
 Vi kan nu prøve at se hvor stor en andel af noderne i de forskellige sektorer, der ligger hhv. højt og lavt på fx brogerage.
 
 ```{r, warnings = F, messages = F}
-metrics %>% filter(!sector %in% c("Commissions", "Unknown")) %>% 
+metrics %>% 
 ggplot() + 
-  geom_density(aes(x = brokerage, fill=sector)) + 
+  geom_density(aes(x = brokerage, fill=type)) + 
   labs(y='share') + 
-  facet_wrap(~sector) + 
+  facet_wrap(~type) + 
   scale_fill_manual(values=colors) + 
   guides(fill = "none") +
   theme_minimal(base_family = "serif") + 
   theme(strip.text.x = element_text(size = 12, face = "bold")) 
 ```
 
-## En masse mål i forhold til hinanden
+<!-- # Beregning af gennemsnit mv. delt op på en variabel  -->
 
-Her kan I bruge min cor_plots funktion, husk at droppe variable i `metrics` der ikke er centralitetsvariable (her `name` og `sector`)
+<!-- Lad os kigge på tags, er der forskel på centralitetsmålene, hvis vi deler noderne op efter deres tags: -->
 
-```{r, warnings = F, messages = F}
-p_cor <- cor_plots(metrics_table = metrics %>% select(-name,-sector, -tags))
-p_cor
-```
+<!-- **Første** skal vi lige **huske** at en node kan have flere tags. Men `separate_longer_delim()` laver vi en nu data tibble, med en række for hver virksomhed for hver tag. -->
 
-# Beregning af gennemsnit mv. delt op på en variabel 
+<!-- ```{r, warnings = F, messages = F} -->
+<!-- metrics_long <- metrics %>% separate_longer_delim(tags, delim = ", ") -->
+<!-- ``` -->
 
-Lad os kigge på tags, er der forskel på centralitetsmålene, hvis vi deler noderne op efter deres tags:
+<!-- Vi vil gerne nøjes med at kigge på vores finans tags, så vi nøjes med de rækker: -->
 
-**Første** skal vi lige **huske** at en node kan have flere tags. Men `separate_longer_delim()` laver vi en nu data tibble, med en række for hver virksomhed for hver tag.
+<!-- ```{r, warnings = F, messages = F} -->
+<!-- metrics_long <- metrics_long %>% filter(tags %in% finans_tags) -->
+<!-- ``` -->
 
-```{r, warnings = F, messages = F}
-metrics_long <- metrics %>% separate_longer_delim(tags, delim = ", ")
-```
+<!-- ```{r, warnings = F, messages = F} -->
+<!-- metrics_long %>% count(tags) -->
+<!-- ``` -->
 
-Vi vil gerne nøjes med at kigge på vores finans tags, så vi nøjes med de rækker:
+<!-- Vi lægger lige FINA og Finance sammen og tager kun unikke name + tags kombinationer (for at slette den ene række for dem, der havde både FINA og Finance. `.keep_all = TRUE` gør at vi beholder alle kolonner. -->
 
-```{r, warnings = F, messages = F}
-metrics_long <- metrics_long %>% filter(tags %in% finans_tags)
-```
+<!-- ```{r, warnings = F, messages = F} -->
+<!-- metrics_long <- metrics_long %>% mutate(tags = case_when(tags == "FINA"~ "Finance", .default = tags)) %>% distinct(name, tags, .keep_all = TRUE) -->
+<!-- ``` -->
 
-```{r, warnings = F, messages = F}
-metrics_long %>% count(tags)
-```
+<!-- Nu kan vi med `group_by` og `summarise` beregne hhv mean max og min for udvalgte centralitetsmål opdelt på tags (som vi gruppere efter) -->
 
-Vi lægger lige FINA og Finance sammen og tager kun unikke name + tags kombinationer (for at slette den ene række for dem, der havde både FINA og Finance. `.keep_all = TRUE` gør at vi beholder alle kolonner.
+<!-- ```{r, warnings = F, messages = F} -->
+<!-- metrics_long %>% group_by(tags) %>% summarise(n = n_distinct(name),  -->
+<!--                       across(.cols = c("degree", "closeness","betweenness", "brokerage"),  -->
+<!--                              .fns = list("Mean" = mean, "Max" = max, "Min" = min))) -->
+<!-- ``` -->
 
-```{r, warnings = F, messages = F}
-metrics_long <- metrics_long %>% mutate(tags = case_when(tags == "FINA"~ "Finance", .default = tags)) %>% distinct(name, tags, .keep_all = TRUE)
-```
+<!-- # Bonus: Hvordan linker virksomheder med forskellige egenskaber til hinanden -->
 
-Nu kan vi med `group_by` og `summarise` beregne hhv mean max og min for udvalgte centralitetsmål opdelt på tags (som vi gruppere efter)
+<!-- Lad os kigge på sektor -->
 
-```{r, warnings = F, messages = F}
-metrics_long %>% group_by(tags) %>% summarise(n = n_distinct(name), 
-                      across(.cols = c("degree", "closeness","betweenness", "brokerage"), 
-                             .fns = list("Mean" = mean, "Max" = max, "Min" = min)))
-```
+<!-- ```{r, warnings = F, messages = F} -->
+<!-- ## Forholdet mellem ties indenfor og mellem tags -->
+<!-- # vi henter en edgelist ud fra netværksobjektet -->
+<!-- e <- as_data_frame(net_affil_l, what = "edges") -->
+<!-- # fordi det er undirected vil vi gerne 'fordoble' det så from-to og to-from er med -->
+<!-- e <- tibble(from = c(e$from, e$to),  -->
+<!--             to   = c(e$to, e$from)) -->
+<!-- # dernæst kan vi left_join'e tags på for henholdsvis from variablen og to variablen. -->
+<!-- e <- e %>%  -->
+<!--   left_join(., tibble(from = V(net_affil_l)$name, from_sector = V(net_affil_l)$sector)) %>%  -->
+<!--   left_join(., tibble(to = V(net_affil_l)$name, to_sector = V(net_affil_l)$sector)) -->
 
-# Bonus: Hvordan linker virksomheder med forskellige egenskaber til hinanden
+<!-- # og lave en summarise(....., .by = from_tag), hvor vi 1. tæller hvor mange der har tag'et og dernæst hvor mange af hvert tags forbindelser, der er til det samme tag og hvor mange der er til et andet tag. -->
+<!-- e %>% summarise(nodes     = n_distinct(from) , ties_within = sum(from_sector == to_sector), -->
+<!--                 ties_out  = sum(from_sector != to_sector), -->
+<!--                 share_out = ties_out / (ties_within + ties_out), .by = from_sector) -->
 
-Lad os kigge på sektor
+<!-- ``` -->
 
-```{r, warnings = F, messages = F}
-## Forholdet mellem ties indenfor og mellem tags
-# vi henter en edgelist ud fra netværksobjektet
-e <- as_data_frame(net_affil_l, what = "edges")
-# fordi det er undirected vil vi gerne 'fordoble' det så from-to og to-from er med
-e <- tibble(from = c(e$from, e$to), 
-            to   = c(e$to, e$from))
-# dernæst kan vi left_join'e tags på for henholdsvis from variablen og to variablen.
-e <- e %>% 
-  left_join(., tibble(from = V(net_affil_l)$name, from_sector = V(net_affil_l)$sector)) %>% 
-  left_join(., tibble(to = V(net_affil_l)$name, to_sector = V(net_affil_l)$sector))
+<!-- Eller hvad med andel af out-going ties fra sektor til sektor: -->
 
-# og lave en summarise(....., .by = from_tag), hvor vi 1. tæller hvor mange der har tag'et og dernæst hvor mange af hvert tags forbindelser, der er til det samme tag og hvor mange der er til et andet tag.
-e %>% summarise(nodes     = n_distinct(from) , ties_within = sum(from_sector == to_sector),
-                ties_out  = sum(from_sector != to_sector),
-                share_out = ties_out / (ties_within + ties_out), .by = from_sector)
-
-```
-
-Eller hvad med andel af out-going ties fra sektor til sektor:
-
-```{r, warnings = F, messages = F}
-sector_tie_table <- xtabs(e, formula = ~from_sector + to_sector)
-diag(sector_tie_table) <- 0
-prop.table(sector_tie_table, margin = 1) %>% round(3)
-```
+<!-- ```{r, warnings = F, messages = F} -->
+<!-- sector_tie_table <- xtabs(e, formula = ~from_sector + to_sector) -->
+<!-- diag(sector_tie_table) <- 0 -->
+<!-- prop.table(sector_tie_table, margin = 1) %>% round(3) -->
+<!-- ``` -->

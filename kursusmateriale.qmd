@@ -123,8 +123,13 @@ farvepaletter og labels for at gøre netværksvisualiseringerne mere informative
 gennemgå, hvordan man kan bruge forskellige typer af skalaer for at fremhæve
 bestemte aspekter af netværket.
 
-[Download script til Session 7 her](scripts til undervisning/Session7.R){.btn .btn-primary}
+[Download script til Session 7 her](scripts til undervisning/Session7_new.R){.btn .btn-primary}
 
 
+[Download datasættet: finans_den17](data/finans_den17.csv){.btn .btn-primary}
+som lægges i undermappen /data i din r-projekt-mappe
+
+[Donload funktione: get_edge_coord.R]("functions/get_edge_coord.R"){.btn .btn-primary}
+som lægges i undermappen /functions i r-projekt-mappen
 
 ---

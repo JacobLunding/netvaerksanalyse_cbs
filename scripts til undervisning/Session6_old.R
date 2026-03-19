@@ -2,6 +2,7 @@ library(tidyverse)
 library(readxl)
 library(writexl)
 library(igraph)
+library(tidygraph)
 library(ggraph)
 library(ggpubr)
 library(Matrix)
@@ -13,6 +14,8 @@ source("functions/custom_functions.R")
 ###################################################################################################/
 # 1. Læs datafil ----
 ###################################################################################################/
+
+
 den <- read_csv("data/den17-no-nordic-letters.csv")
 # kig på data, ser det rigtigt ud
 den %>% head()

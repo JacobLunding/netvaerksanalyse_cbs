@@ -20,6 +20,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -119,8 +154,18 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#data---den-danske-magtelite-anno-2024" id="toc-data---den-danske-magtelite-anno-2024" class="nav-link active" data-scroll-target="#data---den-danske-magtelite-anno-2024">Data - den danske magtelite anno 2024</a>
+  <ul class="collapse">
+  <li><a href="#centralitet-med-og-uden-vægt" id="toc-centralitet-med-og-uden-vægt" class="nav-link" data-scroll-target="#centralitet-med-og-uden-vægt">Centralitet, med og uden vægt</a></li>
+  <li><a href="#grupperinger-i-magteliten" id="toc-grupperinger-i-magteliten" class="nav-link" data-scroll-target="#grupperinger-i-magteliten">Grupperinger i magteliten?</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -144,8 +189,119 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="data---den-danske-magtelite-anno-2024" class="level1">
+<h1>Data - den danske magtelite anno 2024</h1>
+<p>Til denne session skal vi undersøge community strukturen i den danske magtelite. Magtelite er fundet gennem en kerne-analyse af hele det store Danish Elite Network.</p>
+<p>Først indlæser vi en R-data fil, som indeholder to forskellige data objekter:</p>
+<ul>
+<li>Et tidygraph objekt <code>net.pe24</code> , der indeholder nodes og edges i netværket.</li>
+<li>Et datasæt <code>pe24</code> med en række variable der knytter sig til de i alt <code>401</code> personer</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"data/Power Elite 2024.Rda"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>lad os se, hvad <code>pe24</code> indeholder:</p>
+<p>navn, om det er en kvinde hvilken primære organisation vedkommende er knyttet til og hvilken samfundssektor han eller hun primært repræsenterer.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(pe24)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 401
+Columns: 5
+$ name              &lt;chr&gt; "Joachim Holger Waldemar Christian Greve af Monpezat…
+$ women             &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE…
+$ Organisation      &lt;chr&gt; "Hoffet", "Hoffet", "DI", "SOCIALDEMOKRATIET", "Land…
+$ Sektor            &lt;chr&gt; "Stat", "Stat", "Erhvervsorganisationer", "Politik",…
+$ Under_undersektor &lt;chr&gt; NA, NA, "Industri", "Socialdemokraterne", NA, NA, NA…</code></pre>
+</div>
+</div>
+<p>lad os tilføje de variable til vores netværks objekt ved at bruge <code>left_join()</code> .</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>net.pe24 <span class="ot">&lt;-</span> net.pe24 <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(pe24, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"name"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>bemærk at netværksobjektet har en edge variabel <code>weight</code>. Det er i dette tilfælde en værdi der udtrykker afstanden mellem de to noder i nettet. For at kunne bruge de som en reel <code>vægt</code> i det følgende skal vi vende den om, så lille afstand bliver lig stor vægt.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>net.pe24 <span class="ot">&lt;-</span> net.pe24 <span class="sc">%&gt;%</span> <span class="fu">activate</span>(edges) <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">weight_inv =</span> <span class="dv">1</span><span class="sc">/</span>weight) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(nodes)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Det er altså et vægtet netværk vi har at gøre med, hvor forbindelserne mellem folk har en vægt alt efter hvor mange (og i hvilke sammenhænge) de kender hinanden. Det er fx ‘bedre’ at kende hinanden fra en lille bestyrelse, end at have været deltagere i det samme store topmøde.</p>
+<section id="centralitet-med-og-uden-vægt" class="level2">
+<h2 class="anchored" data-anchor-id="centralitet-med-og-uden-vægt">Centralitet, med og uden vægt</h2>
+<p>Når netværket er vægtet er det afgørende for udregningen af fx centralitet at vi forholder os til at om vægten af forbindelsen skal tælle med, når vi udregner målene.</p>
+<p>Lad os udregne nogle af de nodespecifikke centralitetsmål med og uden vægte:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>net.pe24 <span class="ot">&lt;-</span> net.pe24 <span class="sc">%&gt;%</span> <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">degree        =</span> <span class="fu">centrality_degree</span>(),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">betweenness   =</span> <span class="fu">centrality_betweenness</span>(),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">closeness     =</span> <span class="fu">centrality_closeness</span>(),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">eigen         =</span> <span class="fu">centrality_eigen</span>(),</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">constraint    =</span> <span class="fu">node_constraint</span>(),</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">brokerage     =</span> <span class="dv">1</span><span class="sc">/</span> constraint,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">local_trans   =</span> <span class="fu">local_transitivity</span>(),</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">degree_w      =</span> <span class="fu">centrality_degree</span>(<span class="at">weights =</span> weight_inv),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">betweenness_w =</span> <span class="fu">centrality_betweenness</span>(<span class="at">weights =</span> weight_inv),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">closeness_w   =</span> <span class="fu">centrality_closeness</span>(<span class="at">weights =</span> weight_inv),</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">eigen_w       =</span> <span class="fu">centrality_eigen</span>(<span class="at">weights =</span> weight_inv),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">constraint_w  =</span> <span class="fu">node_constraint</span>(<span class="at">weights =</span> weight_inv),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">brokerage_w   =</span> <span class="dv">1</span><span class="sc">/</span> constraint_w,</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">local_trans_w =</span> <span class="fu">local_transitivity</span>(<span class="at">weights =</span> weight_inv))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Hvem er fx de 5 mest centrale målt på betweenness med og uden vægte:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>net.pe24 <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>(<span class="st">"nodes"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(betweenness) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="at">decreasing =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Claus Jensen 14495"          "Brian Mikkelsen 77471"      
+[3] "Lars Sandahl Sørensen 15312" "André Rogaczewski 56739"    
+[5] "Nanna Højlund 15106"        </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>net.pe24 <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>(<span class="st">"nodes"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(betweenness_w) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="at">decreasing =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Niels Jacobsen 21106"                  
+[2] "Ole Wehlast 57326"                     
+[3] "Claus Jensen 14495"                    
+[4] "Morten Bødskov 76196"                  
+[5] "Katherine Richardson Christensen 76349"</code></pre>
+</div>
+</div>
+<p>Claus Jensen fra Dansk Metal går igen, (1. og 3. plads), men ellers er det andre navne.</p>
+</section>
+<section id="grupperinger-i-magteliten" class="level2">
+<h2 class="anchored" data-anchor-id="grupperinger-i-magteliten">Grupperinger i magteliten?</h2>
+<p>Lad os starte med at lave et fast layout, så alle følgende plots ser ens ud!!</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>layout <span class="ot">&lt;-</span> <span class="fu">create_layout</span>(net.pe24, <span class="st">"fr"</span>, <span class="at">weights =</span> weight_inv)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Dernæst kan vi plotte netværket, hvor vi farver noderne efter køn</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>net.pe24 <span class="sc">%&gt;%</span> <span class="fu">ggraph</span>(<span class="at">layout =</span> layout) <span class="sc">+</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link0</span>(<span class="fu">aes</span>(<span class="at">width =</span> weight_inv, <span class="at">alpha =</span> weight_inv), <span class="at">color =</span> <span class="st">"grey40"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_edge_alpha_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_edge_width_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="fl">0.4</span>)) <span class="sc">+</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">fill =</span> women, <span class="at">size =</span> betweenness_w), <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>() <span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">size =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="session6_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Vi har tidligere kigget på assortativity; altså tendensen til at noder, der er ens på et eller andet parameter, i højere grad danner forbindelser med hinanden.</p>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
